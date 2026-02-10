@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz - EMS Learning</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .quiz-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            margin-bottom: 1.5rem;
+        }
+        .question-number {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        .question-text {
+            font-size: 1.2rem;
+            color: #333;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .option {
+            padding: 1rem 1.25rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+        }
+        .option:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+        .option.selected {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+        .option.correct {
+            border-color: #4CAF50;
+            background: #e8f5e9;
+        }
+        .option.incorrect {
+            border-color: #f44336;
+            background: #ffebee;
+        }
+        .option-letter {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+        .option.selected .option-letter {
+            background: #667eea;
+            color: white;
+        }
+        .option.correct .option-letter {
+            background: #4CAF50;
+            color: white;
+        }
+        .option.incorrect .option-letter {
+            background: #f44336;
+            color: white;
+        }
+        .explanation {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            display: none;
+        }
+        .explanation.show {
+            display: block;
+        }
+        .explanation h4 {
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+        .btn {
+            padding: 12px 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+        .score-display {
+            text-align: center;
+            padding: 2rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+        .score-display h2 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+        .final-score {
+            font-size: 4rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>🚑 EMS Learning Platform - Quiz</h1>
+        <span>{{ user.level }} Level</span>
+    </nav>
+    
+    <div class="container">
+        <!-- Quick Topic Filters -->
+        <div class="quick-filters" style="margin-bottom: 1.5rem; padding: 1.5rem; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.08);">
+            <h3 style="margin-bottom: 1rem; color: #333;">🎯 Quick Topic Selection</h3>
+            
+            <!-- Pediatric Topics -->
+            <div style="margin-bottom: 1rem;">
+                <strong style="color: #667eea; display: block; margin-bottom: 0.5rem;">👶 Pediatric Focus</strong>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <a href="/quiz?category=Pediatric" class="topic-btn" style="padding: 8px 16px; background: #e3f2fd; color: #1976d2; border-radius: 20px; text-decoration: none; font-size: 0.9rem; border: 1px solid #bbdefb;">👶 All Pediatric (350+ questions)</a>
+                    <a href="/quiz?category=Fluid+Boluses" class="topic-btn" style="padding: 8px 16px; background: #e8f5e9; color: #388e3c; border-radius: 20px; text-decoration: none; font-size: 0.9rem; border: 1px solid #a5d6a7;">💧 All Fluid Boluses</a>
+                    <a href="/quiz?category=Medications" class="topic-btn" style="padding: 8px 16px; background: #fff3e0; color: #f57c00; border-radius: 20px; text-decoration: none; font-size: 0.9rem; border: 1px solid #ffcc80;">💊 All Medications</a>
+                </div>
+            </div>
+            
+            <!-- Core Topics -->
+            <div style="margin-bottom: 1rem;">
+                <strong style="color: #667eea; display: block; margin-bottom: 0.5rem;">📚 Core Topics</strong>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <a href="/quiz?category=Fluid+Boluses" class="topic-btn" style="padding: 8px 16px; background: #e8f5e9; color: #388e3c; border-radius: 20px; text-decoration: none; font-size: 0.9rem; border: 1px solid #a5d6a7;">Fluid Boluses</a>
+                    <a href="/quiz?category=Medications" class="topic-btn" style="padding: 8px 16px; background: #fff3e0; color: #f57c00; border-radius: 20px; text-decoration: none; font-size: 0.9rem; border: 1px solid #ffcc80;">Medications</a>
+                    <a href="/quiz?category=Trauma" class="topic-btn" style="padding: 8px 16px; background: #ffebee; color: #d32f2f; border-radius: 20px; text-decoration: none; font-size: 0.9rem; border: 1px solid #ef9a9a;">Trauma/TFTC</a>
+                    <a href="/quiz?category=Transport" class="topic-btn" style="padding: 8px 16px; background: #e0f2f1; color: #00796b; border-radius: 20px; text-decoration: none; font-size: 0.9rem; border: 1px solid #80cbc4;">Hospital Selection</a>
+                </div>
+            </div>
+            
+            <!-- All Categories Dropdown -->
+            <form method="GET" action="/quiz" style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #eee;">
+                <label style="font-weight: 600; color: #333;">More topics:</label>
+                <select name="category" onchange="this.form.submit()" style="padding: 8px; border-radius: 6px; border: 1px solid #ddd; min-width: 200px;">
+                    <option value="all">All Categories</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat }}" {% if cat == selected_category %}selected{% endif %}>{{ cat }}</option>
+                    {% endfor %}
+                </select>
+                {% if selected_category != 'all' %}
+                <a href="/quiz" style="color: #667eea; text-decoration: none; font-size: 0.9rem;">✕ Clear filter</a>
+                {% endif %}
+            </form>
+        </div>
+        
+        <!-- Question Count Display -->
+        <div style="background: #e3f2fd; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; text-align: center;">
+            <strong style="color: #1976d2; font-size: 1.2rem;">
+                Showing {{ questions|length }} questions 
+                {% if selected_category != 'all' %}in "{{ selected_category }}"{% endif %}
+                ({{ total_available }} total available)
+            </strong>
+            {% if questions|length < total_available %}
+            <br><small><a href="/quiz?category={{ selected_category }}&limit=all" style="color: #1976d2;">Show all {{ total_available }} questions</a></small>
+            {% endif %}
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+        </div>
+        
+        <div id="quizContainer">
+            {% for q in questions %}
+            <div class="quiz-card question-card" data-question-id="{{ q.id }}" data-correct="{{ q.correct_answer }}" {% if loop.index > 1 %}style="display: none;"{% endif %}>
+                <div class="question-number">Question {{ loop.index }} of {{ questions|length }}</div>
+                <div class="question-text">{{ q.question }}</div>
+                <div class="options">
+                    {% for option in q.get_options() %}
+                    <div class="option" data-index="{{ loop.index0 }}">
+                        <span class="option-letter">{{ ['A', 'B', 'C', 'D'][loop.index0] }}</span>
+                        <span>{{ option }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="explanation" id="explanation-{{ q.id }}">
+                    <h4>Explanation</h4>
+                    <p>{{ q.explanation }}</p>
+                    <small>Source: {{ q.source }}</small>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="score-display hidden" id="finalScore">
+            <h2>Quiz Complete!</h2>
+            <div class="final-score" id="scorePercent">0%</div>
+            <p id="scoreText">You got 0 out of 0 correct</p>
+            <br>
+            <a href="/dashboard" class="btn">Back to Dashboard</a>
+            <a href="/results" class="btn" style="margin-left: 1rem;">View Detailed Results</a>
+        </div>
+        
+        <div class="navigation" id="navigation">
+            <button class="btn" id="prevBtn" disabled>Previous</button>
+            <button class="btn" id="nextBtn" disabled>Next</button>
+        </div>
+    </div>
+    
+    <script>
+        const questions = document.querySelectorAll('.question-card');
+        const totalQuestions = questions.length;
+        let currentQuestion = 0;
+        let answers = {};
+        let score = 0;
+        
+        function updateProgress() {
+            const progress = ((currentQuestion + 1) / totalQuestions) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+        
+        function showQuestion(index) {
+            questions.forEach((q, i) => {
+                q.style.display = i === index ? 'block' : 'none';
+            });
+            document.getElementById('prevBtn').disabled = index === 0;
+            
+            const currentQ = questions[index];
+            const qid = currentQ.dataset.questionId;
+            const answered = answers[qid];
+            const nextBtn = document.getElementById('nextBtn');
+            
+            if (answered) {
+                nextBtn.disabled = false;
+                nextBtn.textContent = index === totalQuestions - 1 ? 'Finish' : 'Next';
+            } else {
+                nextBtn.disabled = true;
+                nextBtn.textContent = 'Next';
+            }
+            
+            updateProgress();
+        }
+        
+        document.querySelectorAll('.option').forEach(option => {
+            option.addEventListener('click', async function() {
+                const card = this.closest('.question-card');
+                const qid = card.dataset.questionId;
+                const correctIndex = parseInt(card.dataset.correct);
+                const selectedIndex = parseInt(this.dataset.index);
+                
+                if (answers[qid]) return; // Already answered
+                
+                // Mark all options
+                card.querySelectorAll('.option').forEach((opt, idx) => {
+                    opt.classList.remove('selected');
+                    if (idx === correctIndex) {
+                        opt.classList.add('correct');
+                    } else if (idx === selectedIndex && idx !== correctIndex) {
+                        opt.classList.add('incorrect');
+                    }
+                });
+                
+                // Show explanation
+                document.getElementById('explanation-' + qid).classList.add('show');
+                
+                // Record answer
+                const correct = selectedIndex === correctIndex;
+                answers[qid] = { correct, selectedIndex };
+                if (correct) score++;
+                
+                // Send to server
+                await fetch('/submit_answer', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        question_id: qid,
+                        correct: correct,
+                        time_spent: 0
+                    })
+                });
+                
+                // Enable next button
+                document.getElementById('nextBtn').disabled = false;
+                document.getElementById('nextBtn').textContent = 
+                    currentQuestion === totalQuestions - 1 ? 'Finish' : 'Next';
+            });
+        });
+        
+        document.getElementById('nextBtn').addEventListener('click', function() {
+            if (currentQuestion < totalQuestions - 1) {
+                currentQuestion++;
+                showQuestion(currentQuestion);
+            } else {
+                // Show final score
+                const percentage = Math.round((score / totalQuestions) * 100);
+                document.getElementById('quizContainer').style.display = 'none';
+                document.getElementById('navigation').style.display = 'none';
+                document.getElementById('finalScore').classList.remove('hidden');
+                document.getElementById('scorePercent').textContent = percentage + '%';
+                document.getElementById('scoreText').textContent = 
+                    `You got ${score} out of ${totalQuestions} correct`;
+            }
+        });
+        
+        document.getElementById('prevBtn').addEventListener('click', function() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                showQuestion(currentQuestion);
+            }
+        });
+        
+        // Initialize
+        showQuestion(0);
+    </script>
+</body>
+</html>
