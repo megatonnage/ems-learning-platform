@@ -2849,6 +2849,118 @@ def init_sample_questions():
     
     db.session.commit()
 
+# ==================== ADMIN ROUTES ====================
+
+@app.route('/admin')
+def admin_dashboard():
+    """Admin dashboard to manage questions"""
+    questions = Question.query.order_by(Question.category, Question.level).all()
+    categories = db.session.query(Question.category).distinct().all()
+    categories = [c[0] for c in categories]
+    return render_template('admin.html', questions=questions, categories=categories)
+
+@app.route('/admin/question/new', methods=['POST'])
+def admin_create_question():
+    """Create a new question"""
+    try:
+        question = Question(
+            level=request.form['level'],
+            category=request.form['category'],
+            subcategory=request.form.get('subcategory', ''),
+            question=request.form['question'],
+            options=json.dumps([
+                request.form['option_0'],
+                request.form['option_1'],
+                request.form['option_2'],
+                request.form['option_3']
+            ]),
+            correct_answer=int(request.form['correct_answer']),
+            explanation=request.form['explanation'],
+            source=request.form.get('source', '')
+        )
+        db.session.add(question)
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Question created successfully'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
+
+@app.route('/admin/question/<int:question_id>/edit', methods=['POST'])
+def admin_update_question(question_id):
+    """Update an existing question"""
+    try:
+        question = Question.query.get_or_404(question_id)
+        question.level = request.form['level']
+        question.category = request.form['category']
+        question.subcategory = request.form.get('subcategory', '')
+        question.question = request.form['question']
+        question.options = json.dumps([
+            request.form['option_0'],
+            request.form['option_1'],
+            request.form['option_2'],
+            request.form['option_3']
+        ])
+        question.correct_answer = int(request.form['correct_answer'])
+        question.explanation = request.form['explanation']
+        question.source = request.form.get('source', '')
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Question updated successfully'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
+
+@app.route('/admin/question/<int:question_id>/delete', methods=['POST'])
+def admin_delete_question(question_id):
+    """Delete a question"""
+    try:
+        question = Question.query.get_or_404(question_id)
+        db.session.delete(question)
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Question deleted successfully'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
+
+@app.route('/admin/question/<int:question_id>/json')
+def admin_get_question_json(question_id):
+    """Get question data as JSON for editing"""
+    question = Question.query.get_or_404(question_id)
+    return jsonify({
+        'id': question.id,
+        'level': question.level,
+        'category': question.category,
+        'subcategory': question.subcategory,
+        'question': question.question,
+        'options': question.get_options(),
+        'correct_answer': question.correct_answer,
+        'explanation': question.explanation,
+        'source': question.source
+    })
+
+@app.route('/admin/categories')
+def admin_get_categories():
+    """Get all unique categories"""
+    categories = db.session.query(Question.category).distinct().all()
+    return jsonify([c[0] for c in categories])
+
+@app.route('/admin/stats')
+def admin_stats():
+    """Get admin statistics"""
+    total_questions = Question.query.count()
+    by_level = {
+        'EMT': Question.query.filter_by(level='EMT').count(),
+        'AEMT': Question.query.filter_by(level='AEMT').count(),
+        'PARAMEDIC': Question.query.filter_by(level='PARAMEDIC').count()
+    }
+    by_category = {}
+    for cat in db.session.query(Question.category).distinct():
+        by_category[cat[0]] = Question.query.filter_by(category=cat[0]).count()
+    
+    return jsonify({
+        'total_questions': total_questions,
+        'by_level': by_level,
+        'by_category': by_category
+    })
+
+# ==================== MAIN ====================
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
