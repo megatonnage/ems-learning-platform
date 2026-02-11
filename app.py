@@ -48,6 +48,19 @@ class Question(db.Model):
     def get_options(self):
         return json.loads(self.options)
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'level': self.level,
+            'category': self.category,
+            'subcategory': self.subcategory,
+            'question': self.question,
+            'options': self.options,
+            'correct_answer': self.correct_answer,
+            'explanation': self.explanation,
+            'source': self.source
+        }
+
 class Answer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
@@ -63,7 +76,7 @@ def index():
 
 @app.route('/register', methods=['POST'])
 def register():
-    name = request.form['name']
+    name = request.form.get('name', 'Student')
     level = request.form['level']
     user = User(name=name, level=level)
     db.session.add(user)
@@ -203,13 +216,62 @@ def api_stats():
     user = User.query.get(session['user_id'])
     return jsonify(user.get_score_stats())
 
+# Admin Routes
+@app.route('/admin')
+def admin():
+    questions = Question.query.all()
+    categories = db.session.query(Question.category).distinct().all()
+    categories = [c[0] for c in categories if c[0]]
+    return render_template('admin.html', questions=questions, categories=categories)
+
+@app.route('/admin/question/add', methods=['POST'])
+def add_question():
+    data = request.json
+    q = Question(
+        level=data['level'],
+        category=data['category'],
+        subcategory=data['subcategory'],
+        question=data['question'],
+        options=data['options'],  # Already JSON string from frontend
+        correct_answer=data['correct_answer'],
+        explanation=data['explanation'],
+        source=data['source']
+    )
+    db.session.add(q)
+    db.session.commit()
+    return jsonify({'success': True, 'id': q.id})
+
+@app.route('/admin/question/edit/<int:id>', methods=['POST'])
+def edit_question(id):
+    q = Question.query.get_or_404(id)
+    data = request.json
+    
+    q.level = data['level']
+    q.category = data['category']
+    q.subcategory = data['subcategory']
+    q.question = data['question']
+    q.options = data['options']
+    q.correct_answer = data['correct_answer']
+    q.explanation = data['explanation']
+    q.source = data['source']
+    
+    db.session.commit()
+    return jsonify({'success': True})
+
+@app.route('/admin/question/delete/<int:id>', methods=['POST'])
+def delete_question(id):
+    q = Question.query.get_or_404(id)
+    db.session.delete(q)
+    db.session.commit()
+    return jsonify({'success': True})
+
 # Initialize with sample questions
 def init_sample_questions():
     """Add comprehensive SNHD protocol questions"""
     sample_questions = [
         # === FLUID BOLUSES - ADULT ===
         {
-            'level': 'EMT',
+            'level': 'AEMT',
             'category': 'Fluid Boluses',
             'subcategory': 'Adult',
             'question': 'What is the standard adult fluid bolus amount for a patient in shock?',
@@ -219,7 +281,7 @@ def init_sample_questions():
             'source': 'SNHD Protocols - Fluid Therapy'
         },
         {
-            'level': 'EMT',
+            'level': 'AEMT',
             'category': 'Fluid Boluses',
             'subcategory': 'Adult',
             'question': 'For an adult trauma patient with suspected hemorrhagic shock, how much fluid should be administered before reassessment?',
@@ -229,7 +291,7 @@ def init_sample_questions():
             'source': 'SNHD Protocols - Shock'
         },
         {
-            'level': 'PARAMEDIC',
+            'level': 'AEMT',
             'category': 'Fluid Boluses',
             'subcategory': 'Adult',
             'question': 'In traumatic brain injury with signs of herniation, what is the target systolic BP for fluid resuscitation?',
@@ -241,7 +303,7 @@ def init_sample_questions():
         
         # === FLUID BOLUSES - PEDIATRIC ===
         {
-            'level': 'EMT',
+            'level': 'AEMT',
             'category': 'Fluid Boluses',
             'subcategory': 'Pediatric',
             'question': 'What is the pediatric fluid bolus amount per kg for shock?',
@@ -251,7 +313,7 @@ def init_sample_questions():
             'source': 'SNHD Protocols - Pediatric Shock'
         },
         {
-            'level': 'EMT',
+            'level': 'AEMT',
             'category': 'Fluid Boluses',
             'subcategory': 'Pediatric',
             'question': 'Maximum single fluid bolus for a pediatric patient should not exceed:',
@@ -505,7 +567,7 @@ def init_sample_questions():
             'source': 'SNHD Protocols - Fluid Therapy'
         },
         {
-            'level': 'EMT',
+            'level': 'AEMT',
             'category': 'Fluid Boluses',
             'subcategory': 'Pediatric',
             'question': 'How many fluid boluses can be given to a pediatric patient before reassessment?',
@@ -515,7 +577,7 @@ def init_sample_questions():
             'source': 'SNHD Protocols - Pediatric Shock'
         },
         {
-            'level': 'PARAMEDIC',
+            'level': 'AEMT',
             'category': 'Fluid Boluses',
             'subcategory': 'Adult',
             'question': 'In sepsis with hypotension, what is the initial fluid bolus?',
@@ -525,7 +587,7 @@ def init_sample_questions():
             'source': 'SNHD Protocols - Sepsis'
         },
         {
-            'level': 'EMT',
+            'level': 'AEMT',
             'category': 'Fluid Boluses',
             'subcategory': 'Adult',
             'question': 'Fluid boluses are contraindicated in which condition?',
@@ -545,7 +607,7 @@ def init_sample_questions():
             'source': 'SNHD Protocols - Pediatric Dehydration'
         },
         {
-            'level': 'PARAMEDIC',
+            'level': 'AEMT',
             'category': 'Fluid Boluses',
             'subcategory': 'Adult',
             'question': 'In hemorrhagic shock, permissive hypotension targets what SBP range?',
@@ -2965,4 +3027,4 @@ if __name__ == '__main__':
     with app.app_context():
         db.create_all()
         init_sample_questions()
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=5001)

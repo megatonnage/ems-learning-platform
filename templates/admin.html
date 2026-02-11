@@ -1,169 +1,190 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - EMS Learning Platform</title>
+    <title>Admin Panel - EMS Learning</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f5f5f5;
+            background: #f5f7fa;
+            color: #333;
             min-height: 100vh;
         }
-        .header {
+
+        .navbar {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 1.5rem 2rem;
+            padding: 1rem 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
-        .header h1 { font-size: 1.5rem; }
-        .header a {
+
+        .navbar h1 {
+            font-size: 1.3rem;
+        }
+
+        .nav-links a {
             color: white;
             text-decoration: none;
-            padding: 0.5rem 1rem;
-            background: rgba(255,255,255,0.2);
-            border-radius: 6px;
-            transition: background 0.3s;
+            margin-left: 1.5rem;
+            font-weight: 500;
+            opacity: 0.9;
         }
-        .header a:hover { background: rgba(255,255,255,0.3); }
+
+        .nav-links a:hover {
+            opacity: 1;
+        }
+
         .container {
             max-width: 1400px;
-            margin: 0 auto;
-            padding: 2rem;
+            margin: 2rem auto;
+            padding: 0 1rem;
         }
-        .stats-bar {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-        .stat-card {
+
+        /* Controls Section */
+        .controls {
             background: white;
             padding: 1.5rem;
             border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        .stat-card h3 {
-            font-size: 0.875rem;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 0.5rem;
-        }
-        .stat-card .number {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #667eea;
-        }
-        .actions {
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
             display: flex;
             gap: 1rem;
-            margin-bottom: 2rem;
+            align-items: center;
             flex-wrap: wrap;
         }
-        .btn {
-            padding: 0.75rem 1.5rem;
-            border: none;
+
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
             border-radius: 8px;
             font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
         }
+
+        .filter-group {
+            display: flex;
+            gap: 1rem;
+        }
+
+        select {
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: white;
+            cursor: pointer;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
         .btn-primary {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
         }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-        }
+
         .btn-danger {
-            background: #ef4444;
+            background: #ff4757;
             color: white;
         }
+
         .btn-secondary {
-            background: #e5e7eb;
-            color: #374151;
+            background: #e0e0e0;
+            color: #333;
         }
-        .filters {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 12px;
-            margin-bottom: 2rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        .filters label {
-            font-weight: 500;
-            color: #374151;
-        }
-        .filters select, .filters input {
-            padding: 0.5rem;
-            border: 2px solid #e5e7eb;
-            border-radius: 6px;
-            font-size: 1rem;
-        }
-        .questions-list {
+
+        /* Table Section */
+        .table-container {
             background: white;
             border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
             overflow: hidden;
+            overflow-x: auto;
         }
-        .question-item {
-            padding: 1.5rem;
-            border-bottom: 1px solid #e5e7eb;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 1rem;
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
         }
-        .question-item:last-child { border-bottom: none; }
-        .question-item:hover { background: #f9fafb; }
-        .question-content {
-            flex: 1;
+
+        th,
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
         }
-        .question-header {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 0.5rem;
-            flex-wrap: wrap;
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #555;
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
         }
+
+        th:hover {
+            background: #f0f0f0;
+        }
+
+        .sort-icon::after {
+            content: '↕';
+            font-size: 0.8em;
+            margin-left: 5px;
+            color: #999;
+        }
+
+        /* Question Rows */
+        .q-text {
+            max-width: 400px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
         .badge {
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
             font-weight: 600;
         }
-        .badge-level-EMT { background: #dbeafe; color: #1e40af; }
-        .badge-level-AEMT { background: #fef3c7; color: #92400e; }
-        .badge-level-PARAMEDIC { background: #fce7f3; color: #be185d; }
-        .badge-category { background: #f3f4f6; color: #4b5563; }
-        .question-text {
-            font-size: 1rem;
-            color: #111827;
-            margin-bottom: 0.5rem;
-            line-height: 1.5;
+
+        .badge-emt {
+            background: #e3f2fd;
+            color: #1976d2;
         }
-        .question-meta {
-            font-size: 0.875rem;
-            color: #6b7280;
+
+        .badge-aemt {
+            background: #e8f5e9;
+            color: #388e3c;
         }
-        .question-actions {
-            display: flex;
-            gap: 0.5rem;
-        }
-        .btn-small {
-            padding: 0.5rem;
-            font-size: 0.875rem;
+
+        .badge-paramedic {
+            background: #fff3e0;
+            color: #f57c00;
         }
 
         /* Modal */
@@ -174,283 +195,204 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.5);
             z-index: 1000;
-            align-items: center;
             justify-content: center;
+            align-items: center;
+            padding: 1rem;
         }
-        .modal.active { display: flex; }
+
+        .modal.active {
+            display: flex;
+        }
+
         .modal-content {
             background: white;
-            border-radius: 16px;
-            max-width: 700px;
-            width: 90%;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 600px;
             max-height: 90vh;
             overflow-y: auto;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
+
         .modal-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid #e5e7eb;
             display: flex;
             justify-content: space-between;
             align-items: center;
-        }
-        .modal-header h2 { color: #111827; }
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #6b7280;
-        }
-        .modal-body {
-            padding: 1.5rem;
-        }
-        .form-group {
             margin-bottom: 1.5rem;
         }
-        .form-group label {
+
+        .close-modal {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .form-row {
+            margin-bottom: 1rem;
+        }
+
+        .form-row label {
             display: block;
             margin-bottom: 0.5rem;
             font-weight: 500;
-            color: #374151;
         }
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
+
+        textarea {
             width: 100%;
-            padding: 0.75rem;
-            border: 2px solid #e5e7eb;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
             border-radius: 8px;
-            font-size: 1rem;
             font-family: inherit;
-        }
-        .form-group textarea {
-            resize: vertical;
             min-height: 100px;
-        }
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        .options-grid {
-            display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 0.75rem;
-            align-items: center;
-        }
-        .radio-label {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            cursor: pointer;
-        }
-        .modal-footer {
-            padding: 1.5rem;
-            border-top: 1px solid #e5e7eb;
-            display: flex;
-            justify-content: flex-end;
-            gap: 1rem;
+            resize: vertical;
         }
 
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 1rem 1.5rem;
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
             border-radius: 8px;
-            color: white;
-            font-weight: 500;
-            z-index: 2000;
-            animation: slideIn 0.3s ease;
-        }
-        .notification.success { background: #10b981; }
-        .notification.error { background: #ef4444; }
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
         }
 
-        .empty-state {
-            text-align: center;
-            padding: 3rem;
-            color: #6b7280;
+        .option-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 5px;
+            align-items: center;
         }
-        .empty-state-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
+
+        .radio-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
         }
     </style>
 </head>
+
 <body>
-    <div class="header">
-        <h1>🚑 EMS Learning Platform - Admin</h1>
-        <a href="/">← Back to App</a>
-    </div>
+    <nav class="navbar">
+        <h1>🛠️ EMS Admin Panel</h1>
+        <div class="nav-links">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/">Home</a>
+        </div>
+    </nav>
 
     <div class="container">
-        <div class="stats-bar" id="statsBar">
-            <div class="stat-card">
-                <h3>Total Questions</h3>
-                <div class="number" id="totalQuestions">-</div>
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search questions..." onkeyup="filterTable()">
             </div>
-            <div class="stat-card">
-                <h3>EMT Level</h3>
-                <div class="number" id="emtCount">-</div>
+            <div class="filter-group">
+                <select id="levelFilter" onchange="filterTable()">
+                    <option value="">All Levels</option>
+                    <option value="EMT">EMT</option>
+                    <option value="AEMT">AEMT</option>
+                    <option value="PARAMEDIC">Paramedic</option>
+                </select>
+                <select id="categoryFilter" onchange="filterTable()">
+                    <option value="">All Categories</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat }}">{{ cat }}</option>
+                    {% endfor %}
+                </select>
             </div>
-            <div class="stat-card">
-                <h3>AEMT Level</h3>
-                <div class="number" id="aemtCount">-</div>
-            </div>
-            <div class="stat-card">
-                <h3>Paramedic</h3>
-                <div class="number" id="paramedicCount">-</div>
-            </div>
+            <button class="btn btn-primary" onclick="openModal('add')">+ Add Question</button>
         </div>
 
-        <div class="actions">
-            <button class="btn btn-primary" onclick="openModal()">
-                <span>+</span> Add New Question
-            </button>
-        </div>
-
-        <div class="filters">
-            <label>Filter by Level:</label>
-            <select id="filterLevel" onchange="applyFilters()">
-                <option value="">All Levels</option>
-                <option value="EMT">EMT</option>
-                <option value="AEMT">AEMT</option>
-                <option value="PARAMEDIC">Paramedic</option>
-            </select>
-
-            <label>Filter by Category:</label>
-            <select id="filterCategory" onchange="applyFilters()">
-                <option value="">All Categories</option>
-                {% for cat in categories %}
-                <option value="{{ cat }}">{{ cat }}</option>
-                {% endfor %}
-            </select>
-
-            <label>Search:</label>
-            <input type="text" id="searchText" placeholder="Search questions..." onkeyup="applyFilters()">
-        </div>
-
-        <div class="questions-list" id="questionsList">
-            {% for q in questions %}
-            <div class="question-item" data-id="{{ q.id }}" data-level="{{ q.level }}" data-category="{{ q.category }}">
-                <div class="question-content">
-                    <div class="question-header">
-                        <span class="badge badge-level-{{ q.level }}">{{ q.level }}</span>
-                        <span class="badge badge-category">{{ q.category }}</span>
-                        {% if q.subcategory %}
-                        <span class="badge badge-category">{{ q.subcategory }}</span>
-                        {% endif %}
-                    </div>
-                    <div class="question-text">{{ q.question }}</div>
-                    <div class="question-meta">
-                        Source: {{ q.source or 'N/A' }}
-                    </div>
-                </div>
-                <div class="question-actions">
-                    <button class="btn btn-secondary btn-small" onclick="editQuestion({{ q.id }})">✏️ Edit</button>
-                    <button class="btn btn-danger btn-small" onclick="deleteQuestion({{ q.id }})">🗑️ Delete</button>
-                </div>
-            </div>
-            {% else %}
-            <div class="empty-state">
-                <div class="empty-state-icon">📚</div>
-                <h3>No questions yet</h3>
-                <p>Add your first question to get started!</p>
-            </div>
-            {% endfor %}
+        <div class="table-container">
+            <table id="questionsTable">
+                <thead>
+                    <tr>
+                        <th onclick="sortTable(0)" class="sort-icon">ID</th>
+                        <th onclick="sortTable(1)" class="sort-icon">Level</th>
+                        <th onclick="sortTable(2)" class="sort-icon">Category</th>
+                        <th onclick="sortTable(3)" class="sort-icon">Question</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for q in questions %}
+                    <tr data-id="{{ q.id }}" data-level="{{ q.level }}" data-category="{{ q.category }}">
+                        <td>{{ q.id }}</td>
+                        <td><span class="badge badge-{{ q.level.lower() }}">{{ q.level }}</span></td>
+                        <td>{{ q.category }} <br><span style="font-size:0.8em; color:#666">{{ q.subcategory }}</span>
+                        </td>
+                        <td class="q-text" title="{{ q.question }}">{{ q.question }}</td>
+                        <td>
+                            <button class="btn btn-secondary" style="padding:5px 10px; font-size:0.8rem"
+                                onclick='openModal("edit", {{ q.id }}, {{ q.to_dict() | tojson }})'>Edit</button>
+                            <button class="btn btn-danger" style="padding:5px 10px; font-size:0.8rem"
+                                onclick="deleteQuestion({{ q.id }})">Delete</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 
-    <!-- Modal for Add/Edit -->
+    <!-- Question Modal -->
     <div class="modal" id="questionModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 id="modalTitle">Add New Question</h2>
-                <button class="modal-close" onclick="closeModal()">&times;</button>
+                <h2 id="modalTitle">Add Question</h2>
+                <span class="close-modal" onclick="closeModal()">&times;</span>
             </div>
-            <form id="questionForm">
-                <input type="hidden" id="questionId" name="question_id">
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label for="level">NREMT Level *</label>
-                        <select id="level" name="level" required>
+            <form id="questionForm" onsubmit="handleFormSubmit(event)">
+                <input type="hidden" id="editId" name="id">
+
+                <div class="form-row" style="display:flex; gap:1rem">
+                    <div style="flex:1">
+                        <label>Level</label>
+                        <select id="qLevel" name="level" required>
                             <option value="EMT">EMT</option>
                             <option value="AEMT">AEMT</option>
                             <option value="PARAMEDIC">Paramedic</option>
                         </select>
                     </div>
-
-                    <div class="form-group">
-                        <label for="category">Category *</label>
-                        <input type="text" id="category" name="category" required 
-                               placeholder="e.g., Fluid Boluses, Medications, Trauma">
+                    <div style="flex:1">
+                        <label>Category</label>
+                        <input type="text" id="qCategory" name="category" required list="catList">
+                        <datalist id="catList">
+                            {% for cat in categories %}
+                            <option value="{{ cat }}">
+                                {% endfor %}
+                        </datalist>
                     </div>
-
-                    <div class="form-group">
-                        <label for="subcategory">Subcategory</label>
-                        <input type="text" id="subcategory" name="subcategory" 
-                               placeholder="e.g., Adult, Pediatric, Dosages">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="question">Question *</label>
-                        <textarea id="question" name="question" required 
-                                  placeholder="Enter your question here..."></textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Answer Options * (Select the correct one)</label>
-                        <div class="options-grid">
-                            <input type="text" id="option_0" name="option_0" required placeholder="Option A">
-                            <label class="radio-label">
-                                <input type="radio" name="correct_answer" value="0" required>
-                                Correct
-                            </label>
-                        </div>
-                        <div class="options-grid">
-                            <input type="text" id="option_1" name="option_1" required placeholder="Option B">
-                            <label class="radio-label">
-                                <input type="radio" name="correct_answer" value="1">
-                                Correct
-                            </label>
-                        </div>
-                        <div class="options-grid">
-                            <input type="text" id="option_2" name="option_2" required placeholder="Option C">
-                            <label class="radio-label">
-                                <input type="radio" name="correct_answer" value="2">
-                                Correct
-                            </label>
-                        </div>
-                        <div class="options-grid">
-                            <input type="text" id="option_3" name="option_3" required placeholder="Option D">
-                            <label class="radio-label">
-                                <input type="radio" name="correct_answer" value="3">
-                                Correct
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="explanation">Explanation *</label>
-                        <textarea id="explanation" name="explanation" required 
-                                  placeholder="Explain why the correct answer is right..."></textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="source">Source</label>
-                        <input type="text" id="source" name="source" 
-                               placeholder="e.g., SNHD Protocols - Section Name">
+                    <div style="flex:1">
+                        <label>Subcategory</label>
+                        <input type="text" id="qSubcategory" name="subcategory" required>
                     </div>
                 </div>
-                <div class="modal-footer">
+
+                <div class="form-row">
+                    <label>Question Text</label>
+                    <textarea id="qText" name="question" required></textarea>
+                </div>
+
+                <div class="form-row">
+                    <label>Options (Select correct one)</label>
+                    <div id="optionsContainer">
+                        <!-- Options injected by JS -->
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <label>Explanation</label>
+                    <textarea id="qExplanation" name="explanation" required></textarea>
+                </div>
+
+                <div class="form-row">
+                    <label>Source/Reference</label>
+                    <input type="text" id="qSource" name="source" placeholder="e.g., SNHD Protocols - Section X">
+                </div>
+
+                <div style="text-align:right">
                     <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
                     <button type="submit" class="btn btn-primary">Save Question</button>
                 </div>
@@ -459,128 +401,186 @@
     </div>
 
     <script>
-        // Load stats on page load
-        loadStats();
+        // Modal & Form Handling
+        function openModal(mode, id = null, data = null) {
+            const modal = document.getElementById('questionModal');
+            const title = document.getElementById('modalTitle');
+            const form = document.getElementById('questionForm');
+            const optionsContainer = document.getElementById('optionsContainer');
 
-        function loadStats() {
-            fetch('/admin/stats')
-                .then(r => r.json())
-                .then(data => {
-                    document.getElementById('totalQuestions').textContent = data.total_questions;
-                    document.getElementById('emtCount').textContent = data.by_level.EMT;
-                    document.getElementById('aemtCount').textContent = data.by_level.AEMT;
-                    document.getElementById('paramedicCount').textContent = data.by_level.PARAMEDIC;
-                });
-        }
+            // Reset form
+            form.reset();
+            optionsContainer.innerHTML = '';
 
-        function applyFilters() {
-            const level = document.getElementById('filterLevel').value;
-            const category = document.getElementById('filterCategory').value;
-            const search = document.getElementById('searchText').value.toLowerCase();
+            // Initialize options inputs
+            const currentOptions = data ? JSON.parse(data.options) : ['', '', '', ''];
+            const correctIndex = data ? data.correct_answer : 0;
 
-            document.querySelectorAll('.question-item').forEach(item => {
-                const itemLevel = item.dataset.level;
-                const itemCategory = item.dataset.category;
-                const itemText = item.querySelector('.question-text').textContent.toLowerCase();
+            for (let i = 0; i < 4; i++) {
+                const div = document.createElement('div');
+                div.className = 'option-group';
+                div.innerHTML = `
+                    <div class="radio-wrapper">
+                        <input type="radio" name="correct_answer" value="${i}" ${i === correctIndex ? 'checked' : ''} required>
+                    </div>
+                    <input type="text" name="options[]" placeholder="Option ${String.fromCharCode(65 + i)}" value="${currentOptions[i] || ''}" required>
+                `;
+                optionsContainer.appendChild(div);
+            }
 
-                const levelMatch = !level || itemLevel === level;
-                const categoryMatch = !category || itemCategory === category;
-                const searchMatch = !search || itemText.includes(search);
+            if (mode === 'edit' && data) {
+                title.textContent = 'Edit Question #' + id;
+                document.getElementById('editId').value = id;
+                document.getElementById('qLevel').value = data.level;
+                document.getElementById('qCategory').value = data.category;
+                document.getElementById('qSubcategory').value = data.subcategory;
+                document.getElementById('qText').value = data.question;
+                document.getElementById('qExplanation').value = data.explanation;
+                document.getElementById('qSource').value = data.source;
+            } else {
+                title.textContent = 'Add New Question';
+                document.getElementById('editId').value = '';
+            }
 
-                item.style.display = levelMatch && categoryMatch && searchMatch ? 'flex' : 'none';
-            });
-        }
-
-        function openModal() {
-            document.getElementById('questionForm').reset();
-            document.getElementById('questionId').value = '';
-            document.getElementById('modalTitle').textContent = 'Add New Question';
-            document.getElementById('questionModal').classList.add('active');
+            modal.classList.add('active');
         }
 
         function closeModal() {
             document.getElementById('questionModal').classList.remove('active');
         }
 
-        function editQuestion(id) {
-            fetch(`/admin/question/${id}/json`)
-                .then(r => r.json())
-                .then(data => {
-                    document.getElementById('questionId').value = data.id;
-                    document.getElementById('level').value = data.level;
-                    document.getElementById('category').value = data.category;
-                    document.getElementById('subcategory').value = data.subcategory || '';
-                    document.getElementById('question').value = data.question;
-                    document.getElementById('option_0').value = data.options[0];
-                    document.getElementById('option_1').value = data.options[1];
-                    document.getElementById('option_2').value = data.options[2];
-                    document.getElementById('option_3').value = data.options[3];
-                    document.querySelector(`input[name="correct_answer"][value="${data.correct_answer}"]`).checked = true;
-                    document.getElementById('explanation').value = data.explanation;
-                    document.getElementById('source').value = data.source || '';
-
-                    document.getElementById('modalTitle').textContent = 'Edit Question';
-                    document.getElementById('questionModal').classList.add('active');
-                });
-        }
-
-        function deleteQuestion(id) {
-            if (!confirm('Are you sure you want to delete this question? This cannot be undone.')) {
-                return;
-            }
-
-            fetch(`/admin/question/${id}/delete`, {
-                method: 'POST'
-            })
-            .then(r => r.json())
-            .then(data => {
-                if (data.success) {
-                    showNotification('Question deleted successfully', 'success');
-                    document.querySelector(`.question-item[data-id="${id}"]`).remove();
-                    loadStats();
-                } else {
-                    showNotification(data.error, 'error');
-                }
-            });
-        }
-
-        document.getElementById('questionForm').addEventListener('submit', function(e) {
+        async function handleFormSubmit(e) {
             e.preventDefault();
+            const formData = new FormData(e.target);
+            const id = formData.get('id');
+            const url = id ? `/admin/question/edit/${id}` : '/admin/question/add';
 
-            const formData = new FormData(this);
-            const questionId = document.getElementById('questionId').value;
-            const url = questionId 
-                ? `/admin/question/${questionId}/edit` 
-                : '/admin/question/new';
+            // Collect options into JSON array
+            const options = formData.getAll('options[]');
 
-            fetch(url, {
-                method: 'POST',
-                body: formData
-            })
-            .then(r => r.json())
-            .then(data => {
-                if (data.success) {
-                    showNotification(data.message, 'success');
-                    closeModal();
-                    setTimeout(() => location.reload(), 500);
+            const payload = {
+                level: formData.get('level'),
+                category: formData.get('category'),
+                subcategory: formData.get('subcategory'),
+                question: formData.get('question'),
+                options: JSON.stringify(options),
+                correct_answer: parseInt(formData.get('correct_answer')),
+                explanation: formData.get('explanation'),
+                source: formData.get('source')
+            };
+
+            try {
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    location.reload();
                 } else {
-                    showNotification(data.error, 'error');
+                    alert('Error saving question');
                 }
-            });
-        });
-
-        function showNotification(message, type) {
-            const notif = document.createElement('div');
-            notif.className = `notification ${type}`;
-            notif.textContent = message;
-            document.body.appendChild(notif);
-            setTimeout(() => notif.remove(), 3000);
+            } catch (err) {
+                console.error(err);
+                alert('Connection error');
+            }
         }
 
-        // Close modal on outside click
-        document.getElementById('questionModal').addEventListener('click', function(e) {
-            if (e.target === this) closeModal();
-        });
+        async function deleteQuestion(id) {
+            if (!confirm(`Are you sure you want to delete Question #${id}?`)) return;
+
+            try {
+                const res = await fetch(`/admin/question/delete/${id}`, { method: 'POST' });
+                if (res.ok) {
+                    location.reload();
+                } else {
+                    alert('Error deleting question');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Connection error');
+            }
+        }
+
+        // Filtering
+        function filterTable() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const level = document.getElementById('levelFilter').value;
+            const category = document.getElementById('categoryFilter').value;
+
+            const levelMap = { 'EMT': 1, 'AEMT': 2, 'PARAMEDIC': 3 };
+
+            const rows = document.querySelectorAll('#questionsTable tbody tr');
+
+            rows.forEach(row => {
+                const text = row.querySelector('.q-text').textContent.toLowerCase();
+                const rLevel = row.dataset.level;
+                const rCat = row.dataset.category;
+                const rId = row.dataset.id;
+
+                let matches = true;
+
+                if (search && !text.includes(search) && !rId.includes(search)) matches = false;
+
+                // Hierarchical Level Filtering
+                if (level) {
+                    const filterVal = levelMap[level] || 0;
+                    const rowVal = levelMap[rLevel] || 0;
+                    if (rowVal > filterVal) matches = false;
+                }
+
+                if (category && rCat !== category) matches = false;
+
+                row.style.display = matches ? '' : 'none';
+            });
+        }
+
+        // Sorting
+        function sortTable(n) {
+            const table = document.getElementById("questionsTable");
+            let switching = true;
+            let dir = "asc";
+            let switchcount = 0;
+
+            while (switching) {
+                switching = false;
+                const rows = table.rows;
+
+                for (let i = 1; i < (rows.length - 1); i++) {
+                    let shouldSwitch = false;
+                    const x = rows[i].getElementsByTagName("TD")[n];
+                    const y = rows[i + 1].getElementsByTagName("TD")[n];
+
+                    let xVal = x.textContent.toLowerCase();
+                    let yVal = y.textContent.toLowerCase();
+
+                    // Numeric sort for ID
+                    if (n === 0) {
+                        xVal = parseInt(xVal);
+                        yVal = parseInt(yVal);
+                    }
+
+                    if (dir == "asc") {
+                        if (xVal > yVal) { shouldSwitch = true; break; }
+                    } else if (dir == "desc") {
+                        if (xVal < yVal) { shouldSwitch = true; break; }
+                    }
+                }
+
+                if (shouldSwitch) {
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                    switchcount++;
+                } else {
+                    if (switchcount == 0 && dir == "asc") {
+                        dir = "desc";
+                        switching = true;
+                    }
+                }
+            }
+        }
     </script>
 </body>
+
 </html>
