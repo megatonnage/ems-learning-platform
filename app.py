@@ -22,7 +22,8 @@ db = SQLAlchemy(app)
 # Set admin password via environment variable: export EMS_ADMIN_PASSWORD=your_secure_password
 # If not set, defaults to 'ems-admin-2024' (change this in production!)
 ADMIN_PASSWORD = os.environ.get('EMS_ADMIN_PASSWORD', 'ems-admin-2024')
-ADMIN_PASSWORD_HASH = generate_password_hash(ADMIN_PASSWORD)
+# Use pbkdf2:sha256 for compatibility (scrypt not available on all Python builds)
+ADMIN_PASSWORD_HASH = generate_password_hash(ADMIN_PASSWORD, method='pbkdf2:sha256')
 
 def admin_required(f):
     """Decorator to require admin authentication"""
