@@ -45,6 +45,17 @@
             opacity: 1;
         }
 
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: background 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
         .container {
             max-width: 1400px;
             margin: 2rem auto;
@@ -279,6 +290,7 @@
         <div class="nav-links">
             <a href="/dashboard">Dashboard</a>
             <a href="/">Home</a>
+            <a href="/admin/logout" class="logout-btn">Logout</a>
         </div>
     </nav>
 

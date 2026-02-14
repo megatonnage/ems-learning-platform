@@ -1,5 +1,7 @@
-from flask import Flask, render_template, request, jsonify, session
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import check_password_hash, generate_password_hash
+from functools import wraps
 from datetime import datetime
 import json
 import random
@@ -15,6 +17,21 @@ app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
+
+# Admin Configuration
+# Set admin password via environment variable: export EMS_ADMIN_PASSWORD=your_secure_password
+# If not set, defaults to 'ems-admin-2024' (change this in production!)
+ADMIN_PASSWORD = os.environ.get('EMS_ADMIN_PASSWORD', 'ems-admin-2024')
+ADMIN_PASSWORD_HASH = generate_password_hash(ADMIN_PASSWORD)
+
+def admin_required(f):
+    """Decorator to require admin authentication"""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get('admin_logged_in'):
+            return redirect(url_for('admin_login'))
+        return f(*args, **kwargs)
+    return decorated_function
 
 # Database Models
 class User(db.Model):
@@ -217,7 +234,27 @@ def api_stats():
     return jsonify(user.get_score_stats())
 
 # Admin Routes
+
+@app.route('/admin/login', methods=['GET', 'POST'])
+def admin_login():
+    """Admin login page"""
+    if request.method == 'POST':
+        password = request.form.get('password', '')
+        if check_password_hash(ADMIN_PASSWORD_HASH, password):
+            session['admin_logged_in'] = True
+            return redirect(url_for('admin'))
+        else:
+            return render_template('admin_login.html', error='Invalid password')
+    return render_template('admin_login.html')
+
+@app.route('/admin/logout')
+def admin_logout():
+    """Admin logout"""
+    session.pop('admin_logged_in', None)
+    return redirect(url_for('admin_login'))
+
 @app.route('/admin')
+@admin_required
 def admin():
     questions = Question.query.all()
     categories = db.session.query(Question.category).distinct().all()
@@ -225,6 +262,7 @@ def admin():
     return render_template('admin.html', questions=questions, categories=categories)
 
 @app.route('/admin/question/add', methods=['POST'])
+@admin_required
 def add_question():
     data = request.json
     q = Question(
@@ -242,6 +280,7 @@ def add_question():
     return jsonify({'success': True, 'id': q.id})
 
 @app.route('/admin/question/edit/<int:id>', methods=['POST'])
+@admin_required
 def edit_question(id):
     q = Question.query.get_or_404(id)
     data = request.json
@@ -259,6 +298,7 @@ def edit_question(id):
     return jsonify({'success': True})
 
 @app.route('/admin/question/delete/<int:id>', methods=['POST'])
+@admin_required
 def delete_question(id):
     q = Question.query.get_or_404(id)
     db.session.delete(q)
