@@ -11,8 +11,13 @@ app = Flask(__name__)
 app.secret_key = 'ems-learning-secret-key'
 
 # Use absolute path for database
-db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'protocols.db')
-os.makedirs(os.path.dirname(db_path), exist_ok=True)
+# Check if running on Vercel
+if os.environ.get('VERCEL'):
+    db_path = os.path.join('/tmp', 'protocols.db')
+else:
+    db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'protocols.db')
+    os.makedirs(os.path.dirname(db_path), exist_ok=True)
+
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -3066,6 +3071,13 @@ def admin_stats():
 
 if __name__ == '__main__':
     with app.app_context():
-        db.create_all()
-        init_sample_questions()
+        if Question.query.count() == 0:
+            init_sample_questions()
     app.run(debug=True, host='0.0.0.0', port=5001)
+
+# Ensure DB is initialized on Vercel import
+if os.environ.get('VERCEL'):
+    with app.app_context():
+        db.create_all()
+        if Question.query.count() == 0:
+            init_sample_questions()
