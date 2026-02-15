@@ -6,6 +6,7 @@ from datetime import datetime
 import json
 import random
 import os
+import traceback
 
 app = Flask(__name__)
 app.secret_key = 'ems-learning-secret-key'
@@ -117,86 +118,93 @@ def dashboard():
 
 @app.route('/quiz')
 def quiz():
-    if 'user_id' not in session:
-        return redirect('/')
-    user = User.query.get(session['user_id'])
-    
-    # Get filter parameters
-    category = request.args.get('category', 'all')
-    subcategory = request.args.get('subcategory', 'all')
-    limit = request.args.get('limit', 'all')  # 'all' or '10'
-    
-    # Build base query - show questions for user's level and below
-    if user.level == 'PARAMEDIC':
-        base_query = Question.query
-    elif user.level == 'AEMT':
-        base_query = Question.query.filter(Question.level.in_(['EMT', 'AEMT']))
-    else:  # EMT
-        base_query = Question.query.filter_by(level='EMT')
-    
-    questions = []
-    
-    if category == 'all':
-        # No filter - get all questions for user's level
-        questions = base_query.all()
-    else:
-        # Filter by category - also include pediatric questions with matching subcategory
-        # For example, "Fluid Boluses" should include "Pediatric" category with "Fluid Boluses" subcategory
+    try:
+        if 'user_id' not in session:
+            return redirect('/')
+        user = User.query.get(session['user_id'])
         
-        # First get questions in the main category
-        main_query = base_query.filter_by(category=category)
-        if subcategory != 'all':
-            main_query = main_query.filter_by(subcategory=subcategory)
-        questions = main_query.all()
+        # Get filter parameters
+        category = request.args.get('category', 'all')
+        subcategory = request.args.get('subcategory', 'all')
+        limit = request.args.get('limit', 'all')  # 'all' or '10'
         
-        # Then get pediatric questions with matching subcategory
-        # Map category names to subcategory names
-        subcategory_map = {
-            'Fluid Boluses': 'Fluid Boluses',
-            'Medications': 'Medications'
-        }
+        # Build base query - show questions for user's level and below
+        if user.level == 'PARAMEDIC':
+            base_query = Question.query
+        elif user.level == 'AEMT':
+            base_query = Question.query.filter(Question.level.in_(['EMT', 'AEMT']))
+        else:  # EMT
+            base_query = Question.query.filter_by(level='EMT')
         
-        if category in subcategory_map:
-            pediatric_query = base_query.filter_by(category='Pediatric', 
-                                                   subcategory=subcategory_map[category])
-            pediatric_questions = pediatric_query.all()
-            # Add pediatric questions to main list
-            questions.extend(pediatric_questions)
+        questions = []
         
-        # If still no questions, try all levels
-        if not questions:
-            all_levels_query = Question.query.filter_by(category=category)
+        if category == 'all':
+            # No filter - get all questions for user's level
+            questions = base_query.all()
+        else:
+            # Filter by category - also include pediatric questions with matching subcategory
+            # For example, "Fluid Boluses" should include "Pediatric" category with "Fluid Boluses" subcategory
+            
+            # First get questions in the main category
+            main_query = base_query.filter_by(category=category)
             if subcategory != 'all':
-                all_levels_query = all_levels_query.filter_by(subcategory=subcategory)
-            questions = all_levels_query.all()
-    
-    # Remove duplicates (in case of overlap)
-    seen_ids = set()
-    unique_questions = []
-    for q in questions:
-        if q.id not in seen_ids:
-            seen_ids.add(q.id)
-            unique_questions.append(q)
-    questions = unique_questions
-    
-    # Get available categories for filter UI
-    categories = db.session.query(Question.category).distinct().all()
-    categories = [c[0] for c in categories if c[0]]
-    
-    # Get total count before limiting
-    total_available = len(questions)
-    
-    # Shuffle questions
-    random.shuffle(questions)
-    
-    # Limit to 10 only if no category filter and limit != 'all'
-    if limit != 'all' and category == 'all':
-        questions = questions[:10]
-    
-    return render_template('quiz.html', questions=questions, user=user, 
-                         categories=categories, selected_category=category,
-                         selected_subcategory=subcategory,
-                         total_available=total_available)
+                main_query = main_query.filter_by(subcategory=subcategory)
+            questions = main_query.all()
+            
+            # Then get pediatric questions with matching subcategory
+            # Map category names to subcategory names
+            subcategory_map = {
+                'Fluid Boluses': 'Fluid Boluses',
+                'Medications': 'Medications'
+            }
+            
+            if category in subcategory_map:
+                pediatric_query = base_query.filter_by(category='Pediatric', 
+                                                       subcategory=subcategory_map[category])
+                pediatric_questions = pediatric_query.all()
+                # Add pediatric questions to main list
+                questions.extend(pediatric_questions)
+            
+            # If still no questions, try all levels
+            if not questions:
+                all_levels_query = Question.query.filter_by(category=category)
+                if subcategory != 'all':
+                    all_levels_query = all_levels_query.filter_by(subcategory=subcategory)
+                questions = all_levels_query.all()
+        
+        # Remove duplicates (in case of overlap)
+        seen_ids = set()
+        unique_questions = []
+        for q in questions:
+            if q.id not in seen_ids:
+                seen_ids.add(q.id)
+                unique_questions.append(q)
+        questions = unique_questions
+        
+        # Get available categories for filter UI
+        categories = db.session.query(Question.category).distinct().all()
+        categories = [c[0] for c in categories if c[0]]
+        
+        # Get total count before limiting
+        total_available = len(questions)
+        
+        # Shuffle questions
+        random.shuffle(questions)
+        
+        # Limit to 10 only if no category filter and limit != 'all'
+        if limit != 'all' and category == 'all':
+            questions = questions[:10]
+        
+        return render_template('quiz.html', questions=questions, user=user, 
+                             categories=categories, selected_category=category,
+                             selected_subcategory=subcategory,
+                             total_available=total_available)
+                             
+    except Exception as e:
+        return jsonify({
+            'error': str(e),
+            'traceback': traceback.format_exc()
+        }), 500
 
 @app.route('/submit_answer', methods=['POST'])
 def submit_answer():
