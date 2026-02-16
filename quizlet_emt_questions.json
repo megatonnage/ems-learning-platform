@@ -1,0 +1,214 @@
+[
+  {
+    "question": "For a patient in shock, what should the oxygen saturation be kept above?",
+    "answer": "94%"
+  },
+  {
+    "question": "A patient on a legal psychiatric hold may be placed in the ER waiting room",
+    "answer": "False"
+  },
+  {
+    "question": "What is the goal of the protocol manual?",
+    "answer": "standardize prehospital care in Clark County"
+  },
+  {
+    "question": "Describe a partial thickness (2nd degree burn)",
+    "answer": "blistering"
+  },
+  {
+    "question": "Oxygen therapy should be established to keep SpO2 above what level?",
+    "answer": "94%"
+  },
+  {
+    "question": "When should defibrillation be attempted during a witnessed cardiac arrest?",
+    "answer": "Immediately"
+  },
+  {
+    "question": "What must exist for an emergency care physician to direct a prehospital provider in rendering care that is not explicitly listed within the protocols?",
+    "answer": "The provider must feel capable,based on the instructions given by the telemetry physician, of correctly performing the directed care. Both the telemetry physician and the provider must acknowledge and agree that the patient's condition and extraordinary care are not addressed elsewhere within these medical protocols. The telemetry physician and the provider must immediately notify the Office of EMS & Trauma System (OEMSTS) of the extraordinary care situation."
+  },
+  {
+    "question": "What is recommended if hypoxia is the cause of the cardiac arrest?",
+    "answer": "Early ventilation"
+  },
+  {
+    "question": "When transporting a patient to a remote outpatient emergency department, telemetry contact does not have to be made.",
+    "answer": "False"
+  },
+  {
+    "question": "What is the ideal scene time for a patient having a stroke?",
+    "answer": "Less than 10 minutes"
+  },
+  {
+    "question": "Localized cold injuries should be rubbed to warm the skin",
+    "answer": "False"
+  },
+  {
+    "question": "For a patient to be transported to an approved alcohol and drug abuse facility, the pulse rate must be between what range?",
+    "answer": "60-120"
+  },
+  {
+    "question": "Which of the following should be performed for a patient with hyperthermia?",
+    "answer": "Remove from environment, Temperature measurement, Remove tight clothing, Passive cooling measures"
+  },
+  {
+    "question": "What type of patients should ambulance attendants transfer?",
+    "answer": "only those whose therapy required during transfer lies within the attendant's capabilities"
+  },
+  {
+    "question": "Describe a dystonic reaction",
+    "answer": "Involuntary muscle movements or spasms of the face, neck, and upper extremities. Typically an adverse reaction to drugs such as Haloperidol"
+  },
+  {
+    "question": "Patients placed on backboard for extrication or movement should not be moved to a soft mattress",
+    "answer": "False"
+  },
+  {
+    "question": "If cardiac arrest is witnessed by EMS or CPR in progress and patient is unresponsive with no pulse, begin CPR at 30 compressions and two ventilations",
+    "answer": "False (need to do CCC)"
+  },
+  {
+    "question": "Deep suctioning is recommended during neonatal resuscitation",
+    "answer": "False"
+  },
+  {
+    "question": "For a patient to be transported to an approved alcohol and drug abuse facility, the GCS score must be above what level?",
+    "answer": "14"
+  },
+  {
+    "question": "What level trauma center is UMC?",
+    "answer": "1"
+  },
+  {
+    "question": "What does optimal prehospital care result from?",
+    "answer": "(1) Careful patient assessment (2) Appropriate medical consultation (3) essential prehospital emergency medical services"
+  },
+  {
+    "question": "What protocols must be followed in the specific sequence noted?",
+    "answer": "General assessment"
+  },
+  {
+    "question": "What is the most common cause of bradycardia in a child?",
+    "answer": "Hypoxemia"
+  },
+  {
+    "question": "For a drowning victim in cardiac arrest, what should emphasis be placed on?",
+    "answer": "oxygenation/ventilation"
+  },
+  {
+    "question": "How much does a leg represent in a pediatric patient in the rule of 9's?",
+    "answer": "14"
+  },
+  {
+    "question": "Adult trauma calls that meet Step 1 or 2 of the Trauma Field Triage Criteria Protocol and occur within the St. Rose Dominican Hospital - Siena Campus Catchment Area, City of Henderson, or the geographical area bordered by Paradise Road to the west continuing along that portion where it becomes Maryland Parkway, Sunset Road to the north, and the county line to the east, are to be transported to Sunrise Hospital & Medical Center and the medical directions for the treatment of the patient must be transported to Sunrise Trauma Center",
+    "answer": "True"
+  },
+  {
+    "question": "When are backboard indicated?",
+    "answer": "extrication/patient movement"
+  },
+  {
+    "question": "Even if a patient indicates they wish to receive life-rescusitating treatment, the DNR/POLST Order or Identification shall be honored",
+    "answer": "False"
+  },
+  {
+    "question": "The St. Rose Siena catchment area is for all trauma calls that meet Step 3 or in the provider's judgment meet Step 4 of the Trauma Field Triage Criteria Protocol and occur within the City of Henderson or the geographical area bordered by Interstate 15 to the west and Sunset road to the north, and the county line to the east, are to be transported to St. Rose Dominican Hospital - Siena Campus and the medical directions for the treatment of the patient must originate at that center",
+    "answer": "True"
+  },
+  {
+    "question": "How should oxygen be delivered to patients with smoke inhalation?",
+    "answer": "100% NRB"
+  },
+  {
+    "question": "Patients with a possible spinal injury found in motor vehicles should not be asked if they are able to exist the motor vehicle on their own",
+    "answer": "False"
+  },
+  {
+    "question": "In patients in which the ability to ventilate cannot be established, where shall the patient be transported to?",
+    "answer": "the nearest emergency department"
+  },
+  {
+    "question": "Circumferential burns meets criteria to be transported to a burn center",
+    "answer": "True"
+  },
+  {
+    "question": "A patient with burns that involve the face, hands, feet, genitalia, perineum, or major joints meets criteria to be transported to a burn center",
+    "answer": "True"
+  },
+  {
+    "question": "What are possible causes of Cardiogenic Shock?",
+    "answer": "Myocardial contusion, Heart failure, MI, toxins, Cardiomyopathy"
+  },
+  {
+    "question": "When is cervical stabilization not performed?",
+    "answer": "Injuries where placement of the collar might compromise patient assessment, airway management, ventilation, and/or hemorrhage control. Patients in cardiac patient. Penetrating trauma to the head and/or neck with no evidence of spinal injury"
+  },
+  {
+    "question": "For cardiac arrest patients who are pregnant, manual CPR is recommended",
+    "answer": "True"
+  },
+  {
+    "question": "How shall contact with medical control be established?",
+    "answer": "by radio"
+  },
+  {
+    "question": "When should patient care be rendered?",
+    "answer": "en route to a definitive treatment facility"
+  },
+  {
+    "question": "Adult pads may be used on children weighing more than how much?",
+    "answer": "15 kg"
+  },
+  {
+    "question": "A patient who meets step 2 of the Trauma Triage Field Criteria, must be transported to what level trauma center",
+    "answer": "Level 1 or 2"
+  },
+  {
+    "question": "What does the Parkland burn Formula define?",
+    "answer": "how much fluid is given over the 24 hours for a burned patient"
+  },
+  {
+    "question": "What is a normal blood glucose reading in a newborn?",
+    "answer": "40 mg/dL"
+  },
+  {
+    "question": "If a drowning victim has foam in the airway, the foam should be suctioned out initially",
+    "answer": "False"
+  },
+  {
+    "question": "Which of the following are approved pediatric centers?",
+    "answer": "Summerlin Hospital, UMC, St. Rose Siena, Sunrise Hospital"
+  },
+  {
+    "question": "Ice should be applied to burns",
+    "answer": "false"
+  },
+  {
+    "question": "How long can postpartum eclampsia/pre-eclampsia present after childbirth?",
+    "answer": "up to 6 weeks"
+  },
+  {
+    "question": "What is the compression to ventilation ratio in neonatal resuscitation?",
+    "answer": "3:1"
+  },
+  {
+    "question": "Telemetry contact should be established by radio",
+    "answer": "True"
+  },
+  {
+    "question": "What medications can be administered or monitored during an inter facility transfer?",
+    "answer": "all medications listed on the official drug inventory as appropriate for level of license and per protocol"
+  },
+  {
+    "question": "Carefully monitor patients as you treat them; stable tachycardia may convert to unstable rhythms/condition quickly",
+    "answer": "True"
+  },
+  {
+    "question": "All drowning patients should be transported for evaluation because of the potential for worsening over the next several hours",
+    "answer": "True"
+  },
+  {
+    "question": "How much does the head represent in an adult patient in the rule of 9's?",
+    "answer": "9%"
+  }
+]
