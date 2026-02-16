@@ -3094,6 +3094,9 @@ def admin_stats():
 @admin_required
 def admin_export_json():
     """Export all questions to JSON"""
+    from flask import Response
+    import json
+    
     questions = Question.query.all()
     export_data = []
     for q in questions:
@@ -3109,9 +3112,14 @@ def admin_export_json():
             'source': q.source
         })
     
-    response = jsonify(export_data)
-    response.headers['Content-Disposition'] = 'attachment; filename=ems_questions.json'
-    response.headers['Content-Type'] = 'application/json'
+    response = Response(
+        json.dumps(export_data, indent=2),
+        mimetype='application/json',
+        headers={
+            'Content-Disposition': 'attachment; filename="ems_questions.json"',
+            'Cache-Control': 'no-cache, no-store, must-revalidate'
+        }
+    )
     return response
 
 @app.route('/admin/export/csv')
@@ -3120,6 +3128,7 @@ def admin_export_csv():
     """Export all questions to CSV"""
     import csv
     import io
+    from flask import Response
     
     questions = Question.query.all()
     output = io.StringIO()
@@ -3140,10 +3149,18 @@ def admin_export_csv():
         ])
     
     output.seek(0)
-    return output.getvalue(), 200, {
-        'Content-Disposition': 'attachment; filename=ems_questions.csv',
-        'Content-Type': 'text/csv'
-    }
+    
+    response = Response(
+        output.getvalue(),
+        mimetype='text/csv',
+        headers={
+            'Content-Disposition': 'attachment; filename="ems_questions.csv"',
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+        }
+    )
+    return response
 
 @app.route('/admin/import/json', methods=['POST'])
 @admin_required
