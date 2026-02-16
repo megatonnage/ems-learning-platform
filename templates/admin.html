@@ -314,6 +314,29 @@
                 </select>
             </div>
             <button class="btn btn-primary" onclick="openModal('add')">+ Add Question</button>
+            <button class="btn btn-secondary" onclick="toggleBulkOps()">📁 Bulk Import/Export</button>
+        </div>
+
+        <div class="controls" id="bulkOps" style="display:none; background:#f8f9fa;">
+            <div style="display:flex; gap:1rem; flex-wrap:wrap; align-items:center; width:100%;">
+                <div>
+                    <strong>Export:</strong>
+                    <a href="/admin/export/json" class="btn btn-secondary" style="margin-left:0.5rem">Export JSON</a>
+                    <a href="/admin/export/csv" class="btn btn-secondary" style="margin-left:0.5rem">Export CSV</a>
+                </div>
+                <div style="margin-left:auto; display:flex; gap:1rem; align-items:center;">
+                    <strong>Import:</strong>
+                    <form id="importJsonForm" style="display:inline-flex; align-items:center; gap:0.5rem;">
+                        <input type="file" name="file" accept=".json" id="jsonFile" style="width:150px">
+                        <button type="submit" class="btn btn-primary">Import JSON</button>
+                    </form>
+                    <form id="importCsvForm" style="display:inline-flex; align-items:center; gap:0.5rem;">
+                        <input type="file" name="file" accept=".csv" id="csvFile" style="width:150px">
+                        <button type="submit" class="btn btn-primary">Import CSV</button>
+                    </form>
+                </div>
+            </div>
+            <div id="importResult" style="width:100%; margin-top:0.5rem; display:none;"></div>
         </div>
 
         <div class="table-container">
@@ -547,6 +570,76 @@
                 row.style.display = matches ? '' : 'none';
             });
         }
+
+        // Toggle bulk operations
+        function toggleBulkOps() {
+            const bulkOps = document.getElementById('bulkOps');
+            bulkOps.style.display = bulkOps.style.display === 'none' ? 'flex' : 'none';
+        }
+
+        // Import JSON
+        document.getElementById('importJsonForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const resultDiv = document.getElementById('importResult');
+            
+            try {
+                const response = await fetch('/admin/import/json', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultDiv.innerHTML = `<div style="color:green; padding:10px; background:#e6ffe6; border-radius:6px;">
+                        ✅ Imported ${data.imported} new, updated ${data.updated} existing questions.
+                        ${data.errors.length > 0 ? '<br>Errors: ' + data.errors.join(', ') : ''}
+                    </div>`;
+                    setTimeout(() => location.reload(), 2000);
+                } else {
+                    resultDiv.innerHTML = `<div style="color:red; padding:10px; background:#ffe6e6; border-radius:6px;">
+                        ❌ Error: ${data.error}
+                    </div>`;
+                }
+            } catch (err) {
+                resultDiv.innerHTML = `<div style="color:red; padding:10px; background:#ffe6e6; border-radius:6px;">
+                    ❌ Import failed: ${err.message}
+                </div>`;
+            }
+            resultDiv.style.display = 'block';
+        });
+
+        // Import CSV
+        document.getElementById('importCsvForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const resultDiv = document.getElementById('importResult');
+            
+            try {
+                const response = await fetch('/admin/import/csv', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultDiv.innerHTML = `<div style="color:green; padding:10px; background:#e6ffe6; border-radius:6px;">
+                        ✅ Imported ${data.imported} new, updated ${data.updated} existing questions.
+                        ${data.errors.length > 0 ? '<br>Errors: ' + data.errors.join(', ') : ''}
+                    </div>`;
+                    setTimeout(() => location.reload(), 2000);
+                } else {
+                    resultDiv.innerHTML = `<div style="color:red; padding:10px; background:#ffe6e6; border-radius:6px;">
+                        ❌ Error: ${data.error}
+                    </div>`;
+                }
+            } catch (err) {
+                resultDiv.innerHTML = `<div style="color:red; padding:10px; background:#ffe6e6; border-radius:6px;">
+                    ❌ Import failed: ${err.message}
+                </div>`;
+            }
+            resultDiv.style.display = 'block';
+        });
 
         // Sorting
         function sortTable(n) {

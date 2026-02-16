@@ -3062,6 +3062,220 @@ def admin_stats():
         'by_category': by_category
     })
 
+# ==================== BULK IMPORT/EXPORT ROUTES ====================
+
+@app.route('/admin/export/json')
+@admin_required
+def admin_export_json():
+    """Export all questions to JSON"""
+    questions = Question.query.all()
+    export_data = []
+    for q in questions:
+        export_data.append({
+            'id': q.id,
+            'level': q.level,
+            'category': q.category,
+            'subcategory': q.subcategory,
+            'question': q.question,
+            'options': q.get_options(),
+            'correct_answer': q.correct_answer,
+            'explanation': q.explanation,
+            'source': q.source
+        })
+    
+    response = jsonify(export_data)
+    response.headers['Content-Disposition'] = 'attachment; filename=ems_questions.json'
+    response.headers['Content-Type'] = 'application/json'
+    return response
+
+@app.route('/admin/export/csv')
+@admin_required
+def admin_export_csv():
+    """Export all questions to CSV"""
+    import csv
+    import io
+    
+    questions = Question.query.all()
+    output = io.StringIO()
+    writer = csv.writer(output)
+    
+    # Header
+    writer.writerow(['id', 'level', 'category', 'subcategory', 'question', 
+                     'option_0', 'option_1', 'option_2', 'option_3',
+                     'correct_answer', 'explanation', 'source'])
+    
+    # Data
+    for q in questions:
+        options = q.get_options()
+        writer.writerow([
+            q.id, q.level, q.category, q.subcategory, q.question,
+            options[0], options[1], options[2], options[3],
+            q.correct_answer, q.explanation, q.source
+        ])
+    
+    output.seek(0)
+    return output.getvalue(), 200, {
+        'Content-Disposition': 'attachment; filename=ems_questions.csv',
+        'Content-Type': 'text/csv'
+    }
+
+@app.route('/admin/import/json', methods=['POST'])
+@admin_required
+def admin_import_json():
+    """Import questions from JSON"""
+    try:
+        if 'file' not in request.files:
+            return jsonify({'success': False, 'error': 'No file provided'}), 400
+        
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({'success': False, 'error': 'No file selected'}), 400
+        
+        data = json.load(file)
+        imported = 0
+        updated = 0
+        errors = []
+        
+        for item in data:
+            try:
+                # Validate required fields
+                required = ['question', 'options', 'correct_answer', 'explanation']
+                for field in required:
+                    if field not in item:
+                        errors.append(f"Missing field '{field}' in question: {item.get('question', 'unknown')}")
+                        continue
+                
+                # Check if question exists (by ID or by question text)
+                existing = None
+                if 'id' in item and item['id']:
+                    existing = Question.query.get(item['id'])
+                if not existing:
+                    existing = Question.query.filter_by(question=item['question']).first()
+                
+                if existing:
+                    # Update existing
+                    existing.level = item.get('level', 'EMT')
+                    existing.category = item.get('category', 'General')
+                    existing.subcategory = item.get('subcategory', '')
+                    existing.options = json.dumps(item['options'])
+                    existing.correct_answer = int(item['correct_answer'])
+                    existing.explanation = item['explanation']
+                    existing.source = item.get('source', '')
+                    updated += 1
+                else:
+                    # Create new
+                    q = Question(
+                        level=item.get('level', 'EMT'),
+                        category=item.get('category', 'General'),
+                        subcategory=item.get('subcategory', ''),
+                        question=item['question'],
+                        options=json.dumps(item['options']),
+                        correct_answer=int(item['correct_answer']),
+                        explanation=item['explanation'],
+                        source=item.get('source', '')
+                    )
+                    db.session.add(q)
+                    imported += 1
+                    
+            except Exception as e:
+                errors.append(f"Error processing question: {str(e)}")
+        
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'imported': imported,
+            'updated': updated,
+            'errors': errors
+        })
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
+
+@app.route('/admin/import/csv', methods=['POST'])
+@admin_required
+def admin_import_csv():
+    """Import questions from CSV"""
+    try:
+        import csv
+        import io
+        
+        if 'file' not in request.files:
+            return jsonify({'success': False, 'error': 'No file provided'}), 400
+        
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({'success': False, 'error': 'No file selected'}), 400
+        
+        stream = io.StringIO(file.stream.read().decode('UTF-8'))
+        reader = csv.DictReader(stream)
+        
+        imported = 0
+        updated = 0
+        errors = []
+        
+        for row in reader:
+            try:
+                # Build options list
+                options = [
+                    row.get('option_0', ''),
+                    row.get('option_1', ''),
+                    row.get('option_2', ''),
+                    row.get('option_3', '')
+                ]
+                
+                # Validate
+                if not row.get('question'):
+                    errors.append("Missing question text")
+                    continue
+                
+                # Check if exists
+                existing = None
+                if row.get('id'):
+                    existing = Question.query.get(int(row['id']))
+                if not existing:
+                    existing = Question.query.filter_by(question=row['question']).first()
+                
+                if existing:
+                    # Update
+                    existing.level = row.get('level', 'EMT')
+                    existing.category = row.get('category', 'General')
+                    existing.subcategory = row.get('subcategory', '')
+                    existing.options = json.dumps(options)
+                    existing.correct_answer = int(row.get('correct_answer', 0))
+                    existing.explanation = row.get('explanation', '')
+                    existing.source = row.get('source', '')
+                    updated += 1
+                else:
+                    # Create new
+                    q = Question(
+                        level=row.get('level', 'EMT'),
+                        category=row.get('category', 'General'),
+                        subcategory=row.get('subcategory', ''),
+                        question=row['question'],
+                        options=json.dumps(options),
+                        correct_answer=int(row.get('correct_answer', 0)),
+                        explanation=row.get('explanation', ''),
+                        source=row.get('source', '')
+                    )
+                    db.session.add(q)
+                    imported += 1
+                    
+            except Exception as e:
+                errors.append(f"Error processing row: {str(e)}")
+        
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'imported': imported,
+            'updated': updated,
+            'errors': errors
+        })
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
+
 # ==================== MAIN ====================
 
 if __name__ == '__main__':
