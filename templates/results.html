@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Results - EMS Learning</title>
+    <title>Results - SNHD Learning</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -19,6 +19,23 @@
             justify-content: space-between;
             align-items: center;
         }
+        .level-select {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 28px 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            color: white;
+            cursor: pointer;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='white' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+        }
+        .level-select option { color: #333; background: white; }
         .container {
             max-width: 1000px;
             margin: 2rem auto;
@@ -121,8 +138,15 @@
 </head>
 <body>
     <nav class="navbar">
-        <h1>🚑 EMS Learning Platform - Results</h1>
-        <a href="/dashboard" style="color: white; text-decoration: none;">Dashboard</a>
+        <a href="/dashboard" style="color: white; text-decoration: none;"><h1>🚑 SNHD Learning Platform - Results</h1></a>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <a href="/dashboard" style="color: white; text-decoration: none;">Home</a>
+            <select class="level-select" id="levelSelect" aria-label="Change NREMT level">
+                <option value="EMT" {% if user.level == 'EMT' %}selected{% endif %}>EMT</option>
+                <option value="AEMT" {% if user.level == 'AEMT' %}selected{% endif %}>AEMT</option>
+                <option value="PARAMEDIC" {% if user.level == 'PARAMEDIC' %}selected{% endif %}>Paramedic</option>
+            </select>
+        </div>
     </nav>
     
     <div class="container">
@@ -170,5 +194,16 @@
             {% endif %}
         </div>
     </div>
+    <script>
+        document.getElementById('levelSelect').addEventListener('change', async function() {
+            const level = this.value;
+            const res = await fetch('/api/update_level', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ level: level })
+            });
+            if (res.ok) window.location.reload();
+        });
+    </script>
 </body>
 </html>

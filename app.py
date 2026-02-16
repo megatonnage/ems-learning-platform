@@ -245,6 +245,21 @@ def api_stats():
     user = User.query.get(session['user_id'])
     return jsonify(user.get_score_stats())
 
+@app.route('/api/update_level', methods=['POST'])
+def api_update_level():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not logged in'}), 401
+    data = request.json or {}
+    level = data.get('level')
+    if level not in ('EMT', 'AEMT', 'PARAMEDIC'):
+        return jsonify({'error': 'Invalid level'}), 400
+    user = User.query.get(session['user_id'])
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    user.level = level
+    db.session.commit()
+    return jsonify({'success': True, 'level': level})
+
 # Admin Routes
 
 @app.route('/admin/login', methods=['GET', 'POST'])

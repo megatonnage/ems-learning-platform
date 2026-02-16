@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz - EMS Learning</title>
+    <title>Quiz - SNHD Learning</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -19,6 +19,23 @@
             justify-content: space-between;
             align-items: center;
         }
+        .level-select {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 28px 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            color: white;
+            cursor: pointer;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='white' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+        }
+        .level-select option { color: #333; background: white; }
         .container {
             max-width: 800px;
             margin: 2rem auto;
@@ -172,8 +189,15 @@
 </head>
 <body>
     <nav class="navbar">
-        <h1>🚑 EMS Learning Platform - Quiz</h1>
-        <span>{{ user.level }} Level</span>
+        <a href="/dashboard" style="color: white; text-decoration: none;"><h1>🚑 SNHD Learning Platform - Quiz</h1></a>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <a href="/dashboard" style="color: white; text-decoration: none;">Home</a>
+            <select class="level-select" id="levelSelect" aria-label="Change NREMT level">
+                <option value="EMT" {% if user.level == 'EMT' %}selected{% endif %}>EMT</option>
+                <option value="AEMT" {% if user.level == 'AEMT' %}selected{% endif %}>AEMT</option>
+                <option value="PARAMEDIC" {% if user.level == 'PARAMEDIC' %}selected{% endif %}>Paramedic</option>
+            </select>
+        </div>
     </nav>
     
     <div class="container">
@@ -185,7 +209,7 @@
             <div style="margin-bottom: 1rem;">
                 <strong style="color: #667eea; display: block; margin-bottom: 0.5rem;">👶 Pediatric Focus</strong>
                 <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                    <a href="/quiz?category=Pediatric" class="topic-btn" style="padding: 8px 16px; background: #e3f2fd; color: #1976d2; border-radius: 20px; text-decoration: none; font-size: 0.9rem; border: 1px solid #bbdefb;">👶 All Pediatric (350+ questions)</a>
+                    <a href="/quiz?category=Pediatric" class="topic-btn" style="padding: 8px 16px; background: #e3f2fd; color: #1976d2; border-radius: 20px; text-decoration: none; font-size: 0.9rem; border: 1px solid #bbdefb;">All Pediatric</a>
                     <a href="/quiz?category=Fluid+Boluses" class="topic-btn" style="padding: 8px 16px; background: #e8f5e9; color: #388e3c; border-radius: 20px; text-decoration: none; font-size: 0.9rem; border: 1px solid #a5d6a7;">💧 All Fluid Boluses</a>
                     <a href="/quiz?category=Medications" class="topic-btn" style="padding: 8px 16px; background: #fff3e0; color: #f57c00; border-radius: 20px; text-decoration: none; font-size: 0.9rem; border: 1px solid #ffcc80;">💊 All Medications</a>
                 </div>
@@ -271,6 +295,18 @@
     </div>
     
     <script>
+        const levelSelect = document.getElementById('levelSelect');
+        if (levelSelect) {
+            levelSelect.addEventListener('change', async function() {
+                const level = this.value;
+                const res = await fetch('/api/update_level', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ level: level })
+                });
+                if (res.ok) window.location.reload();
+            });
+        }
         const questions = document.querySelectorAll('.question-card');
         const totalQuestions = questions.length;
         let currentQuestion = 0;
