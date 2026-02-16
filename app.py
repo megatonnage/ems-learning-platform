@@ -11,8 +11,13 @@ app = Flask(__name__)
 app.secret_key = 'ems-learning-secret-key'
 
 # Use absolute path for database
-db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'protocols.db')
-os.makedirs(os.path.dirname(db_path), exist_ok=True)
+# Check if running on Vercel
+if os.environ.get('VERCEL'):
+    db_path = os.path.join('/tmp', 'protocols.db')
+else:
+    db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'protocols.db')
+    os.makedirs(os.path.dirname(db_path), exist_ok=True)
+
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -115,6 +120,12 @@ def quiz():
     if 'user_id' not in session:
         return redirect('/')
     user = User.query.get(session['user_id'])
+    
+    # Handle stale sessions (e.g. server restart/redeploy cleared the DB)
+    if not user:
+        session.clear()
+        return redirect('/')
+        
     
     # Get filter parameters
     category = request.args.get('category', 'all')
@@ -233,6 +244,21 @@ def api_stats():
         return jsonify({'error': 'Not logged in'})
     user = User.query.get(session['user_id'])
     return jsonify(user.get_score_stats())
+
+@app.route('/api/update_level', methods=['POST'])
+def api_update_level():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not logged in'}), 401
+    data = request.json or {}
+    level = data.get('level')
+    if level not in ('EMT', 'AEMT', 'PARAMEDIC'):
+        return jsonify({'error': 'Invalid level'}), 400
+    user = User.query.get(session['user_id'])
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    user.level = level
+    db.session.commit()
+    return jsonify({'success': True, 'level': level})
 
 # Admin Routes
 
@@ -3281,5 +3307,13 @@ def admin_import_csv():
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-        init_sample_questions()
+        if Question.query.count() == 0:
+            init_sample_questions()
     app.run(debug=True, host='0.0.0.0', port=5001)
+
+# Ensure DB is initialized on Vercel import
+if os.environ.get('VERCEL'):
+    with app.app_context():
+        db.create_all()
+        if Question.query.count() == 0:
+            init_sample_questions()

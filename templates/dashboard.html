@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - EMS Learning</title>
+    <title>Dashboard - SNHD Learning</title>
     <style>
         * {
             margin: 0;
@@ -118,7 +118,7 @@
             box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
         }
 
-        .level-badge {
+        .level-badge, .level-select {
             display: inline-block;
             background: rgba(255, 255, 255, 0.2);
             padding: 4px 12px;
@@ -126,6 +126,22 @@
             font-size: 0.8rem;
             font-weight: 600;
             margin-left: 1rem;
+        }
+        .level-select {
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            color: white;
+            cursor: pointer;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='white' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            padding-right: 28px;
+        }
+        .level-select option {
+            color: #333;
+            background: white;
         }
 
         .progress-bar {
@@ -148,10 +164,14 @@
 
 <body>
     <nav class="navbar">
-        <h1>🚑 EMS Learning Platform</h1>
+        <a href="/dashboard" style="color: white; text-decoration: none;"><h1>🚑 SNHD Learning Platform</h1></a>
         <div class="user-info">
-
-            <span class="level-badge">{{ user.level }}</span>
+            <a href="/dashboard" style="color: white; text-decoration: none; margin-right: 1rem;">Home</a>
+            <select class="level-select" id="levelSelect" aria-label="Change NREMT level">
+                <option value="EMT" {% if user.level == 'EMT' %}selected{% endif %}>EMT</option>
+                <option value="AEMT" {% if user.level == 'AEMT' %}selected{% endif %}>AEMT</option>
+                <option value="PARAMEDIC" {% if user.level == 'PARAMEDIC' %}selected{% endif %}>Paramedic</option>
+            </select>
         </div>
     </nav>
 
@@ -183,8 +203,8 @@
         <!-- Pediatric Focus Section -->
         <div
             style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; color: white;">
-            <h2 style="margin-bottom: 1rem;">👶 Pediatric Focus (350+ Questions!)</h2>
-            <p style="margin-bottom: 1rem; opacity: 0.9;">Master pediatric protocols - the toughest part of NREMT!</p>
+            <h2 style="margin-bottom: 1rem;">👶 Pediatric Focus</h2>
+            <p style="margin-bottom: 1rem; opacity: 0.9;">Master pediatric SNHD protocols.</p>
             <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
                 <a href="/quiz?category=Pediatric"
                     style="background: white; color: #667eea; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600;">🧪
@@ -201,7 +221,7 @@
         <div class="actions">
             <div class="action-card">
                 <h2>📝 Start Quiz</h2>
-                <p>Test your knowledge with 10 random questions based on SNHD protocols and your {{ user.level }} level.
+                <p>Test your knowledge with random questions based on SNHD protocols and your {{ user.level }} level.
                 </p>
                 <a href="/quiz" class="btn">Start Quiz</a>
             </div>
@@ -212,6 +232,17 @@
             </div>
         </div>
     </div>
+    <script>
+        document.getElementById('levelSelect').addEventListener('change', async function() {
+            const level = this.value;
+            const res = await fetch('/api/update_level', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ level: level })
+            });
+            if (res.ok) window.location.reload();
+        });
+    </script>
 </body>
 
 </html>
