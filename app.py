@@ -3357,16 +3357,21 @@ def init_db():
 @app.route('/cleanup-db')
 @admin_required
 def cleanup_db():
-    """Remove all sample questions, keep only SNHD Protocol questions"""
+    """Remove all sample questions, keep only imported SNHD Protocol questions"""
     try:
         with app.app_context():
             # Count before deletion
             total_before = Question.query.count()
             
-            # Delete all questions that are NOT from SNHD Protocols
-            # (or have no source specified)
+            # Delete all questions that have extended SNHD source names
+            # (sample questions have sources like "SNHD Protocols - Fluid Therapy")
+            # Keep only exact "SNHD Protocols" or "SNHD Protocols - Quizlet"
+            from sqlalchemy import or_
             sample_questions = Question.query.filter(
-                (Question.source != 'SNHD Protocols') | 
+                ~or_(
+                    Question.source == 'SNHD Protocols',
+                    Question.source == 'SNHD Protocols - Quizlet'
+                ) | 
                 (Question.source == None) | 
                 (Question.source == '')
             ).all()
@@ -3386,7 +3391,7 @@ def cleanup_db():
                 'message': 'Database cleanup completed',
                 'deleted': deleted_count,
                 'remaining': total_after,
-                'note': 'Only SNHD Protocol questions remain'
+                'note': 'Kept only SNHD Protocols and SNHD Protocols - Quizlet questions'
             })
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
