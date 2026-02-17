@@ -3362,6 +3362,7 @@ def cleanup_db():
         with app.app_context():
             # Count before deletion
             total_before = Question.query.count()
+            answers_before = Answer.query.count()
             
             # Delete all questions that have extended SNHD source names
             # (sample questions have sources like "SNHD Protocols - Fluid Therapy")
@@ -3376,21 +3377,32 @@ def cleanup_db():
                 (Question.source == '')
             ).all()
             
-            deleted_count = len(sample_questions)
+            deleted_questions = len(sample_questions)
+            deleted_answers = 0
             
+            # First delete any answers that reference these questions
             for q in sample_questions:
+                # Delete all answers for this question
+                answers = Answer.query.filter_by(question_id=q.id).all()
+                for a in answers:
+                    db.session.delete(a)
+                    deleted_answers += 1
+                # Then delete the question
                 db.session.delete(q)
             
             db.session.commit()
             
             # Count after deletion
             total_after = Question.query.count()
+            answers_after = Answer.query.count()
             
             return jsonify({
                 'success': True,
                 'message': 'Database cleanup completed',
-                'deleted': deleted_count,
-                'remaining': total_after,
+                'deleted_questions': deleted_questions,
+                'deleted_answers': deleted_answers,
+                'remaining_questions': total_after,
+                'remaining_answers': answers_after,
                 'note': 'Kept only SNHD Protocols and SNHD Protocols - Quizlet questions'
             })
     except Exception as e:
