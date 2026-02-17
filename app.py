@@ -23,6 +23,15 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
+# Security Headers - CSP to allow inline scripts for admin panel
+@app.after_request
+def add_security_headers(response):
+    # Allow inline scripts and styles for the admin panel functionality
+    response.headers['Content-Security-Policy'] = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';"
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'DENY'
+    return response
+
 # Admin Configuration
 # Set admin password via environment variable: export EMS_ADMIN_PASSWORD=your_secure_password
 # If not set, defaults to 'ems-admin-2024' (change this in production!)
