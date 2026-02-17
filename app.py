@@ -3338,6 +3338,22 @@ def admin_import_csv():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 400
 
+@app.route('/init-db')
+def init_db():
+    """Initialize database tables (for PostgreSQL setup)"""
+    try:
+        with app.app_context():
+            db.create_all()
+            count = Question.query.count()
+            return jsonify({
+                'success': True,
+                'message': 'Database tables created successfully',
+                'questions_count': count,
+                'note': 'If questions_count is 0, you need to import questions via admin panel'
+            })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 # ==================== MAIN ====================
 
 if __name__ == '__main__':
