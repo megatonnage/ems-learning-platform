@@ -10,15 +10,25 @@ import os
 app = Flask(__name__)
 app.secret_key = 'ems-learning-secret-key'
 
-# Use absolute path for database
-# Check if running on Vercel
-if os.environ.get('VERCEL'):
-    db_path = os.path.join('/tmp', 'protocols.db')
+# Database configuration
+# Priority: 1) DATABASE_URL (PostgreSQL for production/Vercel)
+#          2) Local SQLite for development
+if os.environ.get('DATABASE_URL'):
+    # Production: Use PostgreSQL (Supabase, Neon, etc.)
+    # Fix for SQLAlchemy compatibility with Postgres URL
+    database_url = os.environ.get('DATABASE_URL')
+    if database_url.startswith('postgres://'):
+        database_url = database_url.replace('postgres://', 'postgresql://', 1)
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 else:
-    db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'protocols.db')
-    os.makedirs(os.path.dirname(db_path), exist_ok=True)
+    # Development: Use SQLite
+    if os.environ.get('VERCEL'):
+        db_path = os.path.join('/tmp', 'protocols.db')
+    else:
+        db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'protocols.db')
+        os.makedirs(os.path.dirname(db_path), exist_ok=True)
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 
-app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
