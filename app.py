@@ -3360,35 +3360,41 @@ def cleanup_db():
     """Remove all sample questions, keep only imported SNHD Protocol questions"""
     try:
         with app.app_context():
+            from sqlalchemy import or_
+            
+            # Get IDs of questions to keep (exact match only)
+            questions_to_keep = Question.query.filter(
+                or_(
+                    Question.source == 'SNHD Protocols',
+                    Question.source == 'SNHD Protocols - Quizlet'
+                )
+            ).with_entities(Question.id).all()
+            keep_ids = [q.id for q in questions_to_keep]
+            
             # Count before deletion
             total_before = Question.query.count()
             answers_before = Answer.query.count()
             
-            # Delete all questions that have extended SNHD source names
-            # (sample questions have sources like "SNHD Protocols - Fluid Therapy")
-            # Keep only exact "SNHD Protocols" or "SNHD Protocols - Quizlet"
-            from sqlalchemy import or_
-            sample_questions = Question.query.filter(
-                ~or_(
-                    Question.source == 'SNHD Protocols',
-                    Question.source == 'SNHD Protocols - Quizlet'
-                ) | 
-                (Question.source == None) | 
-                (Question.source == '')
-            ).all()
+            # Use raw SQL for efficient bulk delete
+            # First delete answers that reference questions we're deleting
+            if keep_ids:
+                db.session.execute(
+                    db.text("DELETE FROM answer WHERE question_id NOT IN :keep_ids"),
+                    {'keep_ids': tuple(keep_ids)}
+                )
+            else:
+                # Delete all answers if no questions to keep
+                db.session.execute(db.text("DELETE FROM answer"))
             
-            deleted_questions = len(sample_questions)
-            deleted_answers = 0
-            
-            # First delete any answers that reference these questions
-            for q in sample_questions:
-                # Delete all answers for this question
-                answers = Answer.query.filter_by(question_id=q.id).all()
-                for a in answers:
-                    db.session.delete(a)
-                    deleted_answers += 1
-                # Then delete the question
-                db.session.delete(q)
+            # Then delete the questions
+            if keep_ids:
+                db.session.execute(
+                    db.text("DELETE FROM question WHERE id NOT IN :keep_ids"),
+                    {'keep_ids': tuple(keep_ids)}
+                )
+            else:
+                # Delete all questions if nothing to keep
+                db.session.execute(db.text("DELETE FROM question"))
             
             db.session.commit()
             
@@ -3399,8 +3405,8 @@ def cleanup_db():
             return jsonify({
                 'success': True,
                 'message': 'Database cleanup completed',
-                'deleted_questions': deleted_questions,
-                'deleted_answers': deleted_answers,
+                'deleted_questions': total_before - total_after,
+                'deleted_answers': answers_before - answers_after,
                 'remaining_questions': total_after,
                 'remaining_answers': answers_after,
                 'note': 'Kept only SNHD Protocols and SNHD Protocols - Quizlet questions'
