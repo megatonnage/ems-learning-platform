@@ -3354,6 +3354,43 @@ def init_db():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
+@app.route('/cleanup-db')
+@admin_required
+def cleanup_db():
+    """Remove all sample questions, keep only SNHD Protocol questions"""
+    try:
+        with app.app_context():
+            # Count before deletion
+            total_before = Question.query.count()
+            
+            # Delete all questions that are NOT from SNHD Protocols
+            # (or have no source specified)
+            sample_questions = Question.query.filter(
+                (Question.source != 'SNHD Protocols') | 
+                (Question.source == None) | 
+                (Question.source == '')
+            ).all()
+            
+            deleted_count = len(sample_questions)
+            
+            for q in sample_questions:
+                db.session.delete(q)
+            
+            db.session.commit()
+            
+            # Count after deletion
+            total_after = Question.query.count()
+            
+            return jsonify({
+                'success': True,
+                'message': 'Database cleanup completed',
+                'deleted': deleted_count,
+                'remaining': total_after,
+                'note': 'Only SNHD Protocol questions remain'
+            })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 # ==================== MAIN ====================
 
 if __name__ == '__main__':
