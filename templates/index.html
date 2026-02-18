@@ -131,6 +131,10 @@
                 Select a level to see what you'll be studying.
             </div>
             
+            <div id="paramedicNotice" style="display: none; margin: 1rem 0; padding: 1rem; background: #fff3e0; border: 1px solid #ffcc80; border-radius: 8px; font-size: 0.9rem; color: #e65100;">
+                <strong>⚠️ Note:</strong> Paramedic level questions are not yet generated because we haven't finished paramedic school. Once we have successfully completed paramedic school and passed the SNHD protocols for the paramedic level, we will update this tool.
+            </div>
+            
             <button type="submit">Start Learning</button>
         </form>
     </div>
@@ -143,6 +147,14 @@
                 'PARAMEDIC': 'Cardiac Monitoring, 12-Lead ECG, Advanced Procedures, Pharmacology, Critical Care'
             };
             document.getElementById('levelInfo').textContent = info[this.value] || 'Select a level to see what you\'ll be studying.';
+            
+            // Show/hide Paramedic notice
+            const paramedicNotice = document.getElementById('paramedicNotice');
+            if (this.value === 'PARAMEDIC') {
+                paramedicNotice.style.display = 'block';
+            } else {
+                paramedicNotice.style.display = 'none';
+            }
         });
         
         document.getElementById('registerForm').addEventListener('submit', async function(e) {
