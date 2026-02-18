@@ -204,9 +204,13 @@ def quiz():
             unique_questions.append(q)
     questions = unique_questions
     
-    # Get available categories for filter UI
+    # Get available categories for Quick Topic Selection
     categories = db.session.query(Question.category).distinct().all()
     categories = [c[0] for c in categories if c[0]]
+    
+    # Get available subcategories for More Topics dropdown
+    subcategories = db.session.query(Question.subcategory).distinct().all()
+    subcategories = [s[0] for s in subcategories if s[0]]
     
     # Get total count before limiting
     total_available = len(questions)
@@ -219,8 +223,8 @@ def quiz():
         questions = questions[:10]
     
     return render_template('quiz.html', questions=questions, user=user, 
-                         categories=categories, selected_category=category,
-                         selected_subcategory=subcategory,
+                         categories=categories, subcategories=subcategories,
+                         selected_category=category, selected_subcategory=subcategory,
                          total_available=total_available)
 
 @app.route('/submit_answer', methods=['POST'])

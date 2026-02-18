@@ -203,40 +203,26 @@
     <div class="container">
         <!-- Quick Topic Filters -->
         <div class="quick-filters" style="margin-bottom: 1.5rem; padding: 1.5rem; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.08);">
-            <h3 style="margin-bottom: 1rem; color: #333;">🎯 Quick Topic Selection</h3>
+            <h3 style="margin-bottom: 1rem; color: #333;">🎯 Quick Topic Selection (Categories)</h3>
             
-            <!-- Pediatric Topics -->
-            <div style="margin-bottom: 1rem;">
-                <strong style="color: #667eea; display: block; margin-bottom: 0.5rem;">👶 Pediatric Focus</strong>
-                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                    <a href="/quiz?category=Pediatric" class="topic-btn" style="padding: 8px 16px; background: #e3f2fd; color: #1976d2; border-radius: 20px; text-decoration: none; font-size: 0.9rem; border: 1px solid #bbdefb;">All Pediatric</a>
-                    <a href="/quiz?category=Fluid+Boluses" class="topic-btn" style="padding: 8px 16px; background: #e8f5e9; color: #388e3c; border-radius: 20px; text-decoration: none; font-size: 0.9rem; border: 1px solid #a5d6a7;">💧 All Fluid Boluses</a>
-                    <a href="/quiz?category=Medications" class="topic-btn" style="padding: 8px 16px; background: #fff3e0; color: #f57c00; border-radius: 20px; text-decoration: none; font-size: 0.9rem; border: 1px solid #ffcc80;">💊 All Medications</a>
-                </div>
+            <!-- Categories -->
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;">
+                {% for cat in categories %}
+                <a href="/quiz?category={{ cat }}" class="topic-btn" style="padding: 8px 16px; background: {% if cat == 'Pediatric' %}#e3f2fd{% elif cat == 'Medications' %}#fff3e0{% elif cat == 'Fluid Boluses' %}#e8f5e9{% elif cat == 'Trauma' %}#ffebee{% else %}#f3e5f5{% endif %}; color: {% if cat == 'Pediatric' %}#1976d2{% elif cat == 'Medications' %}#f57c00{% elif cat == 'Fluid Boluses' %}#388e3c{% elif cat == 'Trauma' %}#d32f2f{% else %}#7b1fa2{% endif %}; border-radius: 20px; text-decoration: none; font-size: 0.9rem; border: 1px solid {% if cat == 'Pediatric' %}#bbdefb{% elif cat == 'Medications' %}#ffcc80{% elif cat == 'Fluid Boluses' %}#a5d6a7{% elif cat == 'Trauma' %}#ef9a9a{% else %}#ce93d8{% endif %}; {% if cat == selected_category %}font-weight: bold; box-shadow: 0 2px 8px rgba(0,0,0,0.15);{% endif %}">{{ cat }}</a>
+                {% endfor %}
             </div>
             
-            <!-- Core Topics -->
-            <div style="margin-bottom: 1rem;">
-                <strong style="color: #667eea; display: block; margin-bottom: 0.5rem;">📚 Core Topics</strong>
-                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                    <a href="/quiz?category=Fluid+Boluses" class="topic-btn" style="padding: 8px 16px; background: #e8f5e9; color: #388e3c; border-radius: 20px; text-decoration: none; font-size: 0.9rem; border: 1px solid #a5d6a7;">Fluid Boluses</a>
-                    <a href="/quiz?category=Medications" class="topic-btn" style="padding: 8px 16px; background: #fff3e0; color: #f57c00; border-radius: 20px; text-decoration: none; font-size: 0.9rem; border: 1px solid #ffcc80;">Medications</a>
-                    <a href="/quiz?category=Trauma" class="topic-btn" style="padding: 8px 16px; background: #ffebee; color: #d32f2f; border-radius: 20px; text-decoration: none; font-size: 0.9rem; border: 1px solid #ef9a9a;">Trauma/TFTC</a>
-                    <a href="/quiz?category=Transport" class="topic-btn" style="padding: 8px 16px; background: #e0f2f1; color: #00796b; border-radius: 20px; text-decoration: none; font-size: 0.9rem; border: 1px solid #80cbc4;">Hospital Selection</a>
-                </div>
-            </div>
-            
-            <!-- All Categories Dropdown -->
+            <!-- Subcategories Dropdown -->
             <form method="GET" action="/quiz" style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #eee;">
-                <label style="font-weight: 600; color: #333;">More topics:</label>
-                <select name="category" onchange="this.form.submit()" style="padding: 8px; border-radius: 6px; border: 1px solid #ddd; min-width: 200px;">
-                    <option value="all">All Categories</option>
-                    {% for cat in categories %}
-                    <option value="{{ cat }}" {% if cat == selected_category %}selected{% endif %}>{{ cat }}</option>
+                <label style="font-weight: 600; color: #333;">📂 More Topics (Subcategories):</label>
+                <select name="subcategory" onchange="this.form.submit()" style="padding: 8px; border-radius: 6px; border: 1px solid #ddd; min-width: 200px;">
+                    <option value="all">All Subcategories</option>
+                    {% for sub in subcategories %}
+                    <option value="{{ sub }}" {% if sub == selected_subcategory %}selected{% endif %}>{{ sub }}</option>
                     {% endfor %}
                 </select>
-                {% if selected_category != 'all' %}
-                <a href="/quiz" style="color: #667eea; text-decoration: none; font-size: 0.9rem;">✕ Clear filter</a>
+                {% if selected_category != 'all' or selected_subcategory != 'all' %}
+                <a href="/quiz" style="color: #667eea; text-decoration: none; font-size: 0.9rem;">✕ Clear filters</a>
                 {% endif %}
             </form>
         </div>
