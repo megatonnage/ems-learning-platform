@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fix Duplicate Questions - Admin</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { color: #333; margin-top: 0; }
+        .status { 
+            background: #e3f2fd; 
+            padding: 20px; 
+            border-radius: 8px; 
+            margin: 20px 0;
+            border-left: 4px solid #2196F3;
+        }
+        .warning {
+            background: #fff3e0;
+            border-left-color: #ff9800;
+        }
+        .success {
+            background: #e8f5e9;
+            border-left-color: #4caf50;
+        }
+        button {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        button:hover { background: #1976D2; }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #2196F3;
+        }
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+        #result { margin-top: 20px; }
+        .loading { 
+            display: none; 
+            text-align: center; 
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Fix Duplicate Questions</h1>
+        
+        <div id="status" class="status">
+            <p><strong>Analyzing database...</strong></p>
+            <p>Please wait while we check for duplicates.</p>
+        </div>
+        
+        <div id="stats" class="stats" style="display: none;">
+            <div class="stat-box">
+                <div class="stat-number" id="total-count">-</div>
+                <div class="stat-label">Total Questions</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number" id="dup-groups">-</div>
+                <div class="stat-label">Duplicate Groups</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number" id="to-delete">-</div>
+                <div class="stat-label">Questions to Delete</div>
+            </div>
+        </div>
+        
+        <div id="action-area" style="display: none;">
+            <button id="fix-btn" onclick="fixDuplicates()">
+                Remove Duplicates
+            </button>
+        </div>
+        
+        <div id="loading" class="loading">
+            <p>⏳ Processing... Please wait.</p>
+        </div>
+        
+        <div id="result"></div>
+    </div>
+
+    <script>
+        // Check status on load
+        fetch('/admin/fix-duplicates')
+            .then(r => r.json())
+            .then(data => {
+                const status = document.getElementById('status');
+                const stats = document.getElementById('stats');
+                const actionArea = document.getElementById('action-area');
+                
+                if (data.success) {
+                    document.getElementById('total-count').textContent = data.total_questions;
+                    document.getElementById('dup-groups').textContent = data.duplicate_groups;
+                    document.getElementById('to-delete').textContent = data.duplicates_to_delete;
+                    
+                    stats.style.display = 'grid';
+                    
+                    if (data.duplicate_groups > 0) {
+                        status.className = 'status warning';
+                        status.innerHTML = `
+                            <p><strong>⚠️ Duplicates Found!</strong></p>
+                            <p>${data.message}</p>
+                        `;
+                        actionArea.style.display = 'block';
+                    } else {
+                        status.className = 'status success';
+                        status.innerHTML = `
+                            <p><strong>✅ No Duplicates!</strong></p>
+                            <p>Your database is clean. No action needed.</p>
+                        `;
+                    }
+                } else {
+                    status.className = 'status warning';
+                    status.innerHTML = `<p><strong>Error:</strong> ${data.error}</p>`;
+                }
+            })
+            .catch(err => {
+                document.getElementById('status').innerHTML = 
+                    `<p><strong>Error:</strong> ${err.message}</p>`;
+            });
+        
+        function fixDuplicates() {
+            if (!confirm('Are you sure? This will permanently delete duplicate questions.\n\nThe newest version of each question will be kept.')) {
+                return;
+            }
+            
+            document.getElementById('fix-btn').disabled = true;
+            document.getElementById('loading').style.display = 'block';
+            
+            fetch('/admin/fix-duplicates', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('loading').style.display = 'none';
+                const result = document.getElementById('result');
+                
+                if (data.success) {
+                    result.innerHTML = `
+                        <div class="status success">
+                            <h3>✅ Fix Complete!</h3>
+                            <p><strong>Duplicates found:</strong> ${data.duplicates_found}</p>
+                            <p><strong>Questions deleted:</strong> ${data.questions_deleted}</p>
+                            <p><strong>Orphaned answers cleaned:</strong> ${data.orphaned_answers_deleted}</p>
+                            <p><strong>Final question count:</strong> ${data.final_question_count}</p>
+                        </div>
+                    `;
+                    document.getElementById('action-area').style.display = 'none';
+                } else {
+                    result.innerHTML = `
+                        <div class="status warning">
+                            <h3>❌ Error</h3>
+                            <p>${data.error}</p>
+                        </div>
+                    `;
+                    document.getElementById('fix-btn').disabled = false;
+                }
+            })
+            .catch(err => {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('result').innerHTML = 
+                    `<div class="status warning"><p>Error: ${err.message}</p></div>`;
+                document.getElementById('fix-btn').disabled = false;
+            });
+        }
+    </script>
+</body>
+</html>
