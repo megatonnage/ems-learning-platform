@@ -218,13 +218,13 @@
             <h3 style="margin-bottom: 1rem; color: #333;">📂 Topics</h3>
             
             <form method="GET" action="/quiz" style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
-                <select name="subcategory" onchange="this.form.submit()" style="padding: 8px; border-radius: 6px; border: 1px solid #ddd; min-width: 250px;">
+                <select name="category" onchange="this.form.submit()" style="padding: 8px; border-radius: 6px; border: 1px solid #ddd; min-width: 250px;">
                     <option value="all">All Topics</option>
-                    {% for sub in subcategories %}
-                    <option value="{{ sub }}" {% if sub == selected_subcategory %}selected{% endif %}>{{ sub }}</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat }}" {% if cat == selected_category %}selected{% endif %}>{{ cat }}</option>
                     {% endfor %}
                 </select>
-                {% if selected_subcategory != 'all' %}
+                {% if selected_category != 'all' %}
                 <a href="/quiz" style="color: #667eea; text-decoration: none; font-size: 0.9rem;">✕ Clear filter</a>
                 {% endif %}
             </form>
