@@ -162,8 +162,13 @@ def quiz():
     questions = []
     
     if category == 'all':
-        # No filter - get all questions for user's level
-        questions = base_query.all()
+        # No category filter - but check for subcategory filter
+        if subcategory != 'all':
+            # Filter by subcategory only
+            questions = base_query.filter_by(subcategory=subcategory).all()
+        else:
+            # No filters - get all questions for user's level
+            questions = base_query.all()
     else:
         # Filter by category - also include pediatric questions with matching subcategory
         # For example, "Fluid Boluses" should include "Pediatric" category with "Fluid Boluses" subcategory
