@@ -202,45 +202,30 @@
     </nav>
     
     <div class="container">
-        <!-- Instructions for Using Filters -->
+        <!-- Instructions -->
         <div style="background: #e3f2fd; padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; border-left: 4px solid #1976d2;">
-            <h2 style="margin-bottom: 0.5rem; color: #1565c0; font-size: 1.1rem;">📖 Instructions for Using Filters</h2>
+            <h2 style="margin-bottom: 0.5rem; color: #1565c0; font-size: 1.1rem;">📖 How to Use This Quiz</h2>
             <p style="color: #424242; margin-bottom: 1rem; line-height: 1.6; font-size: 0.9rem;">
-                The filters may seem confusing at first, but they will make sense as you use them.
-                <strong>Higher certification levels need to know content from more junior levels.</strong> For example:
+                Questions are organized by topic. Select a topic from the dropdown to focus on specific content, or view all questions to study everything.
             </p>
-            <ul style="color: #424242; margin-left: 1.5rem; margin-bottom: 1rem; line-height: 1.6; font-size: 0.9rem;">
-                <li><strong>AEMTs</strong> must know everything from the <strong>EMT</strong> level</li>
-                <li><strong>Paramedics</strong> must know everything from <strong>BOTH EMT and AEMT</strong> levels</li>
-            </ul>
             <p style="color: #424242; line-height: 1.6; font-size: 0.9rem;">
-                <strong>Recommendation:</strong> Start by going through all questions at your default level.
-                When you want to focus on specific topics, use the filters. Click <strong>"Clear filters"</strong> to return to viewing all questions for your level, including those from lower certification levels.
+                <strong>Tip:</strong> Higher certification levels (AEMT, Paramedic) need to know content from more junior levels. All questions at your level and below are included by default.
             </p>
         </div>
 
-        <!-- Quick Topic Filters -->
+        <!-- Topic Filter -->
         <div class="quick-filters" style="margin-bottom: 1.5rem; padding: 1.5rem; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.08);">
-            <h3 style="margin-bottom: 1rem; color: #333;">🎯 Quick Topic Selection (Categories)</h3>
+            <h3 style="margin-bottom: 1rem; color: #333;">📂 Topics</h3>
             
-            <!-- Categories -->
-            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;">
-                {% for cat in categories %}
-                <a href="/quiz?category={{ cat }}" class="topic-btn" style="padding: 8px 16px; background: {% if cat == 'Pediatric' %}#e3f2fd{% elif cat == 'Medications' %}#fff3e0{% elif cat == 'Fluid Boluses' %}#e8f5e9{% elif cat == 'Trauma' %}#ffebee{% else %}#f3e5f5{% endif %}; color: {% if cat == 'Pediatric' %}#1976d2{% elif cat == 'Medications' %}#f57c00{% elif cat == 'Fluid Boluses' %}#388e3c{% elif cat == 'Trauma' %}#d32f2f{% else %}#7b1fa2{% endif %}; border-radius: 20px; text-decoration: none; font-size: 0.9rem; border: 1px solid {% if cat == 'Pediatric' %}#bbdefb{% elif cat == 'Medications' %}#ffcc80{% elif cat == 'Fluid Boluses' %}#a5d6a7{% elif cat == 'Trauma' %}#ef9a9a{% else %}#ce93d8{% endif %}; {% if cat == selected_category %}font-weight: bold; box-shadow: 0 2px 8px rgba(0,0,0,0.15);{% endif %}">{{ cat }}</a>
-                {% endfor %}
-            </div>
-            
-            <!-- Subcategories Dropdown -->
-            <form method="GET" action="/quiz" style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #eee;">
-                <label style="font-weight: 600; color: #333;">📂 More Topics (Subcategories):</label>
-                <select name="subcategory" onchange="this.form.submit()" style="padding: 8px; border-radius: 6px; border: 1px solid #ddd; min-width: 200px;">
-                    <option value="all">All Subcategories</option>
+            <form method="GET" action="/quiz" style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+                <select name="subcategory" onchange="this.form.submit()" style="padding: 8px; border-radius: 6px; border: 1px solid #ddd; min-width: 250px;">
+                    <option value="all">All Topics</option>
                     {% for sub in subcategories %}
                     <option value="{{ sub }}" {% if sub == selected_subcategory %}selected{% endif %}>{{ sub }}</option>
                     {% endfor %}
                 </select>
-                {% if selected_category != 'all' or selected_subcategory != 'all' %}
-                <a href="/quiz" style="color: #667eea; text-decoration: none; font-size: 0.9rem;">✕ Clear filters</a>
+                {% if selected_subcategory != 'all' %}
+                <a href="/quiz" style="color: #667eea; text-decoration: none; font-size: 0.9rem;">✕ Clear filter</a>
                 {% endif %}
             </form>
         </div>
