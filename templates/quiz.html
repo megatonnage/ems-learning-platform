@@ -185,6 +185,131 @@
             color: #667eea;
         }
         .hidden { display: none; }
+        
+        /* Mnemonic Hint Styles */
+        .mnemonic-hint {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: #fff8e1;
+            border-radius: 8px;
+            border-left: 4px solid #ffa000;
+            display: none;
+            animation: slideDown 0.2s ease-out;
+        }
+        .mnemonic-hint.show {
+            display: block;
+        }
+        .mnemonic-hint.revealed {
+            background: #e8f5e9;
+            border-left-color: #4caf50;
+        }
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .hint-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #f57c00;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            margin-top: 1rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .hint-link:hover {
+            color: #e65100;
+        }
+        .hint-link.hidden {
+            display: none;
+        }
+        .mnemonic-acronym {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #e65100;
+            letter-spacing: 2px;
+        }
+        .mnemonic-label {
+            font-size: 0.8rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.25rem;
+        }
+        
+        /* Teaching Moment Styles */
+        .teaching-moment {
+            margin-top: 1.5rem;
+            padding: 1.25rem;
+            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+            border-radius: 8px;
+            border-left: 4px solid #7c4dff;
+            display: none;
+            animation: slideDown 0.3s ease-out;
+        }
+        .teaching-moment.show {
+            display: block;
+        }
+        .teaching-moment.wrong {
+            background: linear-gradient(135deg, #ffebee 0%, #fce4ec 100%);
+            border-left-color: #f44336;
+        }
+        .teaching-moment.correct {
+            background: linear-gradient(135deg, #e8f5e9 0%, #e0f2f1 100%);
+            border-left-color: #4caf50;
+        }
+        .teaching-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+            color: #7c4dff;
+        }
+        .teaching-moment.wrong .teaching-header {
+            color: #d32f2f;
+        }
+        .teaching-moment.correct .teaching-header {
+            color: #388e3c;
+        }
+        .teaching-badge {
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            background: rgba(124, 77, 255, 0.15);
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .teaching-moment.wrong .teaching-badge {
+            background: rgba(244, 67, 54, 0.15);
+            color: #d32f2f;
+        }
+        .teaching-moment.correct .teaching-badge {
+            background: rgba(76, 175, 80, 0.15);
+            color: #388e3c;
+        }
+        .mnemonic-expansion {
+            font-size: 0.95rem;
+            line-height: 1.7;
+            color: #333;
+            white-space: pre-line;
+            margin-bottom: 0.75rem;
+        }
+        .teaching-context {
+            font-size: 0.9rem;
+            color: #555;
+            font-style: italic;
+            padding-top: 0.75rem;
+            border-top: 1px dashed rgba(0,0,0,0.1);
+        }
     </style>
 <script defer src="/_vercel/insights/script.js"></script>
 </head>
@@ -259,11 +384,38 @@
                     </div>
                     {% endfor %}
                 </div>
+                
+                <!-- Mnemonic Hint -->
+                {% if q.mnemonic_enabled and q.mnemonic_acronym %}
+                <a class="hint-link" id="hint-link-{{ q.id }}" onclick="revealHint({{ q.id }})">
+                    💡 Reveal hint
+                </a>
+                <div class="mnemonic-hint" id="mnemonic-{{ q.id }}">
+                    <div class="mnemonic-label">Memory Aid</div>
+                    <div class="mnemonic-acronym">{{ q.mnemonic_acronym }}</div>
+                </div>
+                {% endif %}
+                
                 <div class="explanation" id="explanation-{{ q.id }}">
                     <h4>Explanation</h4>
                     <p>{{ q.explanation }}</p>
                     <small>Source: {{ q.source }}</small>
                 </div>
+                
+                <!-- Teaching Moment (Full Mnemonic) -->
+                {% if q.mnemonic_enabled and q.mnemonic_expansion %}
+                <div class="teaching-moment" id="teaching-{{ q.id }}" data-has-mnemonic="true">
+                    <div class="teaching-header">
+                        <span id="teaching-icon-{{ q.id }}">📚</span>
+                        <span id="teaching-title-{{ q.id }}">Study Note</span>
+                        <span class="teaching-badge" id="teaching-badge-{{ q.id }}">Memory Aid</span>
+                    </div>
+                    <div class="mnemonic-expansion">{{ q.mnemonic_expansion }}</div>
+                    {% if q.mnemonic_teaching_context %}
+                    <div class="teaching-context">💡 {{ q.mnemonic_teaching_context }}</div>
+                    {% endif %}
+                </div>
+                {% endif %}
             </div>
             {% endfor %}
         </div>
@@ -338,6 +490,9 @@
                 
                 if (answers[qid]) return; // Already answered
                 
+                // Hide hint link (can't reveal after answering)
+                hideHint(qid);
+                
                 // Mark all options
                 card.querySelectorAll('.option').forEach((opt, idx) => {
                     opt.classList.remove('selected');
@@ -355,6 +510,9 @@
                 const correct = selectedIndex === correctIndex;
                 answers[qid] = { correct, selectedIndex };
                 if (correct) score++;
+                
+                // Show teaching moment if mnemonic exists
+                showTeachingMoment(qid, correct);
                 
                 // Send to server
                 await fetch('/submit_answer', {
@@ -399,6 +557,65 @@
         
         // Initialize
         showQuestion(0);
+        
+        // Mnemonic Hint Functions
+        async function revealHint(questionId) {
+            const hintLink = document.getElementById('hint-link-' + questionId);
+            const mnemonicCard = document.getElementById('mnemonic-' + questionId);
+            
+            // Hide the link, show the card
+            hintLink.classList.add('hidden');
+            mnemonicCard.classList.add('show');
+            
+            // Track hint usage (optional, for analytics)
+            try {
+                await fetch('/api/question/' + questionId + '/hint', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+            } catch (e) {
+                // Silent fail - don't block user if tracking fails
+                console.log('Hint tracking failed:', e);
+            }
+        }
+        
+        function hideHint(questionId) {
+            const hintLink = document.getElementById('hint-link-' + questionId);
+            const mnemonicCard = document.getElementById('mnemonic-' + questionId);
+            
+            if (hintLink) hintLink.classList.add('hidden');
+            if (mnemonicCard) mnemonicCard.classList.remove('show');
+        }
+        
+        // Teaching Moment Functions
+        function showTeachingMoment(questionId, isCorrect) {
+            const teachingCard = document.getElementById('teaching-' + questionId);
+            if (!teachingCard) return; // No mnemonic for this question
+            
+            const icon = document.getElementById('teaching-icon-' + questionId);
+            const title = document.getElementById('teaching-title-' + questionId);
+            const badge = document.getElementById('teaching-badge-' + questionId);
+            
+            // Remove any existing state classes
+            teachingCard.classList.remove('correct', 'wrong');
+            
+            if (isCorrect) {
+                // Correct answer: show as "Bonus" study note
+                teachingCard.classList.add('correct');
+                icon.textContent = '🎓';
+                title.textContent = 'Study Note';
+                badge.textContent = 'Bonus';
+            } else {
+                // Wrong answer: emphasize learning
+                teachingCard.classList.add('wrong');
+                icon.textContent = '📚';
+                title.textContent = 'Learn';
+                badge.textContent = 'Review';
+            }
+            
+            // Show the teaching moment
+            teachingCard.classList.add('show');
+        }
     </script>
 </body>
 </html>

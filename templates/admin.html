@@ -281,6 +281,72 @@
             justify-content: center;
             width: 30px;
         }
+
+        /* Mnemonic Section Styles */
+        .mnemonic-section {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        .mnemonic-section.enabled {
+            background: #fff8e1;
+            border-color: #ffa000;
+        }
+        .mnemonic-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+        .mnemonic-header input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .mnemonic-header label {
+            font-weight: 600;
+            margin: 0;
+            cursor: pointer;
+        }
+        .mnemonic-fields {
+            display: none;
+        }
+        .mnemonic-fields.visible {
+            display: block;
+        }
+        .mnemonic-fields .form-row {
+            margin-bottom: 0.75rem;
+        }
+        .mnemonic-fields .form-row:last-child {
+            margin-bottom: 0;
+        }
+        .mnemonic-acronym-input {
+            font-family: monospace;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        .mnemonic-preview {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 0.75rem;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+        .mnemonic-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            background: #fff8e1;
+            color: #f57c00;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
     </style>
 <script defer src="/_vercel/insights/script.js"></script>
 </head>
@@ -348,6 +414,7 @@
                         <th onclick="sortTable(1)" class="sort-icon">Level</th>
                         <th onclick="sortTable(2)" class="sort-icon">Category</th>
                         <th onclick="sortTable(3)" class="sort-icon">Question</th>
+                        <th>Mnemonic</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -360,8 +427,15 @@
                         </td>
                         <td class="q-text" title="{{ q.question }}">{{ q.question }}</td>
                         <td>
+                            {% if q.mnemonic_enabled %}
+                            <span class="mnemonic-badge">💡 {{ q.mnemonic_acronym }}</span>
+                            {% else %}
+                            <span style="color:#999; font-size:0.8rem">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
                             <button class="btn btn-secondary" style="padding:5px 10px; font-size:0.8rem"
-                                onclick='openModal("edit", {{ q.id }}, {{ q.to_dict() | tojson }})'>Edit</button>
+                                onclick='openModal("edit", {{ q.id }}, {{ q.to_dict_with_mnemonic() | tojson }})'>Edit</button>
                             <button class="btn btn-danger" style="padding:5px 10px; font-size:0.8rem"
                                 onclick="deleteQuestion({{ q.id }})">Delete</button>
                         </td>
@@ -428,6 +502,40 @@
                     <input type="text" id="qSource" name="source" placeholder="e.g., SNHD Protocols - Section X">
                 </div>
 
+                <!-- Mnemonic Section -->
+                <div class="mnemonic-section" id="mnemonicSection">
+                    <div class="mnemonic-header">
+                        <input type="checkbox" id="mnemonicEnabled" name="mnemonic_enabled" onchange="toggleMnemonicFields()">
+                        <label for="mnemonicEnabled">Include Mnemonic Hint</label>
+                    </div>
+                    <div class="mnemonic-fields" id="mnemonicFields">
+                        <div class="form-row">
+                            <label>Acronym (shown as hint)</label>
+                            <input type="text" id="mnemonicAcronym" name="mnemonic_acronym" 
+                                   class="mnemonic-acronym-input" placeholder="e.g., OPQRST" maxlength="20">
+                        </div>
+                        <div class="form-row">
+                            <label>Full Expansion (shown after answer)</label>
+                            <textarea id="mnemonicExpansion" name="mnemonic_expansion" rows="4"
+                                      placeholder="O - Onset (when did it start?)
+P - Provocation (what makes it better/worse?)
+Q - Quality (sharp, dull, pressure?)
+R - Radiation (does it move?)
+S - Severity (rate 1-10)
+T - Time (how long has it lasted?)"></textarea>
+                        </div>
+                        <div class="form-row">
+                            <label>Teaching Context (why this applies)</label>
+                            <textarea id="mnemonicTeachingContext" name="mnemonic_teaching_context" rows="2"
+                                      placeholder="This question asks about chest pain, the classic use case for OPQRST."></textarea>
+                        </div>
+                        <div class="mnemonic-preview" id="mnemonicPreview" style="display:none;">
+                            <strong>Preview:</strong>
+                            <div id="previewContent"></div>
+                        </div>
+                    </div>
+                </div>
+
                 <div style="text-align:right">
                     <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
                     <button type="submit" class="btn btn-primary">Save Question</button>
@@ -473,9 +581,31 @@
                 document.getElementById('qText').value = data.question;
                 document.getElementById('qExplanation').value = data.explanation;
                 document.getElementById('qSource').value = data.source;
+                
+                // Populate mnemonic fields
+                if (data.mnemonic) {
+                    document.getElementById('mnemonicEnabled').checked = data.mnemonic.enabled;
+                    document.getElementById('mnemonicAcronym').value = data.mnemonic.acronym || '';
+                    document.getElementById('mnemonicExpansion').value = data.mnemonic.expansion || '';
+                    document.getElementById('mnemonicTeachingContext').value = data.mnemonic.teaching_context || '';
+                    toggleMnemonicFields();
+                } else {
+                    // Reset mnemonic fields for new questions
+                    document.getElementById('mnemonicEnabled').checked = false;
+                    document.getElementById('mnemonicAcronym').value = '';
+                    document.getElementById('mnemonicExpansion').value = '';
+                    document.getElementById('mnemonicTeachingContext').value = '';
+                    toggleMnemonicFields();
+                }
             } else {
                 title.textContent = 'Add New Question';
                 document.getElementById('editId').value = '';
+                // Reset mnemonic fields
+                document.getElementById('mnemonicEnabled').checked = false;
+                document.getElementById('mnemonicAcronym').value = '';
+                document.getElementById('mnemonicExpansion').value = '';
+                document.getElementById('mnemonicTeachingContext').value = '';
+                toggleMnemonicFields();
             }
 
             modal.classList.add('active');
@@ -489,33 +619,41 @@
             e.preventDefault();
             const formData = new FormData(e.target);
             const id = formData.get('id');
-            const url = id ? `/admin/question/edit/${id}` : '/admin/question/add';
+            const url = id ? `/admin/question/${id}/edit` : '/admin/question/new';
 
-            // Collect options into JSON array
+            // Convert options[] to option_0, option_1, etc.
             const options = formData.getAll('options[]');
-
-            const payload = {
-                level: formData.get('level'),
-                category: formData.get('category'),
-                subcategory: formData.get('subcategory'),
-                question: formData.get('question'),
-                options: JSON.stringify(options),
-                correct_answer: parseInt(formData.get('correct_answer')),
-                explanation: formData.get('explanation'),
-                source: formData.get('source')
-            };
+            const formBody = new URLSearchParams();
+            
+            formBody.append('level', formData.get('level'));
+            formBody.append('category', formData.get('category'));
+            formBody.append('subcategory', formData.get('subcategory'));
+            formBody.append('question', formData.get('question'));
+            options.forEach((opt, i) => formBody.append(`option_${i}`, opt));
+            formBody.append('correct_answer', formData.get('correct_answer'));
+            formBody.append('explanation', formData.get('explanation'));
+            formBody.append('source', formData.get('source'));
+            
+            // Mnemonic fields
+            if (formData.get('mnemonic_enabled') === 'on') {
+                formBody.append('mnemonic_enabled', 'on');
+            }
+            formBody.append('mnemonic_acronym', formData.get('mnemonic_acronym') || '');
+            formBody.append('mnemonic_expansion', formData.get('mnemonic_expansion') || '');
+            formBody.append('mnemonic_teaching_context', formData.get('mnemonic_teaching_context') || '');
 
             try {
                 const res = await fetch(url, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: formBody
                 });
 
-                if (res.ok) {
+                const result = await res.json();
+                if (result.success) {
                     location.reload();
                 } else {
-                    alert('Error saving question');
+                    alert('Error: ' + (result.error || 'Unknown error'));
                 }
             } catch (err) {
                 console.error(err);
@@ -527,7 +665,7 @@
             if (!confirm(`Are you sure you want to delete Question #${id}?`)) return;
 
             try {
-                const res = await fetch(`/admin/question/delete/${id}`, { method: 'POST' });
+                const res = await fetch(`/admin/question/${id}/delete`, { method: 'POST' });
                 if (res.ok) {
                     location.reload();
                 } else {
@@ -538,6 +676,52 @@
                 alert('Connection error');
             }
         }
+
+        // Mnemonic Functions
+        function toggleMnemonicFields() {
+            const checkbox = document.getElementById('mnemonicEnabled');
+            const fields = document.getElementById('mnemonicFields');
+            const section = document.getElementById('mnemonicSection');
+            
+            if (checkbox.checked) {
+                fields.classList.add('visible');
+                section.classList.add('enabled');
+                updateMnemonicPreview();
+            } else {
+                fields.classList.remove('visible');
+                section.classList.remove('enabled');
+            }
+        }
+
+        function updateMnemonicPreview() {
+            const acronym = document.getElementById('mnemonicAcronym').value.toUpperCase();
+            const expansion = document.getElementById('mnemonicExpansion').value;
+            const context = document.getElementById('mnemonicTeachingContext').value;
+            const previewDiv = document.getElementById('mnemonicPreview');
+            const previewContent = document.getElementById('previewContent');
+            
+            if (acronym || expansion) {
+                previewDiv.style.display = 'block';
+                let html = '';
+                if (acronym) {
+                    html += `<div style="font-weight:600; color:#f57c00; letter-spacing:2px; margin-bottom:0.5rem;">${acronym}</div>`;
+                }
+                if (expansion) {
+                    html += `<div style="white-space:pre-line; font-size:0.9rem; margin-bottom:0.5rem;">${expansion.replace(/\n/g, '<br>')}</div>`;
+                }
+                if (context) {
+                    html += `<div style="font-style:italic; color:#666; font-size:0.85rem; border-top:1px dashed #ddd; padding-top:0.5rem;">💡 ${context}</div>`;
+                }
+                previewContent.innerHTML = html;
+            } else {
+                previewDiv.style.display = 'none';
+            }
+        }
+
+        // Add event listeners for live preview
+        document.getElementById('mnemonicAcronym')?.addEventListener('input', updateMnemonicPreview);
+        document.getElementById('mnemonicExpansion')?.addEventListener('input', updateMnemonicPreview);
+        document.getElementById('mnemonicTeachingContext')?.addEventListener('input', updateMnemonicPreview);
 
         // Filtering
         function filterTable() {

@@ -90,19 +90,92 @@ Want me to:
 
 Just ask!
 
+## Code Quality & Linting
+
+We use automated linting to maintain code quality.
+
+### Setup
+```bash
+pip install -r requirements-dev.txt
+```
+
+### Run Linters
+```bash
+# Check for issues
+python lint.py check
+
+# Auto-fix issues
+python lint.py fix
+```
+
+### Tools Used
+- **ruff** — Fast Python linter (replaces flake8, pylint, isort)
+- **black** — Opinionated code formatter
+- **pre-commit** — Git hooks for automatic checks
+
+### Pre-Commit Hooks (Optional)
+```bash
+pre-commit install  # Run linters automatically on every commit
+```
+
+## Testing
+
+We use pytest for testing. See `TESTING.md` for the full testing framework.
+
+### Run All Tests
+```bash
+python3 -m pytest tests/ -v
+```
+
+### Run Specific Test Categories
+```bash
+# Unit tests only (fast)
+python3 -m pytest tests/unit/ -v
+
+# Integration tests
+python3 -m pytest tests/integration/ -v
+
+# With coverage report
+python3 -m pytest tests/ --cov=. --cov-report=term-missing
+```
+
+### Test Structure
+```
+tests/
+├── unit/               # Fast, isolated tests
+│   ├── test_models.py  # Database model tests
+│   └── test_api.py     # API endpoint tests
+├── integration/        # Multi-component tests
+│   └── test_import.py  # Bulk import tests
+├── conftest.py         # Shared fixtures
+└── requirements.txt    # Test dependencies
+```
+
+### Writing New Tests
+1. Add test file to appropriate directory (`unit/` or `integration/`)
+2. Name it `test_<feature>.py`
+3. Use fixtures from `conftest.py`
+4. Run with `python3 -m pytest tests/unit/test_<feature>.py -v`
+
 ## Project Structure
 
 ```
 ems-platform/
 ├── app.py              # Flask application
 ├── requirements.txt    # Python dependencies
+├── TESTING.md          # Testing framework documentation
+├── tests/              # Test suite
+│   ├── unit/
+│   ├── integration/
+│   ├── conftest.py
+│   └── requirements.txt
 ├── data/
 │   └── protocols.db    # SQLite database
 └── templates/
     ├── index.html      # Registration page
     ├── dashboard.html  # User dashboard
-    ├── quiz.html       # Quiz interface
-    └── results.html    # Results page
+    ├── quiz.html       # Quiz interface (with mnemonic hints)
+    └── admin.html      # Admin panel
 ```
 
 ---
