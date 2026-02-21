@@ -355,6 +355,16 @@
             </form>
         </div>
         
+        <!-- Question Search -->
+        <div class="search-box" style="margin-bottom: 1.5rem; padding: 1.5rem; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.08);">
+            <h3 style="margin-bottom: 1rem; color: #333;">🔍 Search Questions</h3>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+                <input type="text" id="questionSearch" placeholder="Type to search questions..." style="padding: 10px 15px; border-radius: 6px; border: 1px solid #ddd; min-width: 300px; flex: 1; font-size: 1rem;">
+                <button onclick="clearSearch()" style="padding: 10px 20px; background: #f5f5f5; border: 1px solid #ddd; border-radius: 6px; cursor: pointer; font-size: 0.9rem;">Clear</button>
+            </div>
+            <p id="searchResults" style="margin-top: 0.75rem; color: #666; font-size: 0.9rem; display: none;"></p>
+        </div>
+        
         <!-- Question Count Display -->
         <div style="background: #e3f2fd; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; text-align: center;">
             <strong style="color: #1976d2; font-size: 1.2rem;">
@@ -616,6 +626,164 @@
             // Show the teaching moment
             teachingCard.classList.add('show');
         }
+        
+        // Question Search Functionality
+        const questionCards = document.querySelectorAll('.question-card');
+        const searchInput = document.getElementById('questionSearch');
+        const searchResults = document.getElementById('searchResults');
+        
+        // Store original question data for search
+        const questionData = [];
+        questionCards.forEach((card, index) => {
+            const qid = card.dataset.questionId;
+            const questionText = card.querySelector('.question-text').textContent.toLowerCase();
+            const explanation = card.querySelector('.explanation p')?.textContent.toLowerCase() || '';
+            const options = Array.from(card.querySelectorAll('.option span:last-child')).map(opt => opt.textContent.toLowerCase());
+            questionData.push({
+                index: index,
+                element: card,
+                qid: qid,
+                text: questionText,
+                explanation: explanation,
+                options: options
+            });
+        });
+        
+        let filteredIndices = [];
+        let filteredCurrentIndex = 0;
+        
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            
+            if (searchTerm === '') {
+                // Show all questions, reset to normal flow
+                clearSearch();
+                return;
+            }
+            
+            // Filter questions
+            filteredIndices = [];
+            questionData.forEach((q, idx) => {
+                const matchesText = q.text.includes(searchTerm);
+                const matchesExplanation = q.explanation.includes(searchTerm);
+                const matchesOptions = q.options.some(opt => opt.includes(searchTerm));
+                
+                if (matchesText || matchesExplanation || matchesOptions) {
+                    filteredIndices.push(idx);
+                }
+            });
+            
+            // Update display
+            if (filteredIndices.length === 0) {
+                searchResults.textContent = 'No questions found matching "' + searchTerm + '"';
+                searchResults.style.display = 'block';
+                // Hide all questions
+                questionCards.forEach(card => card.style.display = 'none');
+                document.getElementById('navigation').style.display = 'none';
+            } else {
+                searchResults.textContent = 'Found ' + filteredIndices.length + ' question(s) matching "' + searchTerm + '"';
+                searchResults.style.display = 'block';
+                
+                // Hide all questions first
+                questionCards.forEach(card => card.style.display = 'none');
+                
+                // Show only filtered questions
+                filteredIndices.forEach((originalIndex, i) => {
+                    const card = questionData[originalIndex].element;
+                    card.style.display = 'block';
+                    // Update question number
+                    const qNum = card.querySelector('.question-number');
+                    qNum.textContent = 'Question ' + (i + 1) + ' of ' + filteredIndices.length;
+                });
+                
+                // Update navigation
+                currentQuestion = 0;
+                filteredCurrentIndex = 0;
+                updateFilteredNavigation();
+            }
+        });
+        
+        function clearSearch() {
+            searchInput.value = '';
+            searchResults.style.display = 'none';
+            filteredIndices = [];
+            
+            // Show all questions
+            questionCards.forEach((card, index) => {
+                card.style.display = index === 0 ? 'block' : 'none';
+                // Reset question numbers
+                const qNum = card.querySelector('.question-number');
+                qNum.textContent = 'Question ' + (index + 1) + ' of ' + questionCards.length;
+            });
+            
+            // Reset to normal navigation
+            currentQuestion = 0;
+            totalQuestions = questionCards.length;
+            updateProgress();
+            document.getElementById('navigation').style.display = 'flex';
+            updateNavButtons();
+        }
+        
+        function updateFilteredNavigation() {
+            if (filteredIndices.length === 0) return;
+            
+            // Update progress bar
+            const progress = ((filteredCurrentIndex + 1) / filteredIndices.length) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+            
+            // Update buttons
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            prevBtn.disabled = filteredCurrentIndex === 0;
+            
+            if (filteredCurrentIndex === filteredIndices.length - 1) {
+                nextBtn.textContent = 'Finish';
+                nextBtn.onclick = function() {
+                    // Calculate score from filtered questions
+                    let filteredScore = 0;
+                    filteredIndices.forEach(idx => {
+                        const qid = questionData[idx].qid;
+                        if (answers[qid] && answers[qid].correct) filteredScore++;
+                    });
+                    const percentage = Math.round((filteredScore / filteredIndices.length) * 100) || 0;
+                    document.getElementById('quizContainer').style.display = 'none';
+                    document.getElementById('navigation').style.display = 'none';
+                    document.getElementById('finalScore').classList.remove('hidden');
+                    document.getElementById('scorePercent').textContent = percentage + '%';
+                    document.getElementById('scoreText').textContent = 
+                        'You got ' + filteredScore + ' out of ' + filteredIndices.length + ' correct';
+                };
+            } else {
+                nextBtn.textContent = 'Next';
+                nextBtn.onclick = function() {
+                    if (filteredCurrentIndex < filteredIndices.length - 1) {
+                        // Hide current
+                        questionData[filteredIndices[filteredCurrentIndex]].element.style.display = 'none';
+                        filteredCurrentIndex++;
+                        // Show next
+                        questionData[filteredIndices[filteredCurrentIndex]].element.style.display = 'block';
+                        updateFilteredNavigation();
+                    }
+                };
+            }
+        }
+        
+        // Override next/prev buttons when search is active
+        document.getElementById('prevBtn').addEventListener('click', function() {
+            if (filteredIndices.length > 0 && filteredCurrentIndex > 0) {
+                questionData[filteredIndices[filteredCurrentIndex]].element.style.display = 'none';
+                filteredCurrentIndex--;
+                questionData[filteredIndices[filteredCurrentIndex]].element.style.display = 'block';
+                updateFilteredNavigation();
+            } else if (filteredIndices.length === 0) {
+                // Normal navigation
+                if (currentQuestion > 0) {
+                    currentQuestion--;
+                    showQuestion(currentQuestion);
+                }
+            }
+        });
     </script>
 </body>
 </html>
