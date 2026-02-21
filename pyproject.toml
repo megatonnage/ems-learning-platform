@@ -8,6 +8,10 @@ version = "1.0.0"
 description = "NREMT training platform with mnemonic hints"
 requires-python = ">=3.11"
 
+[tool.setuptools]
+py-modules = ["app", "generate_questions", "import_snhd", "lint", "wsgi"]
+packages = []
+
 [tool.ruff]
 target-version = "py311"
 line-length = 100
