@@ -190,21 +190,139 @@
 }
 
 .hint-content {
+  display: none;
   margin-top: var(--space-4);
   padding: var(--space-4);
   background: var(--info-light);
   border-radius: var(--radius);
   border-left: 4px solid var(--info);
+}
+
+.hint-content.show {
+  display: block;
   animation: fadeIn 0.3s ease-out;
+}
+
+/* Mnemonic Hint */
+.mnemonic-hint {
+  display: none;
+  margin-top: var(--space-6);
+  padding: var(--space-4);
+  background: var(--warning-light);
+  border-radius: var(--radius);
+  border-left: 4px solid var(--warning);
+}
+
+.mnemonic-hint.show {
+  display: block;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.mnemonic-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-1);
+}
+
+.mnemonic-acronym {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--warning-dark);
+  letter-spacing: 2px;
+}
+
+/* Teaching Moment */
+.teaching-moment {
+  display: none;
+  margin-top: var(--space-6);
+  padding: var(--space-5);
+  background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
+  border-radius: var(--radius);
+  border-left: 4px solid var(--primary);
+}
+
+.teaching-moment.show {
+  display: block;
+  animation: fadeInUp 0.3s ease-out;
+}
+
+.teaching-moment.correct {
+  background: linear-gradient(135deg, var(--success-light) 0%, #d1fae5 100%);
+  border-left-color: var(--success);
+}
+
+.teaching-moment.wrong {
+  background: linear-gradient(135deg, var(--error-light) 0%, #fee2e2 100%);
+  border-left-color: var(--error);
+}
+
+.teaching-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.teaching-moment.correct .teaching-header {
+  color: var(--success);
+}
+
+.teaching-moment.wrong .teaching-header {
+  color: var(--error);
+}
+
+.teaching-badge {
+  font-size: 0.7rem;
+  padding: var(--space-1) var(--space-2);
+  background: rgba(102, 126, 234, 0.15);
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-left: auto;
+}
+
+.teaching-moment.correct .teaching-badge {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--success-dark);
+}
+
+.teaching-moment.wrong .teaching-badge {
+  background: rgba(248, 113, 113, 0.15);
+  color: var(--error-dark);
+}
+
+.mnemonic-expansion {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--text-primary);
+  white-space: pre-line;
+  margin-bottom: var(--space-3);
+}
+
+.teaching-context {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  padding-top: var(--space-3);
+  border-top: 1px dashed rgba(0, 0, 0, 0.1);
 }
 
 /* Explanation */
 .explanation {
+  display: none;
   margin-top: var(--space-6);
   padding: var(--space-5);
   background: var(--info-light);
   border-radius: var(--radius);
   border-left: 4px solid var(--info);
+}
+
+.explanation.show {
+  display: block;
   animation: fadeInUp 0.4s ease-out;
 }
 
