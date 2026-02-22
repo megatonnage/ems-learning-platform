@@ -4,145 +4,178 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Results - SNHD Learning</title>
+    
+    <!-- External CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f5f7fa;
-            min-height: 100vh;
+        /* Results-specific styles */
+        .results-header {
+            text-align: center;
+            margin-bottom: var(--space-8);
+            animation: fadeInUp 0.5s ease-out;
         }
-        .navbar {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        
+        .results-header h1 {
+            font-size: 2rem;
+            margin-bottom: var(--space-2);
         }
-        .level-select {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 4px 28px 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            color: white;
-            cursor: pointer;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='white' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 8px center;
+        
+        .results-header p {
+            color: var(--text-secondary);
         }
-        .level-select option { color: #333; background: white; }
-        .container {
-            max-width: 1000px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-        }
+        
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
+            gap: var(--space-4);
+            margin-bottom: var(--space-8);
         }
+        
         .stat-card {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            background: var(--card-bg);
+            padding: var(--space-6);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
             text-align: center;
+            transition: all var(--transition-fast);
+            animation: fadeInUp 0.5s ease-out;
+            animation-fill-mode: both;
         }
+        
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.2s; }
+        .stat-card:nth-child(3) { animation-delay: 0.3s; }
+        .stat-card:nth-child(4) { animation-delay: 0.4s; }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        
         .stat-card h3 {
-            color: #666;
-            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
             text-transform: uppercase;
-            margin-bottom: 0.5rem;
+            margin-bottom: var(--space-2);
         }
+        
         .stat-value {
-            font-size: 2.5rem;
+            font-size: 2rem;
             font-weight: 700;
-            color: #333;
         }
+        
+        .stat-value.success { color: var(--success); }
+        .stat-value.error { color: var(--error); }
+        .stat-value.primary { color: var(--primary); }
+        
         .history-section {
-            background: white;
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            background: var(--card-bg);
+            padding: var(--space-6);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            animation: fadeInUp 0.5s ease-out 0.5s both;
         }
+        
         .history-section h2 {
-            margin-bottom: 1.5rem;
-            color: #333;
+            margin-bottom: var(--space-4);
+            padding-bottom: var(--space-3);
+            border-bottom: 1px solid var(--border-light);
         }
+        
         .answer-item {
             display: flex;
             align-items: center;
-            padding: 1rem;
-            border-bottom: 1px solid #eee;
+            padding: var(--space-4);
+            border-bottom: 1px solid var(--border-light);
+            transition: background var(--transition-fast);
         }
+        
+        .answer-item:hover {
+            background: var(--bg);
+        }
+        
         .answer-item:last-child {
             border-bottom: none;
         }
+        
         .status-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-full);
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            margin-right: 1rem;
+            margin-right: var(--space-4);
             flex-shrink: 0;
         }
+        
         .status-icon.correct {
-            background: #e8f5e9;
-            color: #4CAF50;
+            background: var(--success-light);
+            color: var(--success);
         }
+        
         .status-icon.incorrect {
-            background: #ffebee;
-            color: #f44336;
+            background: var(--error-light);
+            color: var(--error);
         }
+        
         .answer-details {
             flex: 1;
+            min-width: 0;
         }
+        
         .answer-question {
             font-weight: 500;
-            color: #333;
-            margin-bottom: 0.25rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-1);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
+        
         .answer-meta {
             font-size: 0.85rem;
-            color: #666;
+            color: var(--text-secondary);
         }
-        .btn {
-            display: inline-block;
-            padding: 12px 32px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: 600;
-            margin-top: 1.5rem;
-        }
+        
         .empty-state {
             text-align: center;
-            padding: 3rem;
-            color: #666;
+            padding: var(--space-12);
+            color: var(--text-secondary);
         }
+        
         .empty-state-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
+            font-size: 4rem;
+            margin-bottom: var(--space-4);
+            display: block;
+        }
+        
+        .empty-state h3 {
+            color: var(--text-primary);
+            margin-bottom: var(--space-2);
+        }
+        
+        .empty-state p {
+            margin-bottom: var(--space-6);
+        }
+        
+        .action-bar {
+            margin-top: var(--space-6);
+            text-align: center;
         }
     </style>
-<script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
     <nav class="navbar">
-        <a href="/dashboard" style="color: white; text-decoration: none;"><h1>🚑 SNHD Learning Platform - Results</h1></a>
-        <div style="display: flex; align-items: center; gap: 1rem;">
+        <a href="/dashboard" style="color: white; text-decoration: none;">
+            <h1>🚑 SNHD Learning Platform - Results</h1>
+        </a>
+        <div style="display: flex; align-items: center; gap: var(--space-4);">
             <a href="/dashboard" style="color: white; text-decoration: none;">Home</a>
-            <select class="level-select" id="levelSelect" aria-label="Change NREMT level">
+            <select class="level-select" id="levelSelect">
                 <option value="EMT" {% if user.level == 'EMT' %}selected{% endif %}>EMT</option>
                 <option value="AEMT" {% if user.level == 'AEMT' %}selected{% endif %}>AEMT</option>
                 <option value="PARAMEDIC" {% if user.level == 'PARAMEDIC' %}selected{% endif %}>Paramedic</option>
@@ -150,28 +183,36 @@
         </div>
     </nav>
     
-    <div class="container">
+    <div class="dashboard-container">
+        <!-- Header -->
+        <div class="results-header">
+            <h1>📊 Your Learning Progress</h1>
+            <p>Track your journey and see how far you've come</p>
+        </div>
+        
+        <!-- Stats Grid -->
         <div class="stats-grid">
             <div class="stat-card">
                 <h3>Total Questions</h3>
-                <div class="stat-value">{{ stats.total }}</div>
+                <div class="stat-value primary">{{ stats.total }}</div>
             </div>
             <div class="stat-card">
                 <h3>Correct</h3>
-                <div class="stat-value" style="color: #4CAF50;">{{ stats.correct }}</div>
+                <div class="stat-value success">{{ stats.correct }}</div>
             </div>
             <div class="stat-card">
                 <h3>Incorrect</h3>
-                <div class="stat-value" style="color: #f44336;">{{ stats.total - stats.correct }}</div>
+                <div class="stat-value error">{{ stats.total - stats.correct }}</div>
             </div>
             <div class="stat-card">
                 <h3>Success Rate</h3>
-                <div class="stat-value" style="color: #667eea;">{{ stats.percentage }}%</div>
+                <div class="stat-value primary">{{ stats.percentage }}%</div>
             </div>
         </div>
         
+        <!-- History -->
         <div class="history-section">
-            <h2>Recent Answers</h2>
+            <h2>📝 Recent Answers</h2>
             {% if recent %}
                 {% for answer, question in recent %}
                 <div class="answer-item">
@@ -188,20 +229,29 @@
                 {% endfor %}
             {% else %}
                 <div class="empty-state">
-                    <div class="empty-state-icon">📝</div>
-                    <p>No answers yet. Take a quiz to see your results!</p>
-                    <a href="/quiz" class="btn">Start Quiz</a>
+                    <span class="empty-state-icon">📝</span>
+                    <h3>No answers yet</h3>
+                    <p>Take a quiz to see your results and track your progress!</p>
+                    <a href="/quiz" class="btn btn-primary">Start Your First Quiz →</a>
                 </div>
             {% endif %}
         </div>
+        
+        <!-- Action Bar -->
+        {% if recent %}
+        <div class="action-bar">
+            <a href="/quiz" class="btn btn-primary">Take Another Quiz →</a>
+        </div>
+        {% endif %}
     </div>
+    
     <script>
         document.getElementById('levelSelect').addEventListener('change', async function() {
             const level = this.value;
             const res = await fetch('/api/update_level', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ level: level })
+                body: JSON.stringify({ level })
             });
             if (res.ok) window.location.reload();
         });

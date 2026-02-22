@@ -1,0 +1,309 @@
+/* Quiz Page Specific Styles */
+
+/* Navbar */
+.navbar {
+  background: var(--primary-gradient);
+  color: white;
+  padding: var(--space-4) var(--space-8);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar h1 {
+  font-size: 1.3rem;
+  color: white;
+}
+
+.level-select {
+  background: rgba(255, 255, 255, 0.2);
+  padding: var(--space-1) var(--space-7) var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: white;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='white' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+}
+
+.level-select option {
+  color: var(--text-primary);
+  background: white;
+}
+
+/* Quiz Container */
+.quiz-container {
+  max-width: 800px;
+  margin: var(--space-8) auto;
+  padding: 0 var(--space-4);
+}
+
+/* Progress Bar */
+.progress-container {
+  margin-bottom: var(--space-6);
+}
+
+.progress-bar {
+  height: 8px;
+  background: var(--border-light);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--primary-gradient);
+  border-radius: var(--radius-full);
+  transition: width var(--transition);
+}
+
+.progress-text {
+  text-align: center;
+  margin-top: var(--space-2);
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+/* Question Card */
+.quiz-card {
+  background: var(--card-bg);
+  padding: var(--space-8);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  margin-bottom: var(--space-6);
+  animation: fadeInUp 0.4s ease-out;
+}
+
+.question-number {
+  color: var(--primary);
+  font-weight: 600;
+  margin-bottom: var(--space-4);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.question-text {
+  font-size: 1.25rem;
+  color: var(--text-primary);
+  margin-bottom: var(--space-6);
+  line-height: 1.6;
+}
+
+/* Options */
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.option {
+  padding: var(--space-4) var(--space-5);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  background: var(--card-bg);
+}
+
+.option:hover {
+  border-color: var(--primary);
+  background: #f8f9ff;
+  transform: translateX(4px);
+}
+
+.option.selected {
+  border-color: var(--primary);
+  background: #f8f9ff;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.option.correct {
+  border-color: var(--success);
+  background: var(--success-light);
+  animation: pop 0.4s ease-out;
+}
+
+.option.incorrect {
+  border-color: var(--error);
+  background: var(--error-light);
+  animation: gentleShake 0.4s ease-in-out;
+}
+
+.option-letter {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  background: var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  margin-right: var(--space-4);
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+}
+
+.option:hover .option-letter,
+.option.selected .option-letter {
+  background: var(--primary);
+  color: white;
+}
+
+.option.correct .option-letter {
+  background: var(--success);
+  color: white;
+}
+
+.option.incorrect .option-letter {
+  background: var(--error);
+  color: white;
+}
+
+/* Hint Section */
+.hint-section {
+  margin-top: var(--space-6);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--border);
+}
+
+.hint-button {
+  background: var(--warning-light);
+  color: var(--warning-dark);
+  border: none;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-weight: 600;
+  transition: all var(--transition-fast);
+}
+
+.hint-button:hover {
+  background: var(--warning);
+  color: white;
+}
+
+.hint-content {
+  margin-top: var(--space-4);
+  padding: var(--space-4);
+  background: var(--info-light);
+  border-radius: var(--radius);
+  border-left: 4px solid var(--info);
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Explanation */
+.explanation {
+  margin-top: var(--space-6);
+  padding: var(--space-5);
+  background: var(--info-light);
+  border-radius: var(--radius);
+  border-left: 4px solid var(--info);
+  animation: fadeInUp 0.4s ease-out;
+}
+
+.explanation h4 {
+  color: var(--info);
+  margin-bottom: var(--space-2);
+}
+
+/* Navigation */
+.quiz-navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--space-6);
+}
+
+.nav-button {
+  padding: var(--space-3) var(--space-6);
+  border-radius: var(--radius);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  border: none;
+  background: var(--border-light);
+  color: var(--text-secondary);
+}
+
+.nav-button:hover:not(:disabled) {
+  background: var(--border);
+  color: var(--text-primary);
+}
+
+.nav-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.nav-button.primary {
+  background: var(--primary-gradient);
+  color: white;
+}
+
+.nav-button.primary:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+/* Streak Counter */
+.streak-counter {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background: var(--warning-light);
+  border-radius: var(--radius-full);
+  color: var(--warning-dark);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.streak-counter .fire {
+  font-size: 1.2rem;
+}
+
+/* Score Display */
+.score-display {
+  text-align: center;
+  padding: var(--space-8);
+}
+
+.score-display h2 {
+  font-size: 3rem;
+  margin-bottom: var(--space-4);
+}
+
+.score-display .percentage {
+  font-size: 1.5rem;
+  color: var(--text-secondary);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .quiz-card {
+    padding: var(--space-5);
+  }
+  
+  .question-text {
+    font-size: 1.1rem;
+  }
+  
+  .option {
+    padding: var(--space-3);
+  }
+  
+  .navbar {
+    padding: var(--space-3) var(--space-4);
+  }
+  
+  .navbar h1 {
+    font-size: 1.1rem;
+  }
+}

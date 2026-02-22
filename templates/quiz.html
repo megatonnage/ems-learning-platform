@@ -4,388 +4,122 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiz - SNHD Learning</title>
+    
+    <!-- External CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/quiz.css') }}">
+    
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f5f7fa;
-            min-height: 100vh;
-        }
-        .navbar {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .level-select {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 4px 28px 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            color: white;
-            cursor: pointer;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='white' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 8px center;
-        }
-        .level-select option { color: #333; background: white; }
-        .container {
-            max-width: 800px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-        }
-        .quiz-card {
-            background: white;
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-            margin-bottom: 1.5rem;
-        }
-        .question-number {
-            color: #667eea;
-            font-weight: 600;
-            margin-bottom: 1rem;
-        }
-        .question-text {
-            font-size: 1.2rem;
-            color: #333;
-            margin-bottom: 1.5rem;
-            line-height: 1.6;
-        }
-        .options {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-        .option {
-            padding: 1rem 1.25rem;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-        }
-        .option:hover {
-            border-color: #667eea;
-            background: #f8f9ff;
-        }
-        .option.selected {
-            border-color: #667eea;
-            background: #f8f9ff;
-        }
-        .option.correct {
-            border-color: #4CAF50;
-            background: #e8f5e9;
-        }
-        .option.incorrect {
-            border-color: #f44336;
-            background: #ffebee;
-        }
-        .option-letter {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: #f0f0f0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            margin-right: 1rem;
-            flex-shrink: 0;
-        }
-        .option.selected .option-letter {
-            background: #667eea;
-            color: white;
-        }
-        .option.correct .option-letter {
-            background: #4CAF50;
-            color: white;
-        }
-        .option.incorrect .option-letter {
-            background: #f44336;
-            color: white;
-        }
-        .explanation {
-            margin-top: 1.5rem;
-            padding: 1rem;
-            background: #f8f9fa;
-            border-radius: 8px;
-            border-left: 4px solid #667eea;
-            display: none;
-        }
-        .explanation.show {
-            display: block;
-        }
-        .explanation h4 {
-            color: #667eea;
-            margin-bottom: 0.5rem;
-        }
-        .navigation {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 2rem;
-        }
-        .btn {
-            padding: 12px 32px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            text-decoration: none;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
-        }
-        .btn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-        .progress-bar {
-            width: 100%;
-            height: 6px;
-            background: #e0e0e0;
-            border-radius: 3px;
-            margin-bottom: 2rem;
-            overflow: hidden;
-        }
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 3px;
-            transition: width 0.3s;
-        }
-        .score-display {
-            text-align: center;
-            padding: 2rem;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-        }
-        .score-display h2 {
-            color: #333;
-            margin-bottom: 1rem;
-        }
-        .final-score {
-            font-size: 4rem;
-            font-weight: 700;
-            color: #667eea;
-        }
-        .hidden { display: none; }
-        
-        /* Mnemonic Hint Styles */
-        .mnemonic-hint {
-            margin-top: 1.5rem;
-            padding: 1rem;
-            background: #fff8e1;
-            border-radius: 8px;
-            border-left: 4px solid #ffa000;
-            display: none;
-            animation: slideDown 0.2s ease-out;
-        }
-        .mnemonic-hint.show {
-            display: block;
-        }
-        .mnemonic-hint.revealed {
-            background: #e8f5e9;
-            border-left-color: #4caf50;
-        }
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        .hint-link {
+        /* Fun & Helpful additions */
+        .streak-counter {
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
-            color: #f57c00;
-            text-decoration: none;
-            font-size: 0.95rem;
-            font-weight: 500;
-            margin-top: 1rem;
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-        .hint-link:hover {
-            color: #e65100;
-        }
-        .hint-link.hidden {
-            display: none;
-        }
-        .mnemonic-acronym {
-            font-size: 1.3rem;
+            gap: var(--space-2);
+            padding: var(--space-2) var(--space-4);
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            border-radius: var(--radius-full);
+            color: white;
             font-weight: 600;
-            color: #e65100;
-            letter-spacing: 2px;
-        }
-        .mnemonic-label {
-            font-size: 0.8rem;
-            color: #888;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 0.25rem;
+            font-size: 0.9rem;
         }
         
-        /* Teaching Moment Styles */
-        .teaching-moment {
-            margin-top: 1.5rem;
-            padding: 1.25rem;
-            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
-            border-radius: 8px;
-            border-left: 4px solid #7c4dff;
+        .streak-counter .fire { font-size: 1.2rem; animation: pulse 1s infinite; }
+        
+        .milestone-celebration {
+            position: fixed; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--card-bg);
+            padding: var(--space-8);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-xl);
+            text-align: center;
+            z-index: 1000;
+            animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             display: none;
-            animation: slideDown 0.3s ease-out;
         }
-        .teaching-moment.show {
-            display: block;
+        
+        .milestone-celebration.show { display: block; }
+        .milestone-celebration .emoji { font-size: 4rem; margin-bottom: var(--space-4); }
+        
+        .encouragement-toast {
+            position: fixed; bottom: 2rem; left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--card-bg);
+            padding: var(--space-4) var(--space-6);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            font-weight: 500;
+            z-index: 100;
+            opacity: 0;
+            transition: all 0.3s ease;
         }
-        .teaching-moment.wrong {
-            background: linear-gradient(135deg, #ffebee 0%, #fce4ec 100%);
-            border-left-color: #f44336;
+        
+        .encouragement-toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
         }
-        .teaching-moment.correct {
-            background: linear-gradient(135deg, #e8f5e9 0%, #e0f2f1 100%);
-            border-left-color: #4caf50;
-        }
-        .teaching-header {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 0.75rem;
-            font-weight: 600;
-            color: #7c4dff;
-        }
-        .teaching-moment.wrong .teaching-header {
-            color: #d32f2f;
-        }
-        .teaching-moment.correct .teaching-header {
-            color: #388e3c;
-        }
-        .teaching-badge {
-            font-size: 0.7rem;
-            padding: 2px 8px;
-            background: rgba(124, 77, 255, 0.15);
-            border-radius: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .teaching-moment.wrong .teaching-badge {
-            background: rgba(244, 67, 54, 0.15);
-            color: #d32f2f;
-        }
-        .teaching-moment.correct .teaching-badge {
-            background: rgba(76, 175, 80, 0.15);
-            color: #388e3c;
-        }
-        .mnemonic-expansion {
-            font-size: 0.95rem;
-            line-height: 1.7;
-            color: #333;
-            white-space: pre-line;
-            margin-bottom: 0.75rem;
-        }
-        .teaching-context {
-            font-size: 0.9rem;
-            color: #555;
-            font-style: italic;
-            padding-top: 0.75rem;
-            border-top: 1px dashed rgba(0,0,0,0.1);
-        }
+        
+        .encouragement-toast.success { border-left: 4px solid var(--success); }
+        .encouragement-toast.info { border-left: 4px solid var(--info); }
     </style>
-<script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
+    <!-- Milestone Celebration -->
+    <div class="milestone-celebration" id="milestoneCelebration">
+        <div class="emoji" id="milestoneEmoji">🎉</div>
+        <h3 id="milestoneTitle">Milestone!</h3>
+        <p id="milestoneText">Great progress!</p>
+    </div>
+    
+    <!-- Encouragement Toast -->
+    <div class="encouragement-toast" id="encouragementToast">
+        <span id="toastMessage">Keep going!</span>
+    </div>
+
     <nav class="navbar">
-        <a href="/dashboard" style="color: white; text-decoration: none;"><h1>🚑 SNHD Learning Platform - Quiz</h1></a>
-        <div style="display: flex; align-items: center; gap: 1rem;">
-            <a href="/dashboard" style="color: white; text-decoration: none;">Home</a>
-            <select class="level-select" id="levelSelect" aria-label="Change NREMT level">
+        <a href="/dashboard" style="color: white; text-decoration: none;">
+            <h1>🚑 SNHD Learning - Quiz</h1>
+        </a>
+        <div style="display: flex; align-items: center; gap: var(--space-4);">
+            <a href="/dashboard" style="color: white;">Home</a>
+            <select class="level-select" id="levelSelect">
                 <option value="EMT" {% if user.level == 'EMT' %}selected{% endif %}>EMT</option>
                 <option value="AEMT" {% if user.level == 'AEMT' %}selected{% endif %}>AEMT</option>
                 <option value="PARAMEDIC" {% if user.level == 'PARAMEDIC' %}selected{% endif %}>Paramedic</option>
             </select>
+            <div class="streak-counter" id="streakCounter" style="display: none;">
+                <span class="fire">🔥</span>
+                <span id="streakCount">0</span>
+            </div>
         </div>
     </nav>
-    
-    <div class="container">
-        <!-- Instructions -->
-        <div style="background: #e3f2fd; padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; border-left: 4px solid #1976d2;">
-            <h2 style="margin-bottom: 0.5rem; color: #1565c0; font-size: 1.1rem;">📖 How to Use This Quiz</h2>
-            <p style="color: #424242; margin-bottom: 1rem; line-height: 1.6; font-size: 0.9rem;">
-                Questions are organized by topic. Select a topic from the dropdown to focus on specific content, or view all questions to study everything.
-            </p>
-            <p style="color: #424242; line-height: 1.6; font-size: 0.9rem;">
-                <strong>Tip:</strong> Higher certification levels (AEMT, Paramedic) need to know content from more junior levels. All questions at your level and below are included by default.
-            </p>
+
+    <div class="quiz-container">
+        <div class="instructions-box">
+            <h2>📖 How to Use This Quiz</h2>
+            <p>Select a topic to focus on specific content, or view all questions to study everything.</p>
+            <p><strong>💡 Tip:</strong> Higher levels need to know content from junior levels.</p>
         </div>
 
-        <!-- Topic Filter -->
-        <div class="quick-filters" style="margin-bottom: 1.5rem; padding: 1.5rem; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.08);">
-            <h3 style="margin-bottom: 1rem; color: #333;">📂 Topics</h3>
-            
-            <form method="GET" action="/quiz" style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
-                <select name="category" onchange="this.form.submit()" style="padding: 8px; border-radius: 6px; border: 1px solid #ddd; min-width: 250px;">
-                    <option value="all">All Topics</option>
-                    {% for cat in categories %}
-                    <option value="{{ cat }}" {% if cat == selected_category %}selected{% endif %}>{{ cat }}</option>
-                    {% endfor %}
-                </select>
-                {% if selected_category != 'all' %}
-                <a href="/quiz" style="color: #667eea; text-decoration: none; font-size: 0.9rem;">✕ Clear filter</a>
-                {% endif %}
-            </form>
-        </div>
-        
-        <!-- Question Search -->
-        <div class="search-box" style="margin-bottom: 1.5rem; padding: 1.5rem; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.08);">
-            <h3 style="margin-bottom: 1rem; color: #333;">🔍 Search Questions</h3>
-            <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
-                <input type="text" id="questionSearch" placeholder="Type to search questions..." style="padding: 10px 15px; border-radius: 6px; border: 1px solid #ddd; min-width: 300px; flex: 1; font-size: 1rem;">
-                <button onclick="clearSearch()" style="padding: 10px 20px; background: #f5f5f5; border: 1px solid #ddd; border-radius: 6px; cursor: pointer; font-size: 0.9rem;">Clear</button>
+        <!-- Progress -->
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar" style="width: 0%"></div>
             </div>
-            <p id="searchResults" style="margin-top: 0.75rem; color: #666; font-size: 0.9rem; display: none;"></p>
+            <p class="progress-text" id="progressText">Question 1 of {{ questions|length }}</p>
         </div>
-        
-        <!-- Question Count Display -->
-        <div style="background: #e3f2fd; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; text-align: center;">
-            <strong style="color: #1976d2; font-size: 1.2rem;">
-                Showing {{ questions|length }} questions 
-                {% if selected_category != 'all' %}in "{{ selected_category }}"{% endif %}
-                ({{ total_available }} total available)
-            </strong>
-            {% if questions|length < total_available %}
-            <br><small><a href="/quiz?category={{ selected_category }}&limit=all" style="color: #1976d2;">Show all {{ total_available }} questions</a></small>
-            {% endif %}
-        </div>
-        
-        <div class="progress-bar">
-            <div class="progress-fill" id="progressBar" style="width: 0%"></div>
-        </div>
-        
+
+        <!-- Questions -->
         <div id="quizContainer">
             {% for q in questions %}
-            <div class="quiz-card question-card" data-question-id="{{ q.id }}" data-correct="{{ q.correct_answer }}" {% if loop.index > 1 %}style="display: none;"{% endif %}>
+            <div class="quiz-card question-card animate-fade-in-up" 
+                 data-question-id="{{ q.id }}" 
+                 data-correct="{{ q.correct_answer }}"
+                 {% if loop.index > 1 %}style="display: none;"{% endif %}>
+                
                 <div class="question-number">Question {{ loop.index }} of {{ questions|length }}</div>
                 <div class="question-text">{{ q.question }}</div>
+                
                 <div class="options">
                     {% for option in q.get_options() %}
                     <div class="option" data-index="{{ loop.index0 }}">
@@ -394,396 +128,209 @@
                     </div>
                     {% endfor %}
                 </div>
-                
-                <!-- Mnemonic Hint -->
+
                 {% if q.mnemonic_enabled and q.mnemonic_acronym %}
                 <a class="hint-link" id="hint-link-{{ q.id }}" onclick="revealHint({{ q.id }})">
-                    💡 Reveal hint
+                    💡 Need a hint?
                 </a>
                 <div class="mnemonic-hint" id="mnemonic-{{ q.id }}">
                     <div class="mnemonic-label">Memory Aid</div>
                     <div class="mnemonic-acronym">{{ q.mnemonic_acronym }}</div>
                 </div>
                 {% endif %}
-                
+
                 <div class="explanation" id="explanation-{{ q.id }}">
-                    <h4>Explanation</h4>
+                    <h4>🎯 Explanation</h4>
                     <p>{{ q.explanation }}</p>
-                    <small>Source: {{ q.source }}</small>
                 </div>
-                
-                <!-- Teaching Moment (Full Mnemonic) -->
+
                 {% if q.mnemonic_enabled and q.mnemonic_expansion %}
-                <div class="teaching-moment" id="teaching-{{ q.id }}" data-has-mnemonic="true">
+                <div class="teaching-moment" id="teaching-{{ q.id }}">
                     <div class="teaching-header">
                         <span id="teaching-icon-{{ q.id }}">📚</span>
                         <span id="teaching-title-{{ q.id }}">Study Note</span>
                         <span class="teaching-badge" id="teaching-badge-{{ q.id }}">Memory Aid</span>
                     </div>
                     <div class="mnemonic-expansion">{{ q.mnemonic_expansion }}</div>
-                    {% if q.mnemonic_teaching_context %}
-                    <div class="teaching-context">💡 {{ q.mnemonic_teaching_context }}</div>
-                    {% endif %}
                 </div>
                 {% endif %}
             </div>
             {% endfor %}
         </div>
-        
-        <div class="score-display hidden" id="finalScore">
-            <h2>Quiz Complete!</h2>
-            <div class="final-score" id="scorePercent">0%</div>
-            <p id="scoreText">You got 0 out of 0 correct</p>
-            <br>
-            <a href="/dashboard" class="btn">Back to Dashboard</a>
-            <a href="/results" class="btn" style="margin-left: 1rem;">View Detailed Results</a>
+
+        <!-- Final Score -->
+        <div class="final-score-display hidden" id="finalScore">
+            <h2 id="completionTitle">🎉 Quiz Complete!</h2>
+            <div class="final-score-number" id="scorePercent">0%</div>
+            <p class="score-message" id="scoreText"></p>
+            <div class="score-buttons">
+                <a href="/dashboard" class="btn btn-primary">Dashboard</a>
+                <a href="/results" class="btn btn-secondary">Results</a>
+            </div>
         </div>
-        
-        <div class="navigation" id="navigation">
-            <button class="btn" id="prevBtn" disabled>Previous</button>
-            <button class="btn" id="nextBtn" disabled>Next</button>
+
+        <!-- Navigation -->
+        <div class="quiz-navigation" id="navigation">
+            <button class="nav-button" id="prevBtn" disabled>← Previous</button>
+            <button class="nav-button primary" id="nextBtn" disabled>Next →</button>
         </div>
     </div>
-    
+
     <script>
-        const levelSelect = document.getElementById('levelSelect');
-        if (levelSelect) {
-            levelSelect.addEventListener('change', async function() {
-                const level = this.value;
-                const res = await fetch('/api/update_level', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ level: level })
-                });
-                if (res.ok) window.location.reload();
-            });
-        }
+        // Encouragement messages
+        const messages = {
+            correct: ["🎉 Nailed it!", "💪 Great job!", "🌟 Excellent!", "🔥 On fire!", "✨ Perfect!"],
+            incorrect: ["💡 Almost!", "📚 Learning moment!", "🎯 Close!", "💪 Keep going!"],
+            milestones: [
+                { pct: 25, emoji: "🌟", title: "Quarter Way!", msg: "Building momentum!" },
+                { pct: 50, emoji: "🔥", title: "Halfway!", msg: "Doing amazing!" },
+                { pct: 75, emoji: "🚀", title: "Almost There!", msg: "So close!" },
+                { pct: 100, emoji: "🏆", title: "Complete!", msg: "Fantastic work!" }
+            ]
+        };
+
+        let currentQ = 0, score = 0, streak = 0, milestones = new Set();
         const questions = document.querySelectorAll('.question-card');
-        const totalQuestions = questions.length;
-        let currentQuestion = 0;
+        const total = questions.length;
         let answers = {};
-        let score = 0;
-        
+
         function updateProgress() {
-            const progress = ((currentQuestion + 1) / totalQuestions) * 100;
-            document.getElementById('progressBar').style.width = progress + '%';
-        }
-        
-        function showQuestion(index) {
-            questions.forEach((q, i) => {
-                q.style.display = i === index ? 'block' : 'none';
-            });
-            document.getElementById('prevBtn').disabled = index === 0;
+            const pct = ((currentQ + 1) / total) * 100;
+            document.getElementById('progressBar').style.width = pct + '%';
+            document.getElementById('progressText').textContent = `Question ${currentQ + 1} of ${total}`;
             
-            const currentQ = questions[index];
-            const qid = currentQ.dataset.questionId;
+            messages.milestones.forEach(m => {
+                if (pct >= m.pct && !milestones.has(m.pct)) {
+                    milestones.add(m.pct);
+                    showMilestone(m);
+                }
+            });
+        }
+
+        function showMilestone(m) {
+            const el = document.getElementById('milestoneCelebration');
+            document.getElementById('milestoneEmoji').textContent = m.emoji;
+            document.getElementById('milestoneTitle').textContent = m.title;
+            document.getElementById('milestoneText').textContent = m.msg;
+            el.classList.add('show');
+            setTimeout(() => el.classList.remove('show'), 2500);
+        }
+
+        function showToast(msg, type) {
+            const toast = document.getElementById('encouragementToast');
+            document.getElementById('toastMessage').textContent = msg;
+            toast.className = 'encouragement-toast ' + type + ' show';
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function updateStreak() {
+            const counter = document.getElementById('streakCounter');
+            document.getElementById('streakCount').textContent = streak;
+            counter.style.display = streak > 0 ? 'inline-flex' : 'none';
+        }
+
+        function showQuestion(idx) {
+            questions.forEach((q, i) => q.style.display = i === idx ? 'block' : 'none');
+            document.getElementById('prevBtn').disabled = idx === 0;
+            
+            const qid = questions[idx].dataset.questionId;
             const answered = answers[qid];
             const nextBtn = document.getElementById('nextBtn');
             
-            if (answered) {
-                nextBtn.disabled = false;
-                nextBtn.textContent = index === totalQuestions - 1 ? 'Finish' : 'Next';
-            } else {
-                nextBtn.disabled = true;
-                nextBtn.textContent = 'Next';
-            }
+            nextBtn.disabled = !answered;
+            nextBtn.textContent = answered && idx === total - 1 ? 'Finish 🎉' : 'Next →';
             
             updateProgress();
         }
-        
-        document.querySelectorAll('.option').forEach(option => {
-            option.addEventListener('click', async function() {
+
+        document.querySelectorAll('.option').forEach(opt => {
+            opt.addEventListener('click', async function() {
                 const card = this.closest('.question-card');
                 const qid = card.dataset.questionId;
-                const correctIndex = parseInt(card.dataset.correct);
-                const selectedIndex = parseInt(this.dataset.index);
-                
-                if (answers[qid]) return; // Already answered
-                
-                // Hide hint link (can't reveal after answering)
-                hideHint(qid);
-                
-                // Mark all options
-                card.querySelectorAll('.option').forEach((opt, idx) => {
-                    opt.classList.remove('selected');
-                    if (idx === correctIndex) {
-                        opt.classList.add('correct');
-                    } else if (idx === selectedIndex && idx !== correctIndex) {
-                        opt.classList.add('incorrect');
-                    }
+                if (answers[qid]) return;
+
+                const correctIdx = parseInt(card.dataset.correct);
+                const selectedIdx = parseInt(this.dataset.index);
+                const correct = selectedIdx === correctIdx;
+
+                // Visual feedback
+                card.querySelectorAll('.option').forEach((o, i) => {
+                    o.classList.remove('selected');
+                    if (i === correctIdx) o.classList.add('correct');
+                    else if (i === selectedIdx) o.classList.add('incorrect');
                 });
-                
-                // Show explanation
+
                 document.getElementById('explanation-' + qid).classList.add('show');
+
+                answers[qid] = { correct, selectedIdx };
+                if (correct) { score++; streak++; showToast(messages.correct[Math.floor(Math.random() * messages.correct.length)], 'success'); }
+                else { streak = 0; showToast(messages.incorrect[Math.floor(Math.random() * messages.incorrect.length)], 'info'); }
                 
-                // Record answer
-                const correct = selectedIndex === correctIndex;
-                answers[qid] = { correct, selectedIndex };
-                if (correct) score++;
-                
-                // Show teaching moment if mnemonic exists
-                showTeachingMoment(qid, correct);
-                
-                // Send to server
+                updateStreak();
+                showTeaching(qid, correct);
+
                 await fetch('/submit_answer', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        question_id: qid,
-                        correct: correct,
-                        time_spent: 0
-                    })
+                    body: JSON.stringify({ question_id: qid, correct })
                 });
-                
-                // Enable next button
+
                 document.getElementById('nextBtn').disabled = false;
-                document.getElementById('nextBtn').textContent = 
-                    currentQuestion === totalQuestions - 1 ? 'Finish' : 'Next';
+                document.getElementById('nextBtn').textContent = currentQ === total - 1 ? 'Finish 🎉' : 'Next →';
             });
         });
-        
-        document.getElementById('nextBtn').addEventListener('click', function() {
-            if (currentQuestion < totalQuestions - 1) {
-                currentQuestion++;
-                showQuestion(currentQuestion);
+
+        function showTeaching(qid, correct) {
+            const el = document.getElementById('teaching-' + qid);
+            if (!el) return;
+            el.classList.remove('correct', 'wrong');
+            el.classList.add(correct ? 'correct' : 'wrong', 'show');
+            document.getElementById('teaching-icon-' + qid).textContent = correct ? '🎓' : '📚';
+            document.getElementById('teaching-title-' + qid).textContent = correct ? 'Study Note' : 'Learning Moment';
+            document.getElementById('teaching-badge-' + qid).textContent = correct ? 'Bonus' : 'Key Concept';
+        }
+
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            if (currentQ < total - 1) {
+                currentQ++;
+                showQuestion(currentQ);
             } else {
-                // Show final score
-                const percentage = Math.round((score / totalQuestions) * 100);
+                const pct = Math.round((score / total) * 100);
                 document.getElementById('quizContainer').style.display = 'none';
                 document.getElementById('navigation').style.display = 'none';
+                document.querySelector('.progress-container').style.display = 'none';
                 document.getElementById('finalScore').classList.remove('hidden');
-                document.getElementById('scorePercent').textContent = percentage + '%';
-                document.getElementById('scoreText').textContent = 
-                    `You got ${score} out of ${totalQuestions} correct`;
+                
+                // Animate score
+                let curr = 0;
+                const timer = setInterval(() => {
+                    curr += pct / 30;
+                    if (curr >= pct) { curr = pct; clearInterval(timer); }
+                    document.getElementById('scorePercent').textContent = Math.round(curr) + '%';
+                }, 30);
+
+                document.getElementById('scoreText').textContent = `You got ${score} out of ${total} correct`;
+                
+                let title = '🎉 Quiz Complete!';
+                if (pct >= 90) title = '🏆 Outstanding!';
+                else if (pct >= 70) title = '⭐ Great Job!';
+                else if (pct >= 50) title = '💪 Good Work!';
+                else title = '📚 Keep Studying!';
+                document.getElementById('completionTitle').textContent = title;
             }
         });
-        
-        document.getElementById('prevBtn').addEventListener('click', function() {
-            if (currentQuestion > 0) {
-                currentQuestion--;
-                showQuestion(currentQuestion);
-            }
+
+        document.getElementById('prevBtn').addEventListener('click', () => {
+            if (currentQ > 0) { currentQ--; showQuestion(currentQ); }
         });
-        
-        // Initialize
+
+        async function revealHint(qid) {
+            document.getElementById('hint-link-' + qid).classList.add('hidden');
+            document.getElementById('mnemonic-' + qid).classList.add('show');
+            try { await fetch('/api/question/' + qid + '/hint', { method: 'POST' }); } catch (e) {}
+        }
+
         showQuestion(0);
-        
-        // Mnemonic Hint Functions
-        async function revealHint(questionId) {
-            const hintLink = document.getElementById('hint-link-' + questionId);
-            const mnemonicCard = document.getElementById('mnemonic-' + questionId);
-            
-            // Hide the link, show the card
-            hintLink.classList.add('hidden');
-            mnemonicCard.classList.add('show');
-            
-            // Track hint usage (optional, for analytics)
-            try {
-                await fetch('/api/question/' + questionId + '/hint', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' }
-                });
-            } catch (e) {
-                // Silent fail - don't block user if tracking fails
-                console.log('Hint tracking failed:', e);
-            }
-        }
-        
-        function hideHint(questionId) {
-            const hintLink = document.getElementById('hint-link-' + questionId);
-            const mnemonicCard = document.getElementById('mnemonic-' + questionId);
-            
-            if (hintLink) hintLink.classList.add('hidden');
-            if (mnemonicCard) mnemonicCard.classList.remove('show');
-        }
-        
-        // Teaching Moment Functions
-        function showTeachingMoment(questionId, isCorrect) {
-            const teachingCard = document.getElementById('teaching-' + questionId);
-            if (!teachingCard) return; // No mnemonic for this question
-            
-            const icon = document.getElementById('teaching-icon-' + questionId);
-            const title = document.getElementById('teaching-title-' + questionId);
-            const badge = document.getElementById('teaching-badge-' + questionId);
-            
-            // Remove any existing state classes
-            teachingCard.classList.remove('correct', 'wrong');
-            
-            if (isCorrect) {
-                // Correct answer: show as "Bonus" study note
-                teachingCard.classList.add('correct');
-                icon.textContent = '🎓';
-                title.textContent = 'Study Note';
-                badge.textContent = 'Bonus';
-            } else {
-                // Wrong answer: emphasize learning
-                teachingCard.classList.add('wrong');
-                icon.textContent = '📚';
-                title.textContent = 'Learn';
-                badge.textContent = 'Review';
-            }
-            
-            // Show the teaching moment
-            teachingCard.classList.add('show');
-        }
-        
-        // Question Search Functionality
-        const questionCards = document.querySelectorAll('.question-card');
-        const searchInput = document.getElementById('questionSearch');
-        const searchResults = document.getElementById('searchResults');
-        
-        // Store original question data for search
-        const questionData = [];
-        questionCards.forEach((card, index) => {
-            const qid = card.dataset.questionId;
-            const questionText = card.querySelector('.question-text').textContent.toLowerCase();
-            const explanation = card.querySelector('.explanation p')?.textContent.toLowerCase() || '';
-            const options = Array.from(card.querySelectorAll('.option span:last-child')).map(opt => opt.textContent.toLowerCase());
-            questionData.push({
-                index: index,
-                element: card,
-                qid: qid,
-                text: questionText,
-                explanation: explanation,
-                options: options
-            });
-        });
-        
-        let filteredIndices = [];
-        let filteredCurrentIndex = 0;
-        
-        searchInput.addEventListener('input', function() {
-            const searchTerm = this.value.toLowerCase().trim();
-            
-            if (searchTerm === '') {
-                // Show all questions, reset to normal flow
-                clearSearch();
-                return;
-            }
-            
-            // Filter questions
-            filteredIndices = [];
-            questionData.forEach((q, idx) => {
-                const matchesText = q.text.includes(searchTerm);
-                const matchesExplanation = q.explanation.includes(searchTerm);
-                const matchesOptions = q.options.some(opt => opt.includes(searchTerm));
-                
-                if (matchesText || matchesExplanation || matchesOptions) {
-                    filteredIndices.push(idx);
-                }
-            });
-            
-            // Update display
-            if (filteredIndices.length === 0) {
-                searchResults.textContent = 'No questions found matching "' + searchTerm + '"';
-                searchResults.style.display = 'block';
-                // Hide all questions
-                questionCards.forEach(card => card.style.display = 'none');
-                document.getElementById('navigation').style.display = 'none';
-            } else {
-                searchResults.textContent = 'Found ' + filteredIndices.length + ' question(s) matching "' + searchTerm + '"';
-                searchResults.style.display = 'block';
-                
-                // Hide all questions first
-                questionCards.forEach(card => card.style.display = 'none');
-                
-                // Show only filtered questions
-                filteredIndices.forEach((originalIndex, i) => {
-                    const card = questionData[originalIndex].element;
-                    card.style.display = 'block';
-                    // Update question number
-                    const qNum = card.querySelector('.question-number');
-                    qNum.textContent = 'Question ' + (i + 1) + ' of ' + filteredIndices.length;
-                });
-                
-                // Update navigation
-                currentQuestion = 0;
-                filteredCurrentIndex = 0;
-                updateFilteredNavigation();
-            }
-        });
-        
-        function clearSearch() {
-            searchInput.value = '';
-            searchResults.style.display = 'none';
-            filteredIndices = [];
-            
-            // Show all questions
-            questionCards.forEach((card, index) => {
-                card.style.display = index === 0 ? 'block' : 'none';
-                // Reset question numbers
-                const qNum = card.querySelector('.question-number');
-                qNum.textContent = 'Question ' + (index + 1) + ' of ' + questionCards.length;
-            });
-            
-            // Reset to normal navigation
-            currentQuestion = 0;
-            totalQuestions = questionCards.length;
-            updateProgress();
-            document.getElementById('navigation').style.display = 'flex';
-            updateNavButtons();
-        }
-        
-        function updateFilteredNavigation() {
-            if (filteredIndices.length === 0) return;
-            
-            // Update progress bar
-            const progress = ((filteredCurrentIndex + 1) / filteredIndices.length) * 100;
-            document.getElementById('progressBar').style.width = progress + '%';
-            
-            // Update buttons
-            const prevBtn = document.getElementById('prevBtn');
-            const nextBtn = document.getElementById('nextBtn');
-            
-            prevBtn.disabled = filteredCurrentIndex === 0;
-            
-            if (filteredCurrentIndex === filteredIndices.length - 1) {
-                nextBtn.textContent = 'Finish';
-                nextBtn.onclick = function() {
-                    // Calculate score from filtered questions
-                    let filteredScore = 0;
-                    filteredIndices.forEach(idx => {
-                        const qid = questionData[idx].qid;
-                        if (answers[qid] && answers[qid].correct) filteredScore++;
-                    });
-                    const percentage = Math.round((filteredScore / filteredIndices.length) * 100) || 0;
-                    document.getElementById('quizContainer').style.display = 'none';
-                    document.getElementById('navigation').style.display = 'none';
-                    document.getElementById('finalScore').classList.remove('hidden');
-                    document.getElementById('scorePercent').textContent = percentage + '%';
-                    document.getElementById('scoreText').textContent = 
-                        'You got ' + filteredScore + ' out of ' + filteredIndices.length + ' correct';
-                };
-            } else {
-                nextBtn.textContent = 'Next';
-                nextBtn.onclick = function() {
-                    if (filteredCurrentIndex < filteredIndices.length - 1) {
-                        // Hide current
-                        questionData[filteredIndices[filteredCurrentIndex]].element.style.display = 'none';
-                        filteredCurrentIndex++;
-                        // Show next
-                        questionData[filteredIndices[filteredCurrentIndex]].element.style.display = 'block';
-                        updateFilteredNavigation();
-                    }
-                };
-            }
-        }
-        
-        // Override next/prev buttons when search is active
-        document.getElementById('prevBtn').addEventListener('click', function() {
-            if (filteredIndices.length > 0 && filteredCurrentIndex > 0) {
-                questionData[filteredIndices[filteredCurrentIndex]].element.style.display = 'none';
-                filteredCurrentIndex--;
-                questionData[filteredIndices[filteredCurrentIndex]].element.style.display = 'block';
-                updateFilteredNavigation();
-            } else if (filteredIndices.length === 0) {
-                // Normal navigation
-                if (currentQuestion > 0) {
-                    currentQuestion--;
-                    showQuestion(currentQuestion);
-                }
-            }
-        });
     </script>
 </body>
 </html>

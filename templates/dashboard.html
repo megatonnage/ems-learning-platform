@@ -1,174 +1,171 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - SNHD Learning</title>
+    
+    <!-- External CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        /* Dashboard-specific additions */
+        .welcome-banner {
+            background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
+            padding: var(--space-6);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--space-6);
+            border-left: 4px solid var(--primary);
+            animation: fadeInUp 0.5s ease-out;
         }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f5f7fa;
-            min-height: 100vh;
+        
+        .welcome-banner h2 {
+            color: var(--primary-dark);
+            margin-bottom: var(--space-2);
         }
-
-        .navbar {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        
+        .welcome-banner p {
+            color: var(--text-secondary);
         }
-
-        .navbar h1 {
-            font-size: 1.3rem;
-        }
-
-        .user-info {
-            font-size: 0.9rem;
-            opacity: 0.9;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-        }
-
+        
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
+            gap: var(--space-6);
+            margin-bottom: var(--space-8);
         }
-
+        
         .stat-card {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            background: var(--card-bg);
+            padding: var(--space-6);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            transition: all var(--transition-fast);
+            animation: fadeInUp 0.5s ease-out;
+            animation-fill-mode: both;
         }
-
+        
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.2s; }
+        .stat-card:nth-child(3) { animation-delay: 0.3s; }
+        
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+        
         .stat-card h3 {
-            color: #666;
-            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 0.5rem;
+            letter-spacing: 0.05em;
+            margin-bottom: var(--space-2);
         }
-
+        
         .stat-value {
             font-size: 2.5rem;
             font-weight: 700;
-            color: #333;
+            color: var(--text-primary);
+            line-height: 1;
         }
-
-        .stat-value.correct {
-            color: #4CAF50;
+        
+        .stat-value.correct { color: var(--success); }
+        .stat-value.warning { color: var(--warning); }
+        .stat-value.accent { color: var(--primary); }
+        
+        .stat-progress {
+            margin-top: var(--space-3);
         }
-
-        .stat-value.incorrect {
-            color: #f44336;
-        }
-
-        .actions {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .action-card {
-            background: white;
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-            text-align: center;
-        }
-
-        .action-card h2 {
-            margin-bottom: 1rem;
-            color: #333;
-        }
-
-        .action-card p {
-            color: #666;
-            margin-bottom: 1.5rem;
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 12px 32px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: 600;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
-        }
-
-        .level-badge, .level-select {
-            display: inline-block;
-            background: rgba(255, 255, 255, 0.2);
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            margin-left: 1rem;
-        }
-        .level-select {
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            color: white;
-            cursor: pointer;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='white' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 8px center;
-            padding-right: 28px;
-        }
-        .level-select option {
-            color: #333;
-            background: white;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: #e0e0e0;
-            border-radius: 4px;
-            margin-top: 1rem;
+        
+        .mini-progress {
+            height: 6px;
+            background: var(--border-light);
+            border-radius: var(--radius-full);
             overflow: hidden;
         }
-
-        .progress-fill {
+        
+        .mini-progress-fill {
             height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 4px;
-            transition: width 0.3s;
+            background: var(--primary-gradient);
+            border-radius: var(--radius-full);
+            transition: width 1s ease-out;
+        }
+        
+        .instructions-box {
+            background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
+            padding: var(--space-6);
+            border-radius: var(--radius);
+            margin-bottom: var(--space-8);
+            border-left: 4px solid var(--primary);
+        }
+        
+        .instructions-box h2 {
+            color: var(--primary-dark);
+            margin-bottom: var(--space-3);
+            font-size: 1.1rem;
+        }
+        
+        .instructions-box p {
+            color: var(--text-secondary);
+            margin-bottom: var(--space-3);
+            line-height: 1.6;
+        }
+        
+        .instructions-box ul {
+            color: var(--text-secondary);
+            margin-left: var(--space-6);
+            margin-bottom: var(--space-3);
+            line-height: 1.8;
+        }
+        
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--space-6);
+        }
+        
+        .action-card {
+            background: var(--card-bg);
+            padding: var(--space-8);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            text-align: center;
+            transition: all var(--transition-fast);
+            animation: fadeInUp 0.5s ease-out 0.4s both;
+        }
+        
+        .action-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .action-card .emoji {
+            font-size: 3rem;
+            margin-bottom: var(--space-4);
+            display: block;
+        }
+        
+        .action-card h2 {
+            margin-bottom: var(--space-3);
+            color: var(--text-primary);
+        }
+        
+        .action-card p {
+            color: var(--text-secondary);
+            margin-bottom: var(--space-6);
+            line-height: 1.6;
         }
     </style>
-<script defer src="/_vercel/insights/script.js"></script>
 </head>
-
 <body>
     <nav class="navbar">
-        <a href="/dashboard" style="color: white; text-decoration: none;"><h1>🚑 SNHD Learning Platform</h1></a>
-        <div class="user-info">
-            <a href="/dashboard" style="color: white; text-decoration: none; margin-right: 1rem;">Home</a>
-            <select class="level-select" id="levelSelect" aria-label="Change NREMT level">
+        <a href="/dashboard" style="color: white; text-decoration: none;">
+            <h1>🚑 SNHD Learning Platform</h1>
+        </a>
+        <div style="display: flex; align-items: center; gap: var(--space-4);">
+            <a href="/dashboard" style="color: white; text-decoration: none;">Home</a>
+            <select class="level-select" id="levelSelect">
                 <option value="EMT" {% if user.level == 'EMT' %}selected{% endif %}>EMT</option>
                 <option value="AEMT" {% if user.level == 'AEMT' %}selected{% endif %}>AEMT</option>
                 <option value="PARAMEDIC" {% if user.level == 'PARAMEDIC' %}selected{% endif %}>Paramedic</option>
@@ -176,73 +173,86 @@
         </div>
     </nav>
 
-    <div class="container">
+    <div class="dashboard-container">
+        <!-- Welcome Banner -->
+        <div class="welcome-banner">
+            <h2>👋 Welcome back!</h2>
+            <p>Ready to master SNHD protocols? Your progress is looking great. Keep up the momentum!</p>
+        </div>
+
+        <!-- Stats Grid -->
         <div class="stats-grid">
             <div class="stat-card">
-                <h3>Total Questions</h3>
+                <h3>📚 Total Questions</h3>
                 <div class="stat-value">{{ stats.total }}</div>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: 100%"></div>
+                <div class="stat-progress">
+                    <div class="mini-progress">
+                        <div class="mini-progress-fill" style="width: 100%"></div>
+                    </div>
                 </div>
             </div>
             <div class="stat-card">
-                <h3>Correct Answers</h3>
+                <h3>✅ Correct Answers</h3>
                 <div class="stat-value correct">{{ stats.correct }}</div>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: {{ stats.percentage }}%"></div>
+                <div class="stat-progress">
+                    <div class="mini-progress">
+                        <div class="mini-progress-fill" style="width: {{ stats.percentage }}%"></div>
+                    </div>
                 </div>
             </div>
             <div class="stat-card">
-                <h3>Success Rate</h3>
-                <div class="stat-value">{{ stats.percentage }}%</div>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: {{ stats.percentage }}%"></div>
+                <h3>🎯 Success Rate</h3>
+                <div class="stat-value accent">{{ stats.percentage }}%</div>
+                <div class="stat-progress">
+                    <div class="mini-progress">
+                        <div class="mini-progress-fill" style="width: {{ stats.percentage }}%"></div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Instructions for Using Filters -->
-        <div style="background: #e3f2fd; padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; border-left: 4px solid #1976d2;">
-            <h2 style="margin-bottom: 0.5rem; color: #1565c0;">📖 Instructions for Using Filters</h2>
-            <p style="color: #424242; margin-bottom: 1rem; line-height: 1.6;">
-                The filters may seem confusing at first, but they will make sense as you use them. 
+        <!-- Instructions -->
+        <div class="instructions-box">
+            <h2>💡 How to Use This Platform</h2>
+            <p>
                 <strong>Higher certification levels need to know content from more junior levels.</strong> For example:
             </p>
-            <ul style="color: #424242; margin-left: 1.5rem; margin-bottom: 1rem; line-height: 1.6;">
+            <ul>
                 <li><strong>AEMTs</strong> must know everything from the <strong>EMT</strong> level</li>
                 <li><strong>Paramedics</strong> must know everything from <strong>BOTH EMT and AEMT</strong> levels</li>
             </ul>
-            <p style="color: #424242; line-height: 1.6;">
-                <strong>Recommendation:</strong> Start by going through all questions at your default level. 
-                When you want to focus on specific topics, use the filters. Click <strong>"Reset All"</strong> to return to viewing all questions for your level, including those from lower certification levels.
+            <p>
+                <strong>💡 Recommendation:</strong> Start with all questions at your level. Use filters to focus on specific topics. Click <strong>"Reset All"</strong> to return to viewing all questions.
             </p>
         </div>
 
-        <div class="actions">
+        <!-- Action Cards -->
+        <div class="actions-grid">
             <div class="action-card">
-                <h2>📝 Start Quiz</h2>
-                <p>Test your knowledge with random questions based on SNHD protocols and your {{ user.level }} level.
-                </p>
-                <a href="/quiz" class="btn">Start Quiz</a>
+                <span class="emoji">📝</span>
+                <h2>Start Quiz</h2>
+                <p>Test your knowledge with {{ user.level }}-level questions based on SNHD protocols.</p>
+                <a href="/quiz" class="btn btn-primary">Start Learning →</a>
             </div>
             <div class="action-card">
-                <h2>📊 View Results</h2>
-                <p>See your detailed performance breakdown, track your progress, and identify areas to improve.</p>
-                <a href="/results" class="btn">View Results</a>
+                <span class="emoji">📊</span>
+                <h2>View Results</h2>
+                <p>See your performance breakdown, track progress, and identify areas to improve.</p>
+                <a href="/results" class="btn btn-secondary">View Results</a>
             </div>
         </div>
     </div>
+
     <script>
         document.getElementById('levelSelect').addEventListener('change', async function() {
             const level = this.value;
             const res = await fetch('/api/update_level', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ level: level })
+                body: JSON.stringify({ level })
             });
             if (res.ok) window.location.reload();
         });
     </script>
 </body>
-
 </html>
