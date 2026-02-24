@@ -216,6 +216,20 @@
     </div>
 
     <script>
+        // Level selector
+        const levelSelect = document.getElementById('levelSelect');
+        if (levelSelect) {
+            levelSelect.addEventListener('change', async function() {
+                const level = this.value;
+                const res = await fetch('/api/update_level', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ level: level })
+                });
+                if (res.ok) window.location.reload();
+            });
+        }
+        
         // Encouragement messages
         const messages = {
             correct: ["🎉 Nailed it!", "💪 Great job!", "🌟 Excellent!", "🔥 On fire!", "✨ Perfect!"],
