@@ -166,16 +166,333 @@
             margin-top: var(--space-6);
             text-align: center;
         }
+        
+        /* Navigation hover effects */
+        .nav-link:hover {
+            background: rgba(255,255,255,0.1) !important;
+        }
+        
+        .nav-link.active:hover {
+            background: rgba(255,255,255,0.2) !important;
+        }
+        
+        /* Custom tooltip for nav links */
+        .nav-link {
+            position: relative;
+        }
+        
+        .nav-link::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: -36px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.85);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease;
+            z-index: 100;
+            pointer-events: none;
+        }
+        
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-bottom-color: rgba(0,0,0,0.85);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease;
+            pointer-events: none;
+        }
+        
+        .nav-link:hover::after,
+        .nav-link:hover::before {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* Clickable answer items */
+        .answer-item {
+            cursor: pointer;
+        }
+        
+        .answer-item:hover {
+            background: var(--bg);
+            transform: translateX(4px);
+        }
+        
+        .view-details {
+            margin-left: var(--space-4);
+            padding: var(--space-1) var(--space-3);
+            background: var(--primary-light);
+            color: var(--primary);
+            border-radius: var(--radius);
+            font-size: 0.8rem;
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity var(--transition-fast);
+        }
+        
+        .answer-item:hover .view-details {
+            opacity: 1;
+        }
+        
+        /* Modal styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            width: 90%;
+            max-width: 700px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-xl);
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+        
+        .modal-overlay.show .modal-content {
+            transform: scale(1);
+        }
+        
+        .modal-header {
+            padding: var(--space-6);
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, var(--primary-light) 0%, #e0e7ff 100%);
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        }
+        
+        .modal-header h3 {
+            color: var(--primary-dark);
+            font-size: 1.2rem;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            padding: var(--space-1);
+            border-radius: var(--radius);
+            transition: all var(--transition-fast);
+        }
+        
+        .modal-close:hover {
+            background: rgba(0,0,0,0.1);
+            color: var(--text-primary);
+        }
+        
+        .modal-body {
+            padding: var(--space-6);
+        }
+        
+        .modal-question {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: var(--space-4);
+            line-height: 1.5;
+        }
+        
+        .modal-options {
+            margin-bottom: var(--space-6);
+        }
+        
+        .modal-option {
+            padding: var(--space-3) var(--space-4);
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            margin-bottom: var(--space-2);
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+        
+        .modal-option.correct {
+            border-color: var(--success);
+            background: var(--success-light);
+        }
+        
+        .modal-option-label {
+            width: 28px;
+            height: 28px;
+            border-radius: var(--radius-full);
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+        
+        .modal-option.correct .modal-option-label {
+            background: var(--success);
+            color: white;
+        }
+        
+        .correct-badge {
+            margin-left: auto;
+            background: var(--success);
+            color: white;
+            padding: var(--space-1) var(--space-3);
+            border-radius: var(--radius);
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .modal-section {
+            margin-bottom: var(--space-5);
+        }
+        
+        .modal-section-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: var(--space-2);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+        
+        .modal-explanation {
+            background: var(--bg);
+            padding: var(--space-4);
+            border-radius: var(--radius);
+            border-left: 4px solid var(--info);
+            line-height: 1.6;
+        }
+        
+        .modal-mnemonic {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            padding: var(--space-4);
+            border-radius: var(--radius);
+            border-left: 4px solid #f59e0b;
+        }
+        
+        .mnemonic-acronym {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #92400e;
+            margin-bottom: var(--space-2);
+            letter-spacing: 0.1em;
+        }
+        
+        .mnemonic-expansion {
+            color: #78350f;
+            line-height: 1.6;
+        }
+        
+        .modal-meta {
+            display: flex;
+            gap: var(--space-4);
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: var(--space-4);
+            padding-top: var(--space-4);
+            border-top: 1px solid var(--border-light);
+        }
+
+        /* Pagination styles */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: var(--space-2);
+            margin-top: var(--space-6);
+            padding-top: var(--space-4);
+            border-top: 1px solid var(--border-light);
+        }
+
+        .pagination-btn {
+            display: flex;
+            align-items: center;
+            gap: var(--space-1);
+            padding: var(--space-2) var(--space-4);
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all var(--transition-fast);
+        }
+
+        .pagination-btn:hover:not(.disabled) {
+            background: var(--primary-light);
+            border-color: var(--primary);
+        }
+
+        .pagination-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .pagination-info {
+            padding: var(--space-2) var(--space-4);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .pagination-current {
+            color: var(--primary);
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
     <nav class="navbar">
         <a href="/dashboard" style="color: white; text-decoration: none;">
-            <h1>🚑 SNHD Learning Platform - Results</h1>
+            <h1>🚑 SNHD Learning Platform</h1>
         </a>
-        <div style="display: flex; align-items: center; gap: var(--space-4);">
-            <a href="/dashboard" style="color: white; text-decoration: none;">Home</a>
-            <select class="level-select" id="levelSelect">
+        <div class="nav-links" style="display: flex; align-items: center; gap: var(--space-2);">
+            <a href="/dashboard" class="nav-link" data-tooltip="Go to Dashboard" style="color: white; text-decoration: none; padding: var(--space-2) var(--space-3); border-radius: var(--radius); transition: background var(--transition-fast);">
+                🏠 Home
+            </a>
+            <a href="/quiz" class="nav-link" data-tooltip="Start a Quiz" style="color: white; text-decoration: none; padding: var(--space-2) var(--space-3); border-radius: var(--radius); transition: background var(--transition-fast);">
+                📝 Quiz
+            </a>
+            <a href="/results" class="nav-link active" data-tooltip="View Your Results" style="color: white; text-decoration: none; padding: var(--space-2) var(--space-3); border-radius: var(--radius); background: rgba(255,255,255,0.15); font-weight: 500;">
+                📊 Results
+            </a>
+            <div style="width: 1px; height: 24px; background: rgba(255,255,255,0.3); margin: 0 var(--space-2);"></div>
+            <select class="level-select" id="levelSelect" style="margin-left: var(--space-2);">
                 <option value="EMT" {% if user.level == 'EMT' %}selected{% endif %}>EMT</option>
                 <option value="AEMT" {% if user.level == 'AEMT' %}selected{% endif %}>AEMT</option>
                 <option value="PARAMEDIC" {% if user.level == 'PARAMEDIC' %}selected{% endif %}>Paramedic</option>
@@ -183,6 +500,36 @@
         </div>
     </nav>
     
+    <!-- Question Detail Modal -->
+    <div class="modal-overlay" id="questionModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📚 Question Review</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-question" id="modalQuestion"></div>
+                
+                <div class="modal-options" id="modalOptions"></div>
+                
+                <div class="modal-section" id="explanationSection">
+                    <div class="modal-section-title">🎯 Explanation</div>
+                    <div class="modal-explanation" id="modalExplanation"></div>
+                </div>
+                
+                <div class="modal-section" id="mnemonicSection" style="display: none;">
+                    <div class="modal-section-title">💡 Memory Aid</div>
+                    <div class="modal-mnemonic">
+                        <div class="mnemonic-acronym" id="modalMnemonicAcronym"></div>
+                        <div class="mnemonic-expansion" id="modalMnemonicExpansion"></div>
+                    </div>
+                </div>
+                
+                <div class="modal-meta" id="modalMeta"></div>
+            </div>
+        </div>
+    </div>
+
     <div class="dashboard-container">
         <!-- Header -->
         <div class="results-header">
@@ -215,7 +562,7 @@
             <h2>📝 Recent Answers</h2>
             {% if recent %}
                 {% for answer, question in recent %}
-                <div class="answer-item">
+                <div class="answer-item" onclick="showQuestionDetail({{ loop.index0 }})" data-question-id="{{ question.id }}">
                     <div class="status-icon {{ 'correct' if answer.correct else 'incorrect' }}">
                         {{ '✓' if answer.correct else '✗' }}
                     </div>
@@ -225,8 +572,45 @@
                             {{ question.level }} • {{ question.category }} • {{ answer.timestamp.strftime('%Y-%m-%d %H:%M') }}
                         </div>
                     </div>
+                    <span class="view-details">View →</span>
                 </div>
                 {% endfor %}
+                
+                <!-- Question data for JavaScript -->
+                <script id="questionsData" type="application/json">
+                [
+                    {% for answer, question in recent %}
+                    {
+                        "id": {{ question.id }},
+                        "question": {{ question.question | tojson }},
+                        "options": {{ question.get_options() | tojson }},
+                        "correct_answer": {{ question.correct_answer }},
+                        "explanation": {{ question.explanation | tojson }},
+                        "mnemonic_enabled": {{ question.mnemonic_enabled | tojson }},
+                        "mnemonic_acronym": {{ question.mnemonic_acronym | tojson }},
+                        "mnemonic_expansion": {{ question.mnemonic_expansion | tojson }},
+                        "level": {{ question.level | tojson }},
+                        "category": {{ question.category | tojson }},
+                        "user_correct": {{ answer.correct | tojson }}
+                    }{% if not loop.last %},{% endif %}
+                    {% endfor %}
+                ]
+                </script>
+
+                <!-- Pagination -->
+                {% if total_pages > 1 %}
+                <div class="pagination">
+                    <a href="{{ url_for('results', page=page-1) }}" class="pagination-btn {{ 'disabled' if page <= 1 else '' }}">
+                        ← Previous
+                    </a>
+                    <span class="pagination-info">
+                        Page <span class="pagination-current">{{ page }}</span> of {{ total_pages }}
+                    </span>
+                    <a href="{{ url_for('results', page=page+1) }}" class="pagination-btn {{ 'disabled' if page >= total_pages else '' }}">
+                        Next →
+                    </a>
+                </div>
+                {% endif %}
             {% else %}
                 <div class="empty-state">
                     <span class="empty-state-icon">📝</span>
@@ -246,6 +630,73 @@
     </div>
     
     <script>
+        // Load question data
+        const questionData = JSON.parse(document.getElementById('questionsData').textContent);
+        const letterLabels = ['A', 'B', 'C', 'D'];
+        
+        function showQuestionDetail(index) {
+            const q = questionData[index];
+            const modal = document.getElementById('questionModal');
+            
+            // Set question text
+            document.getElementById('modalQuestion').textContent = q.question;
+            
+            // Build options
+            const optionsContainer = document.getElementById('modalOptions');
+            optionsContainer.innerHTML = '';
+            q.options.forEach((opt, i) => {
+                const isCorrect = i === q.correct_answer;
+                const div = document.createElement('div');
+                div.className = 'modal-option' + (isCorrect ? ' correct' : '');
+                div.innerHTML = `
+                    <span class="modal-option-label">${letterLabels[i]}</span>
+                    <span>${opt}</span>
+                    ${isCorrect ? '<span class="correct-badge">Correct Answer</span>' : ''}
+                `;
+                optionsContainer.appendChild(div);
+            });
+            
+            // Set explanation
+            document.getElementById('modalExplanation').textContent = q.explanation || 'No explanation provided.';
+            
+            // Handle mnemonic
+            const mnemonicSection = document.getElementById('mnemonicSection');
+            if (q.mnemonic_enabled && q.mnemonic_acronym) {
+                mnemonicSection.style.display = 'block';
+                document.getElementById('modalMnemonicAcronym').textContent = q.mnemonic_acronym;
+                document.getElementById('modalMnemonicExpansion').textContent = q.mnemonic_expansion || '';
+            } else {
+                mnemonicSection.style.display = 'none';
+            }
+            
+            // Set meta info
+            document.getElementById('modalMeta').innerHTML = `
+                <span>📚 ${q.level}</span>
+                <span>📂 ${q.category}</span>
+                <span>${q.user_correct ? '✅ You got this right' : '❌ You got this wrong'}</span>
+            `;
+            
+            // Show modal
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeModal() {
+            const modal = document.getElementById('questionModal');
+            modal.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+        
+        // Close modal on overlay click
+        document.getElementById('questionModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+        
+        // Close on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeModal();
+        });
+        
         document.getElementById('levelSelect').addEventListener('change', async function() {
             const level = this.value;
             const res = await fetch('/api/update_level', {

@@ -298,17 +298,39 @@ def results():
     user = User.query.get(session["user_id"])
     stats = user.get_score_stats()
 
-    # Get recent answers with question details
-    recent = (
+    # Get all answers with question details
+    all_answers = (
         db.session.query(Answer, Question)
         .join(Question)
         .filter(Answer.user_id == user.id)
         .order_by(Answer.timestamp.desc())
-        .limit(20)
         .all()
     )
 
-    return render_template("results.html", user=user, stats=stats, recent=recent)
+    # Pagination
+    page = request.args.get("page", 1, type=int)
+    per_page = 20
+    total = len(all_answers)
+    total_pages = (total + per_page - 1) // per_page if total > 0 else 1
+
+    # Ensure page is valid
+    page = max(1, min(page, total_pages))
+
+    # Slice results for current page
+    start = (page - 1) * per_page
+    end = start + per_page
+    recent = all_answers[start:end]
+
+    return render_template(
+        "results.html",
+        user=user,
+        stats=stats,
+        recent=recent,
+        page=page,
+        total_pages=total_pages,
+        total=total,
+        per_page=per_page,
+    )
 
 
 @app.route("/api/stats")

@@ -156,6 +156,59 @@
             margin-bottom: var(--space-6);
             line-height: 1.6;
         }
+        
+        /* Navigation hover effects */
+        .nav-link:hover {
+            background: rgba(255,255,255,0.1) !important;
+        }
+        
+        .nav-link.active:hover {
+            background: rgba(255,255,255,0.2) !important;
+        }
+        
+        /* Custom tooltip for nav links */
+        .nav-link {
+            position: relative;
+        }
+        
+        .nav-link::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: -36px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.85);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease;
+            z-index: 100;
+            pointer-events: none;
+        }
+        
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-bottom-color: rgba(0,0,0,0.85);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease;
+            pointer-events: none;
+        }
+        
+        .nav-link:hover::after,
+        .nav-link:hover::before {
+            opacity: 1;
+            visibility: visible;
+        }
     </style>
 </head>
 <body>
@@ -163,9 +216,18 @@
         <a href="/dashboard" style="color: white; text-decoration: none;">
             <h1>🚑 SNHD Learning Platform</h1>
         </a>
-        <div style="display: flex; align-items: center; gap: var(--space-4);">
-            <a href="/dashboard" style="color: white; text-decoration: none;">Home</a>
-            <select class="level-select" id="levelSelect">
+        <div class="nav-links" style="display: flex; align-items: center; gap: var(--space-2);">
+            <a href="/dashboard" class="nav-link active" data-tooltip="Go to Dashboard" style="color: white; text-decoration: none; padding: var(--space-2) var(--space-3); border-radius: var(--radius); background: rgba(255,255,255,0.15); font-weight: 500;">
+                🏠 Home
+            </a>
+            <a href="/quiz" class="nav-link" data-tooltip="Start a Quiz" style="color: white; text-decoration: none; padding: var(--space-2) var(--space-3); border-radius: var(--radius); transition: background var(--transition-fast);">
+                📝 Quiz
+            </a>
+            <a href="/results" class="nav-link" data-tooltip="View Your Results" style="color: white; text-decoration: none; padding: var(--space-2) var(--space-3); border-radius: var(--radius); transition: background var(--transition-fast);">
+                📊 Results
+            </a>
+            <div style="width: 1px; height: 24px; background: rgba(255,255,255,0.3); margin: 0 var(--space-2);"></div>
+            <select class="level-select" id="levelSelect" style="margin-left: var(--space-2);">
                 <option value="EMT" {% if user.level == 'EMT' %}selected{% endif %}>EMT</option>
                 <option value="AEMT" {% if user.level == 'AEMT' %}selected{% endif %}>AEMT</option>
                 <option value="PARAMEDIC" {% if user.level == 'PARAMEDIC' %}selected{% endif %}>Paramedic</option>
