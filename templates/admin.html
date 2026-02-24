@@ -729,8 +729,6 @@ T - Time (how long has it lasted?)"></textarea>
             const level = document.getElementById('levelFilter').value;
             const category = document.getElementById('categoryFilter').value;
 
-            const levelMap = { 'EMT': 1, 'AEMT': 2, 'PARAMEDIC': 3 };
-
             const rows = document.querySelectorAll('#questionsTable tbody tr');
 
             rows.forEach(row => {
@@ -743,12 +741,8 @@ T - Time (how long has it lasted?)"></textarea>
 
                 if (search && !text.includes(search) && !rId.includes(search)) matches = false;
 
-                // Hierarchical Level Filtering
-                if (level) {
-                    const filterVal = levelMap[level] || 0;
-                    const rowVal = levelMap[rLevel] || 0;
-                    if (rowVal > filterVal) matches = false;
-                }
+                // Exact Level Filtering (not hierarchical)
+                if (level && rLevel !== level) matches = false;
 
                 if (category && rCat !== category) matches = false;
 
