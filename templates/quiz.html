@@ -101,6 +101,45 @@
             <p><strong>💡 Tip:</strong> Higher levels need to know content from junior levels.</p>
         </div>
 
+        <!-- Topic Filter -->
+        <div class="filter-section" style="background: var(--card-bg); padding: var(--space-5); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: var(--space-5);">
+            <h3 style="margin-bottom: var(--space-3); color: var(--text-primary); font-size: 1rem;">📂 Topics</h3>
+            <form method="GET" action="/quiz" style="display: flex; gap: var(--space-3); flex-wrap: wrap; align-items: center;">
+                <select name="category" onchange="this.form.submit()" style="padding: var(--space-2) var(--space-4); border-radius: var(--radius); border: 2px solid var(--border); font-size: 1rem; min-width: 250px;">
+                    <option value="all">All Topics</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat }}" {% if cat == selected_category %}selected{% endif %}>{{ cat }}</option>
+                    {% endfor %}
+                </select>
+                {% if selected_category != 'all' %}
+                <a href="/quiz" style="color: var(--primary); text-decoration: none; font-size: 0.9rem; font-weight: 500;">✕ Clear filter</a>
+                {% endif %}
+            </form>
+        </div>
+        
+        <!-- Question Search -->
+        <div class="search-section" style="background: var(--card-bg); padding: var(--space-5); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: var(--space-5);">
+            <h3 style="margin-bottom: var(--space-3); font-size: 1rem;">🔍 Search Questions</h3>
+            <div style="display: flex; gap: var(--space-3); flex-wrap: wrap; align-items: center;">
+                <input type="text" id="questionSearch" placeholder="Type to search questions..." style="padding: var(--space-3) var(--space-4); border-radius: var(--radius); border: 2px solid var(--border); font-size: 1rem; flex: 1; min-width: 250px;">
+                <button onclick="clearSearch()" style="padding: var(--space-3) var(--space-5); background: var(--bg); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; font-size: 0.9rem;">Clear</button>
+            </div>
+            <p id="searchResults" style="margin-top: var(--space-2); color: var(--text-secondary); font-size: 0.9rem; display: none;"></p>
+        </div>
+        
+        <!-- Question Count Banner -->
+        <div style="background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%); padding: var(--space-4); border-radius: var(--radius); margin-bottom: var(--space-5); text-align: center;">
+            <strong style="color: var(--primary-dark); font-size: 1.1rem;">
+                Showing {{ questions|length }} questions 
+                {% if selected_category != 'all' %}in "{{ selected_category }}"{% endif %}
+            </strong>
+            <br><small style="margin-top: var(--space-1); display: inline-block;">
+                {% if questions|length < total_available %}
+                <a href="/quiz?category={{ selected_category }}&limit=all" style="color: var(--primary);">Show all {{ total_available }} questions</a>
+                {% endif %}
+            </small>
+        </div>
+
         <!-- Progress -->
         <div class="progress-container">
             <div class="progress-bar">
@@ -331,6 +370,110 @@
         }
 
         showQuestion(0);
+
+        // Question Search Functionality
+        const questionCards = document.querySelectorAll('.question-card');
+        const searchInput = document.getElementById('questionSearch');
+        const searchResults = document.getElementById('searchResults');
+        
+        // Store original question data for search
+        const questionData = [];
+        questionCards.forEach((card, index) => {
+            const qid = card.dataset.questionId;
+            const questionText = card.querySelector('.question-text').textContent.toLowerCase();
+            const explanation = card.querySelector('.explanation p')?.textContent.toLowerCase() || '';
+            const options = Array.from(card.querySelectorAll('.option span:last-child')).map(opt => opt.textContent.toLowerCase());
+            questionData.push({
+                index: index,
+                element: card,
+                qid: qid,
+                text: questionText,
+                explanation: explanation,
+                options: options
+            });
+        });
+        
+        let filteredIndices = [];
+        let filteredCurrentIndex = 0;
+        
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            
+            if (searchTerm === '') {
+                clearSearch();
+                return;
+            }
+            
+            // Filter questions
+            filteredIndices = [];
+            questionData.forEach((q, idx) => {
+                const matchesText = q.text.includes(searchTerm);
+                const matchesExplanation = q.explanation.includes(searchTerm);
+                const matchesOptions = q.options.some(opt => opt.includes(searchTerm));
+                
+                if (matchesText || matchesExplanation || matchesOptions) {
+                    filteredIndices.push(idx);
+                }
+            });
+            
+            if (filteredIndices.length === 0) {
+                searchResults.textContent = 'No questions found matching "' + searchTerm + '"';
+                searchResults.style.display = 'block';
+                questionCards.forEach(card => card.style.display = 'none');
+                document.getElementById('navigation').style.display = 'none';
+            } else {
+                searchResults.textContent = 'Found ' + filteredIndices.length + ' question(s) matching "' + searchTerm + '"';
+                searchResults.style.display = 'block';
+                
+                questionCards.forEach(card => card.style.display = 'none');
+                
+                filteredIndices.forEach((originalIndex, i) => {
+                    const card = questionData[originalIndex].element;
+                    card.style.display = 'block';
+                    const qNum = card.querySelector('.question-number');
+                    qNum.textContent = 'Question ' + (i + 1) + ' of ' + filteredIndices.length;
+                });
+                
+                updateFilteredNavigation();
+            }
+        });
+        
+        function clearSearch() {
+            searchInput.value = '';
+            searchResults.style.display = 'none';
+            filteredIndices = [];
+            
+            questionCards.forEach((card, index) => {
+                card.style.display = index === 0 ? 'block' : 'none';
+                const qNum = card.querySelector('.question-number');
+                qNum.textContent = 'Question ' + (index + 1) + ' of ' + questionCards.length;
+            });
+            
+            currentQ = 0;
+            total = questionCards.length;
+            updateProgress();
+            document.getElementById('navigation').style.display = 'flex';
+            showQuestion(0);
+        }
+        
+        function updateFilteredNavigation() {
+            if (filteredIndices.length === 0) return;
+            
+            const progress = ((filteredCurrentIndex + 1) / filteredIndices.length) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('progressText').textContent = 'Question ' + (filteredCurrentIndex + 1) + ' of ' + filteredIndices.length;
+            
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            prevBtn.disabled = filteredCurrentIndex === 0;
+            
+            if (filteredCurrentIndex === filteredIndices.length - 1) {
+                nextBtn.textContent = 'Finish 🎉';
+            } else {
+                nextBtn.textContent = 'Next →';
+            }
+        }
     </script>
 </body>
 </html>
