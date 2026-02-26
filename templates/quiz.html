@@ -246,7 +246,6 @@
 
         <!-- Final Score -->
         <div class="final-score-display hidden" id="finalScore">
-            <h2 id="completionTitle">QUIZ COMPLETE</h2>
             <div id="nav-target"></div>
             <br><br>
             <div class="score-buttons">
@@ -404,13 +403,6 @@
                 navTarget.appendChild(nav);
 
                 document.getElementById('finalScore').classList.remove('hidden');
-
-                let title = 'QUIZ COMPLETE';
-                if (pct >= 90) title = 'OUTSTANDING';
-                else if (pct >= 70) title = 'GREAT JOB';
-                else if (pct >= 50) title = 'GOOD WORK';
-                else title = 'KEEP STUDYING';
-                document.getElementById('completionTitle').textContent = title;
             }
         });
 
