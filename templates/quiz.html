@@ -82,6 +82,17 @@
         }
 
         /* Navigation hover effects removed */
+        .score-buttons {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-8);
+            margin-top: var(--space-4);
+        }
+
+        .final-score-display {
+            text-align: center;
+            padding: var(--space-8);
+        }
     </style>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}?v=4">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/quiz.css') }}?v=4">
