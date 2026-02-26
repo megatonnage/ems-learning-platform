@@ -247,8 +247,8 @@
         <!-- Final Score -->
         <div class="final-score-display hidden" id="finalScore">
             <h2 id="completionTitle">QUIZ COMPLETE</h2>
-            <div class="final-score-number" id="scorePercent">0%</div>
-            <p class="score-message" id="scoreText"></p>
+            <div id="nav-target"></div>
+            <br><br>
             <div class="score-buttons">
                 <a href="/dashboard" class="btn btn-primary">Dashboard</a>
                 <a href="/results" class="btn btn-secondary">Results</a>
@@ -400,21 +400,10 @@
                 document.querySelector('.progress-container').style.display = 'none';
 
                 const nav = document.getElementById('navigation');
-                const finalScore = document.getElementById('finalScore');
-                const scoreButtons = finalScore.querySelector('.score-buttons');
-                finalScore.insertBefore(nav, scoreButtons);
+                const navTarget = document.getElementById('nav-target');
+                navTarget.appendChild(nav);
 
-                finalScore.classList.remove('hidden');
-
-                // Animate score
-                let curr = 0;
-                const timer = setInterval(() => {
-                    curr += pct / 30;
-                    if (curr >= pct) { curr = pct; clearInterval(timer); }
-                    document.getElementById('scorePercent').textContent = Math.round(curr) + '%';
-                }, 30);
-
-                document.getElementById('scoreText').textContent = `You got ${score} out of ${total} correct`;
+                document.getElementById('finalScore').classList.remove('hidden');
 
                 let title = 'QUIZ COMPLETE';
                 if (pct >= 90) title = 'OUTSTANDING';
