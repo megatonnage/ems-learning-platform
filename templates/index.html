@@ -1,20 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SNHD Learning Platform</title>
-    
+
     <!-- External CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
-    
+
     <!-- Page-specific styles -->
     <style>
         /* Landing page unique styles */
         body {
             background: var(--primary-gradient);
         }
-        
+
         .landing-navbar {
             width: 100%;
             background: rgba(0, 0, 0, 0.2);
@@ -23,17 +24,17 @@
             justify-content: space-between;
             align-items: center;
         }
-        
+
         .landing-navbar a {
             color: white;
             text-decoration: none;
             font-weight: 600;
         }
-        
+
         .landing-navbar a:hover {
             text-decoration: underline;
         }
-        
+
         .landing-container {
             flex: 1;
             display: flex;
@@ -43,7 +44,7 @@
             min-height: calc(100vh - 70px);
             padding: var(--space-6);
         }
-        
+
         .landing-card {
             background: var(--card-bg);
             padding: var(--space-10);
@@ -53,35 +54,42 @@
             width: 100%;
             animation: fadeInUp 0.6s ease-out;
         }
-        
+
         .ambulance {
-            font-size: 4rem;
             text-align: center;
             margin-bottom: var(--space-4);
             animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.2s both;
+            background: transparent;
         }
-        
+
+        .ambulance img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
         .landing-card h1 {
             text-align: center;
             margin-bottom: var(--space-2);
         }
-        
+
         .subtitle {
             text-align: center;
             color: var(--text-secondary);
             margin-bottom: var(--space-8);
         }
-        
+
         .form-group {
             margin-bottom: var(--space-6);
         }
-        
+
         .form-group label {
             display: block;
             margin-bottom: var(--space-2);
             font-weight: 500;
         }
-        
+
         .form-group select,
         .form-group input {
             width: 100%;
@@ -91,13 +99,13 @@
             font-size: 1rem;
             transition: border-color var(--transition-fast);
         }
-        
+
         .form-group select:focus,
         .form-group input:focus {
             outline: none;
             border-color: var(--primary);
         }
-        
+
         .level-info {
             margin-bottom: var(--space-6);
             padding: var(--space-4);
@@ -107,7 +115,7 @@
             color: var(--text-secondary);
             border-left: 4px solid var(--primary);
         }
-        
+
         .notice {
             margin: var(--space-4) 0;
             padding: var(--space-4);
@@ -117,11 +125,11 @@
             font-size: 0.9rem;
             color: var(--warning-dark);
         }
-        
+
         .notice strong {
             color: var(--warning-dark);
         }
-        
+
         .btn-full {
             width: 100%;
             padding: var(--space-4);
@@ -129,18 +137,21 @@
         }
     </style>
 </head>
+
 <body>
     <nav class="landing-navbar">
         <a href="/">SNHD Learning Platform</a>
         <a href="/dashboard">Dashboard</a>
     </nav>
-    
+
     <div class="landing-container">
         <div class="landing-card">
-            <div class="ambulance">🚑</div>
+            <div class="ambulance">
+                <img src="{{ url_for('static', filename='img/ambulance_final_v4.png') }}?v=4" alt="Ambulance">
+            </div>
             <h1>SNHD Learning Platform</h1>
             <p class="subtitle">Master SNHD protocols with confidence</p>
-            
+
             <form id="registerForm">
                 <div class="form-group">
                     <label for="level">Choose Your NREMT Level</label>
@@ -151,41 +162,41 @@
                         <option value="PARAMEDIC">🚑 Paramedic</option>
                     </select>
                 </div>
-                
+
                 <div class="level-info" id="levelInfo">
                     💡 Select a level above to see what topics you'll study.
                 </div>
-                
+
                 <div id="paramedicNotice" class="notice" style="display: none;">
-                    <strong>⚠️ Coming Soon:</strong> Paramedic questions are in development. 
+                    <strong>⚠️ Coming Soon:</strong> Paramedic questions are in development.
                     Check back after we've completed paramedic school and SNHD certification!
                 </div>
-                
+
                 <button type="submit" class="btn btn-primary btn-full">Start Learning →</button>
             </form>
         </div>
     </div>
-    
+
     <script>
-        document.getElementById('level').addEventListener('change', function() {
+        document.getElementById('level').addEventListener('change', function () {
             const info = {
                 'EMT': '✅ Ready! Study: Basic Life Support, Patient Assessment, Airway Management, Trauma, Medical Emergencies',
                 'AEMT': '✅ Ready! Study: Advanced Assessment, IV Therapy, Medication Administration, Advanced Airway',
                 'PARAMEDIC': '📚 Coming soon: Cardiac Monitoring, 12-Lead ECG, Advanced Procedures, Pharmacology, Critical Care'
             };
-            
+
             const levelInfo = document.getElementById('levelInfo');
             const selectedInfo = info[this.value];
-            
+
             levelInfo.textContent = selectedInfo || '💡 Select a level above to see what topics you\'ll study.';
             levelInfo.style.borderLeftColor = this.value === 'PARAMEDIC' ? 'var(--warning)' : 'var(--success)';
-            
+
             // Show/hide Paramedic notice
-            document.getElementById('paramedicNotice').style.display = 
+            document.getElementById('paramedicNotice').style.display =
                 this.value === 'PARAMEDIC' ? 'block' : 'none';
         });
-        
-        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+
+        document.getElementById('registerForm').addEventListener('submit', async function (e) {
             e.preventDefault();
             const formData = new FormData(this);
             const response = await fetch('/register', {
@@ -199,4 +210,5 @@
         });
     </script>
 </body>
+
 </html>

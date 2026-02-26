@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Results - SNHD Learning</title>
-    
+
     <!-- External CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
-    
+
     <style>
         /* Results-specific styles */
         .results-header {
@@ -16,23 +17,23 @@
             margin-bottom: var(--space-8);
             animation: fadeInUp 0.5s ease-out;
         }
-        
+
         .results-header h1 {
             font-size: 2rem;
             margin-bottom: var(--space-2);
         }
-        
+
         .results-header p {
             color: var(--text-secondary);
         }
-        
+
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: var(--space-4);
             margin-bottom: var(--space-8);
         }
-        
+
         .stat-card {
             background: var(--card-bg);
             padding: var(--space-6);
@@ -43,33 +44,52 @@
             animation: fadeInUp 0.5s ease-out;
             animation-fill-mode: both;
         }
-        
-        .stat-card:nth-child(1) { animation-delay: 0.1s; }
-        .stat-card:nth-child(2) { animation-delay: 0.2s; }
-        .stat-card:nth-child(3) { animation-delay: 0.3s; }
-        .stat-card:nth-child(4) { animation-delay: 0.4s; }
-        
+
+        .stat-card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .stat-card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .stat-card:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .stat-card:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
         .stat-card:hover {
             transform: translateY(-2px);
             box-shadow: var(--shadow-lg);
         }
-        
+
         .stat-card h3 {
             color: var(--text-secondary);
             font-size: 0.8rem;
             text-transform: uppercase;
             margin-bottom: var(--space-2);
         }
-        
+
         .stat-value {
             font-size: 2rem;
             font-weight: 700;
         }
-        
-        .stat-value.success { color: var(--success); }
-        .stat-value.error { color: var(--error); }
-        .stat-value.primary { color: var(--primary); }
-        
+
+        .stat-value.success {
+            color: var(--success);
+        }
+
+        .stat-value.error {
+            color: var(--error);
+        }
+
+        .stat-value.primary {
+            color: var(--primary);
+        }
+
         .history-section {
             background: var(--card-bg);
             padding: var(--space-6);
@@ -77,13 +97,13 @@
             box-shadow: var(--shadow);
             animation: fadeInUp 0.5s ease-out 0.5s both;
         }
-        
+
         .history-section h2 {
             margin-bottom: var(--space-4);
             padding-bottom: var(--space-3);
             border-bottom: 1px solid var(--border-light);
         }
-        
+
         .answer-item {
             display: flex;
             align-items: center;
@@ -91,15 +111,15 @@
             border-bottom: 1px solid var(--border-light);
             transition: background var(--transition-fast);
         }
-        
+
         .answer-item:hover {
             background: var(--bg);
         }
-        
+
         .answer-item:last-child {
             border-bottom: none;
         }
-        
+
         .status-icon {
             width: 36px;
             height: 36px;
@@ -111,22 +131,22 @@
             margin-right: var(--space-4);
             flex-shrink: 0;
         }
-        
+
         .status-icon.correct {
             background: var(--success-light);
             color: var(--success);
         }
-        
+
         .status-icon.incorrect {
             background: var(--error-light);
             color: var(--error);
         }
-        
+
         .answer-details {
             flex: 1;
             min-width: 0;
         }
-        
+
         .answer-question {
             font-weight: 500;
             color: var(--text-primary);
@@ -135,59 +155,59 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        
+
         .answer-meta {
             font-size: 0.85rem;
             color: var(--text-secondary);
         }
-        
+
         .empty-state {
             text-align: center;
             padding: var(--space-12);
             color: var(--text-secondary);
         }
-        
+
         .empty-state-icon {
             font-size: 4rem;
             margin-bottom: var(--space-4);
             display: block;
         }
-        
+
         .empty-state h3 {
             color: var(--text-primary);
             margin-bottom: var(--space-2);
         }
-        
+
         .empty-state p {
             margin-bottom: var(--space-6);
         }
-        
+
         .action-bar {
             margin-top: var(--space-6);
             text-align: center;
         }
-        
+
         /* Navigation hover effects */
         .nav-link:hover {
-            background: rgba(255,255,255,0.1) !important;
+            background: rgba(255, 255, 255, 0.1) !important;
         }
-        
+
         .nav-link.active:hover {
-            background: rgba(255,255,255,0.2) !important;
+            background: rgba(255, 255, 255, 0.2) !important;
         }
-        
+
         /* Custom tooltip for nav links */
         .nav-link {
             position: relative;
         }
-        
+
         .nav-link::after {
             content: attr(data-tooltip);
             position: absolute;
             bottom: -36px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0,0,0,0.85);
+            background: rgba(0, 0, 0, 0.85);
             color: white;
             padding: 6px 12px;
             border-radius: 6px;
@@ -199,7 +219,7 @@
             z-index: 100;
             pointer-events: none;
         }
-        
+
         .nav-link::before {
             content: '';
             position: absolute;
@@ -207,29 +227,29 @@
             left: 50%;
             transform: translateX(-50%);
             border: 6px solid transparent;
-            border-bottom-color: rgba(0,0,0,0.85);
+            border-bottom-color: rgba(0, 0, 0, 0.85);
             opacity: 0;
             visibility: hidden;
             transition: all 0.2s ease;
             pointer-events: none;
         }
-        
+
         .nav-link:hover::after,
         .nav-link:hover::before {
             opacity: 1;
             visibility: visible;
         }
-        
+
         /* Clickable answer items */
         .answer-item {
             cursor: pointer;
         }
-        
+
         .answer-item:hover {
             background: var(--bg);
             transform: translateX(4px);
         }
-        
+
         .view-details {
             margin-left: var(--space-4);
             padding: var(--space-1) var(--space-3);
@@ -241,11 +261,11 @@
             opacity: 0;
             transition: opacity var(--transition-fast);
         }
-        
+
         .answer-item:hover .view-details {
             opacity: 1;
         }
-        
+
         /* Modal styles */
         .modal-overlay {
             position: fixed;
@@ -253,7 +273,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.6);
+            background: rgba(0, 0, 0, 0.6);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -262,12 +282,12 @@
             visibility: hidden;
             transition: all 0.3s ease;
         }
-        
+
         .modal-overlay.show {
             opacity: 1;
             visibility: visible;
         }
-        
+
         .modal-content {
             background: var(--card-bg);
             border-radius: var(--radius-lg);
@@ -279,11 +299,11 @@
             transform: scale(0.95);
             transition: transform 0.3s ease;
         }
-        
+
         .modal-overlay.show .modal-content {
             transform: scale(1);
         }
-        
+
         .modal-header {
             padding: var(--space-6);
             border-bottom: 1px solid var(--border-light);
@@ -293,12 +313,12 @@
             background: linear-gradient(135deg, var(--primary-light) 0%, #e0e7ff 100%);
             border-radius: var(--radius-lg) var(--radius-lg) 0 0;
         }
-        
+
         .modal-header h3 {
             color: var(--primary-dark);
             font-size: 1.2rem;
         }
-        
+
         .modal-close {
             background: none;
             border: none;
@@ -309,16 +329,16 @@
             border-radius: var(--radius);
             transition: all var(--transition-fast);
         }
-        
+
         .modal-close:hover {
-            background: rgba(0,0,0,0.1);
+            background: rgba(0, 0, 0, 0.1);
             color: var(--text-primary);
         }
-        
+
         .modal-body {
             padding: var(--space-6);
         }
-        
+
         .modal-question {
             font-size: 1.1rem;
             font-weight: 500;
@@ -326,11 +346,11 @@
             margin-bottom: var(--space-4);
             line-height: 1.5;
         }
-        
+
         .modal-options {
             margin-bottom: var(--space-6);
         }
-        
+
         .modal-option {
             padding: var(--space-3) var(--space-4);
             border: 2px solid var(--border);
@@ -340,12 +360,12 @@
             align-items: center;
             gap: var(--space-3);
         }
-        
+
         .modal-option.correct {
             border-color: var(--success);
             background: var(--success-light);
         }
-        
+
         .modal-option-label {
             width: 28px;
             height: 28px;
@@ -358,12 +378,12 @@
             font-size: 0.85rem;
             flex-shrink: 0;
         }
-        
+
         .modal-option.correct .modal-option-label {
             background: var(--success);
             color: white;
         }
-        
+
         .correct-badge {
             margin-left: auto;
             background: var(--success);
@@ -373,11 +393,11 @@
             font-size: 0.75rem;
             font-weight: 600;
         }
-        
+
         .modal-section {
             margin-bottom: var(--space-5);
         }
-        
+
         .modal-section-title {
             font-size: 0.9rem;
             font-weight: 600;
@@ -389,7 +409,7 @@
             align-items: center;
             gap: var(--space-2);
         }
-        
+
         .modal-explanation {
             background: var(--bg);
             padding: var(--space-4);
@@ -397,14 +417,14 @@
             border-left: 4px solid var(--info);
             line-height: 1.6;
         }
-        
+
         .modal-mnemonic {
             background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
             padding: var(--space-4);
             border-radius: var(--radius);
             border-left: 4px solid #f59e0b;
         }
-        
+
         .mnemonic-acronym {
             font-size: 1.2rem;
             font-weight: 700;
@@ -412,12 +432,12 @@
             margin-bottom: var(--space-2);
             letter-spacing: 0.1em;
         }
-        
+
         .mnemonic-expansion {
             color: #78350f;
             line-height: 1.6;
         }
-        
+
         .modal-meta {
             display: flex;
             gap: var(--space-4);
@@ -476,30 +496,31 @@
         }
     </style>
 </head>
+
 <body>
     <nav class="navbar">
-        <a href="/dashboard" style="color: white; text-decoration: none;">
-            <h1>🚑 SNHD Learning Platform</h1>
+        <a href="/dashboard" class="nav-brand">
+            SNHD LEARNING PLATFORM
         </a>
-        <div class="nav-links" style="display: flex; align-items: center; gap: var(--space-2);">
-            <a href="/dashboard" class="nav-link" data-tooltip="Go to Dashboard" style="color: white; text-decoration: none; padding: var(--space-2) var(--space-3); border-radius: var(--radius); transition: background var(--transition-fast);">
-                🏠 Home
+        <div class="nav-links">
+            <a href="/dashboard" class="btn btn-secondary nav-btn">
+                HOME
             </a>
-            <a href="/quiz" class="nav-link" data-tooltip="Start a Quiz" style="color: white; text-decoration: none; padding: var(--space-2) var(--space-3); border-radius: var(--radius); transition: background var(--transition-fast);">
-                📝 Quiz
+            <a href="/quiz" class="btn btn-secondary nav-btn">
+                QUIZ
             </a>
-            <a href="/results" class="nav-link active" data-tooltip="View Your Results" style="color: white; text-decoration: none; padding: var(--space-2) var(--space-3); border-radius: var(--radius); background: rgba(255,255,255,0.15); font-weight: 500;">
-                📊 Results
+            <a href="/results" class="btn btn-secondary nav-btn active">
+                RESULTS
             </a>
-            <div style="width: 1px; height: 24px; background: rgba(255,255,255,0.3); margin: 0 var(--space-2);"></div>
-            <select class="level-select" id="levelSelect" style="margin-left: var(--space-2);">
-                <option value="EMT" {% if user.level == 'EMT' %}selected{% endif %}>EMT</option>
-                <option value="AEMT" {% if user.level == 'AEMT' %}selected{% endif %}>AEMT</option>
-                <option value="PARAMEDIC" {% if user.level == 'PARAMEDIC' %}selected{% endif %}>Paramedic</option>
+            <div class="nav-divider"></div>
+            <select class="level-select" id="levelSelect">
+                <option value="EMT" {% if user.level=='EMT' %}selected{% endif %}>EMT</option>
+                <option value="AEMT" {% if user.level=='AEMT' %}selected{% endif %}>AEMT</option>
+                <option value="PARAMEDIC" {% if user.level=='PARAMEDIC' %}selected{% endif %}>PARAMEDIC</option>
             </select>
         </div>
     </nav>
-    
+
     <!-- Question Detail Modal -->
     <div class="modal-overlay" id="questionModal">
         <div class="modal-content">
@@ -509,14 +530,14 @@
             </div>
             <div class="modal-body">
                 <div class="modal-question" id="modalQuestion"></div>
-                
+
                 <div class="modal-options" id="modalOptions"></div>
-                
+
                 <div class="modal-section" id="explanationSection">
                     <div class="modal-section-title">🎯 Explanation</div>
                     <div class="modal-explanation" id="modalExplanation"></div>
                 </div>
-                
+
                 <div class="modal-section" id="mnemonicSection" style="display: none;">
                     <div class="modal-section-title">💡 Memory Aid</div>
                     <div class="modal-mnemonic">
@@ -524,7 +545,7 @@
                         <div class="mnemonic-expansion" id="modalMnemonicExpansion"></div>
                     </div>
                 </div>
-                
+
                 <div class="modal-meta" id="modalMeta"></div>
             </div>
         </div>
@@ -533,10 +554,10 @@
     <div class="dashboard-container">
         <!-- Header -->
         <div class="results-header">
-            <h1>📊 Your Learning Progress</h1>
+            <h1>YOUR LEARNING PROGRESS</h1>
             <p>Track your journey and see how far you've come</p>
         </div>
-        
+
         <!-- Stats Grid -->
         <div class="stats-grid">
             <div class="stat-card">
@@ -556,35 +577,38 @@
                 <div class="stat-value primary">{{ stats.percentage }}%</div>
             </div>
         </div>
-        
+
         <!-- History -->
         <div class="history-section">
-            <h2>📝 Recent Answers</h2>
+            <h2>RECENT ANSWERS</h2>
             {% if recent %}
-                {% for answer, question in recent %}
-                <div class="answer-item" onclick="showQuestionDetail({{ loop.index0 }})" data-question-id="{{ question.id }}">
-                    <div class="status-icon {{ 'correct' if answer.correct else 'incorrect' }}">
-                        {{ '✓' if answer.correct else '✗' }}
-                    </div>
-                    <div class="answer-details">
-                        <div class="answer-question">{{ question.question[:100] }}{% if question.question|length > 100 %}...{% endif %}</div>
-                        <div class="answer-meta">
-                            {{ question.level }} • {{ question.category }} • {{ answer.timestamp.strftime('%Y-%m-%d %H:%M') }}
-                        </div>
-                    </div>
-                    <span class="view-details">View →</span>
+            {% for answer, question in recent %}
+            <div class="answer-item" onclick="showQuestionDetail({{ loop.index0 }})"
+                data-question-id="{{ question.id }}">
+                <div class="status-icon {{ 'correct' if answer.correct else 'incorrect' }}">
+                    {{ '✓' if answer.correct else '✗' }}
                 </div>
-                {% endfor %}
-                
-                <!-- Question data for JavaScript -->
-                <script id="questionsData" type="application/json">
+                <div class="answer-details">
+                    <div class="answer-question">{{ question.question[:100] }}{% if question.question|length > 100
+                        %}...{% endif %}</div>
+                    <div class="answer-meta">
+                        {{ question.level }} • {{ question.category }} • {{ answer.timestamp.strftime('%Y-%m-%d %H:%M')
+                        }}
+                    </div>
+                </div>
+                <span class="view-details">View →</span>
+            </div>
+            {% endfor %}
+
+            <!-- Question data for JavaScript -->
+            <script id="questionsData" type="application/json">
                 [
                     {% for answer, question in recent %}
                     {
                         "id": {{ question.id }},
                         "question": {{ question.question | tojson }},
                         "options": {{ question.get_options() | tojson }},
-                        "correct_answer": {{ question.correct_answer }},
+                        "correct_answer": {{ question.correct_answer | tojson }},
                         "explanation": {{ question.explanation | tojson }},
                         "mnemonic_enabled": {{ question.mnemonic_enabled | tojson }},
                         "mnemonic_acronym": {{ question.mnemonic_acronym | tojson }},
@@ -597,30 +621,32 @@
                 ]
                 </script>
 
-                <!-- Pagination -->
-                {% if total_pages > 1 %}
-                <div class="pagination">
-                    <a href="{{ url_for('results', page=page-1) }}" class="pagination-btn {{ 'disabled' if page <= 1 else '' }}">
-                        ← Previous
-                    </a>
-                    <span class="pagination-info">
-                        Page <span class="pagination-current">{{ page }}</span> of {{ total_pages }}
-                    </span>
-                    <a href="{{ url_for('results', page=page+1) }}" class="pagination-btn {{ 'disabled' if page >= total_pages else '' }}">
-                        Next →
-                    </a>
-                </div>
-                {% endif %}
+            <!-- Pagination -->
+            {% if total_pages > 1 %}
+            <div class="pagination">
+                <a href="{{ url_for('results', page=page-1) }}"
+                    class="pagination-btn {{ 'disabled' if page <= 1 else '' }}">
+                    PREVIOUS
+                </a>
+                <span class="pagination-info">
+                    Page <span class="pagination-current">{{ page }}</span> of {{ total_pages }}
+                </span>
+                <a href="{{ url_for('results', page=page+1) }}"
+                    class="pagination-btn {{ 'disabled' if page >= total_pages else '' }}">
+                    NEXT
+                </a>
+            </div>
+            {% endif %}
             {% else %}
-                <div class="empty-state">
-                    <span class="empty-state-icon">📝</span>
-                    <h3>No answers yet</h3>
-                    <p>Take a quiz to see your results and track your progress!</p>
-                    <a href="/quiz" class="btn btn-primary">Start Your First Quiz →</a>
-                </div>
+            <div class="empty-state">
+                <span class="empty-state-icon"></span>
+                <h3>No answers yet</h3>
+                <p>Take a quiz to see your results and track your progress!</p>
+                <a href="/quiz" class="btn btn-primary">Start Your First Quiz →</a>
+            </div>
             {% endif %}
         </div>
-        
+
         <!-- Action Bar -->
         {% if recent %}
         <div class="action-bar">
@@ -628,19 +654,19 @@
         </div>
         {% endif %}
     </div>
-    
+
     <script>
         // Load question data
         const questionData = JSON.parse(document.getElementById('questionsData').textContent);
         const letterLabels = ['A', 'B', 'C', 'D'];
-        
+
         function showQuestionDetail(index) {
             const q = questionData[index];
             const modal = document.getElementById('questionModal');
-            
+
             // Set question text
             document.getElementById('modalQuestion').textContent = q.question;
-            
+
             // Build options
             const optionsContainer = document.getElementById('modalOptions');
             optionsContainer.innerHTML = '';
@@ -655,10 +681,10 @@
                 `;
                 optionsContainer.appendChild(div);
             });
-            
+
             // Set explanation
             document.getElementById('modalExplanation').textContent = q.explanation || 'No explanation provided.';
-            
+
             // Handle mnemonic
             const mnemonicSection = document.getElementById('mnemonicSection');
             if (q.mnemonic_enabled && q.mnemonic_acronym) {
@@ -668,36 +694,36 @@
             } else {
                 mnemonicSection.style.display = 'none';
             }
-            
+
             // Set meta info
             document.getElementById('modalMeta').innerHTML = `
                 <span>📚 ${q.level}</span>
                 <span>📂 ${q.category}</span>
                 <span>${q.user_correct ? '✅ You got this right' : '❌ You got this wrong'}</span>
             `;
-            
+
             // Show modal
             modal.classList.add('show');
             document.body.style.overflow = 'hidden';
         }
-        
+
         function closeModal() {
             const modal = document.getElementById('questionModal');
             modal.classList.remove('show');
             document.body.style.overflow = '';
         }
-        
+
         // Close modal on overlay click
-        document.getElementById('questionModal').addEventListener('click', function(e) {
+        document.getElementById('questionModal').addEventListener('click', function (e) {
             if (e.target === this) closeModal();
         });
-        
+
         // Close on Escape key
-        document.addEventListener('keydown', function(e) {
+        document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape') closeModal();
         });
-        
-        document.getElementById('levelSelect').addEventListener('change', async function() {
+
+        document.getElementById('levelSelect').addEventListener('change', async function () {
             const level = this.value;
             const res = await fetch('/api/update_level', {
                 method: 'POST',
@@ -708,4 +734,5 @@
         });
     </script>
 </body>
+
 </html>
