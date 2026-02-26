@@ -49,8 +49,14 @@ def add_security_headers(response):
 
 # Admin Configuration
 # Set admin password via environment variable: export EMS_ADMIN_PASSWORD=your_secure_password
-# If not set, defaults to 'ems-admin-2024' (change this in production!)
-ADMIN_PASSWORD = os.environ.get("EMS_ADMIN_PASSWORD", "ems-admin-2024")
+# Required in production - app will not start without this set
+ADMIN_PASSWORD = os.environ.get("EMS_ADMIN_PASSWORD")
+if not ADMIN_PASSWORD:
+    raise ValueError(
+        "EMS_ADMIN_PASSWORD environment variable must be set. "
+        "For local development: export EMS_ADMIN_PASSWORD=your_secure_password "
+        "For production: Set in Vercel Dashboard → Settings → Environment Variables"
+    )
 # Use pbkdf2:sha256 for compatibility (scrypt not available on all Python builds)
 ADMIN_PASSWORD_HASH = generate_password_hash(ADMIN_PASSWORD, method="pbkdf2:sha256")
 
