@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiz - SNHD Learning</title>
-    
+
     <!-- External CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/quiz.css') }}">
-    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}?v=2">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/quiz.css') }}?v=2">
+
     <style>
         /* Fun & Helpful additions */
         .streak-counter {
@@ -22,11 +23,16 @@
             font-weight: 600;
             font-size: 0.9rem;
         }
-        
-        .streak-counter .fire { font-size: 1.2rem; animation: pulse 1s infinite; }
-        
+
+        .streak-counter .fire {
+            font-size: 1.2rem;
+            animation: pulse 1s infinite;
+        }
+
         .milestone-celebration {
-            position: fixed; top: 50%; left: 50%;
+            position: fixed;
+            top: 50%;
+            left: 50%;
             transform: translate(-50%, -50%);
             background: var(--card-bg);
             padding: var(--space-8);
@@ -37,12 +43,20 @@
             animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             display: none;
         }
-        
-        .milestone-celebration.show { display: block; }
-        .milestone-celebration .emoji { font-size: 4rem; margin-bottom: var(--space-4); }
-        
+
+        .milestone-celebration.show {
+            display: block;
+        }
+
+        .milestone-celebration .emoji {
+            font-size: 4rem;
+            margin-bottom: var(--space-4);
+        }
+
         .encouragement-toast {
-            position: fixed; bottom: 2rem; left: 50%;
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
             transform: translateX(-50%) translateY(100px);
             background: var(--card-bg);
             padding: var(--space-4) var(--space-6);
@@ -53,104 +67,61 @@
             opacity: 0;
             transition: all 0.3s ease;
         }
-        
+
         .encouragement-toast.show {
             transform: translateX(-50%) translateY(0);
             opacity: 1;
         }
-        
-        .encouragement-toast.success { border-left: 4px solid var(--success); }
-        .encouragement-toast.info { border-left: 4px solid var(--info); }
-        
-        /* Navigation hover effects */
-        .nav-link:hover {
-            background: rgba(255,255,255,0.1) !important;
+
+        .encouragement-toast.success {
+            border-left: 4px solid var(--success);
         }
 
-        .nav-link.active:hover {
-            background: rgba(255,255,255,0.2) !important;
+        .encouragement-toast.info {
+            border-left: 4px solid var(--info);
         }
 
-        /* Custom tooltip for nav links */
-        .nav-link {
-            position: relative;
-        }
-
-        .nav-link::after {
-            content: attr(data-tooltip);
-            position: absolute;
-            bottom: -36px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0,0,0,0.85);
-            color: white;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            white-space: nowrap;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.2s ease;
-            z-index: 100;
-            pointer-events: none;
-        }
-
-        .nav-link::before {
-            content: '';
-            position: absolute;
-            bottom: -8px;
-            left: 50%;
-            transform: translateX(-50%);
-            border: 6px solid transparent;
-            border-bottom-color: rgba(0,0,0,0.85);
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.2s ease;
-            pointer-events: none;
-        }
-
-        .nav-link:hover::after,
-        .nav-link:hover::before {
-            opacity: 1;
-            visibility: visible;
-        }
+        /* Navigation hover effects removed */
     </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}?v=4">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/quiz.css') }}?v=4">
 </head>
+
 <body>
     <!-- Milestone Celebration -->
     <div class="milestone-celebration" id="milestoneCelebration">
-        <div class="emoji" id="milestoneEmoji">🎉</div>
+        <div class="emoji" id="milestoneEmoji"></div>
         <h3 id="milestoneTitle">Milestone!</h3>
         <p id="milestoneText">Great progress!</p>
     </div>
-    
+
     <!-- Encouragement Toast -->
     <div class="encouragement-toast" id="encouragementToast">
         <span id="toastMessage">Keep going!</span>
     </div>
 
     <nav class="navbar">
-        <a href="/dashboard" style="color: white; text-decoration: none;">
-            <h1>🚑 SNHD Learning Platform</h1>
+        <a href="/dashboard" class="nav-brand">
+            SNHD LEARNING PLATFORM
         </a>
-        <div class="nav-links" style="display: flex; align-items: center; gap: var(--space-2);">
-            <a href="/dashboard" class="nav-link" data-tooltip="Go to Dashboard" style="color: white; text-decoration: none; padding: var(--space-2) var(--space-3); border-radius: var(--radius); transition: background var(--transition-fast);">
-                🏠 Home
+        <div class="nav-links">
+            <a href="/dashboard" class="btn btn-secondary nav-btn">
+                HOME
             </a>
-            <a href="/quiz" class="nav-link active" data-tooltip="Start a Quiz" style="color: white; text-decoration: none; padding: var(--space-2) var(--space-3); border-radius: var(--radius); background: rgba(255,255,255,0.15); font-weight: 500;">
-                📝 Quiz
+            <a href="/quiz" class="btn btn-primary nav-btn active">
+                QUIZ
             </a>
-            <a href="/results" class="nav-link" data-tooltip="View Your Results" style="color: white; text-decoration: none; padding: var(--space-2) var(--space-3); border-radius: var(--radius); transition: background var(--transition-fast);">
-                📊 Results
+            <a href="/results" class="btn btn-secondary nav-btn">
+                RESULTS
             </a>
-            <div style="width: 1px; height: 24px; background: rgba(255,255,255,0.3); margin: 0 var(--space-2);"></div>
-            <select class="level-select" id="levelSelect" style="margin-left: var(--space-2);">
-                <option value="EMT" {% if user.level == 'EMT' %}selected{% endif %}>EMT</option>
-                <option value="AEMT" {% if user.level == 'AEMT' %}selected{% endif %}>AEMT</option>
-                <option value="PARAMEDIC" {% if user.level == 'PARAMEDIC' %}selected{% endif %}>Paramedic</option>
+            <div class="nav-divider"></div>
+            <select class="level-select" id="levelSelect">
+                <option value="EMT" {% if user.level=='EMT' %}selected{% endif %}>EMT</option>
+                <option value="AEMT" {% if user.level=='AEMT' %}selected{% endif %}>AEMT</option>
+                <option value="PARAMEDIC" {% if user.level=='PARAMEDIC' %}selected{% endif %}>PARAMEDIC</option>
             </select>
-            <div class="streak-counter" id="streakCounter" style="display: none; margin-left: var(--space-2);">
-                <span class="fire">🔥</span>
+            <div class="streak-counter" id="streakCounter" style="display: none;">
+                <span class="fire">STREAK: </span>
                 <span id="streakCount">0</span>
             </div>
         </div>
@@ -164,41 +135,51 @@
         </div>
 
         <!-- Topic Filter -->
-        <div class="filter-section" style="background: var(--card-bg); padding: var(--space-5); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: var(--space-5);">
+        <div class="filter-section"
+            style="background: var(--card-bg); padding: var(--space-5); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: var(--space-5);">
             <h3 style="margin-bottom: var(--space-3); color: var(--text-primary); font-size: 1rem;">📂 Topics</h3>
-            <form method="GET" action="/quiz" style="display: flex; gap: var(--space-3); flex-wrap: wrap; align-items: center;">
-                <select name="category" onchange="this.form.submit()" style="padding: var(--space-2) var(--space-4); border-radius: var(--radius); border: 2px solid var(--border); font-size: 1rem; min-width: 250px;">
+            <form method="GET" action="/quiz"
+                style="display: flex; gap: var(--space-3); flex-wrap: wrap; align-items: center;">
+                <select name="category" onchange="this.form.submit()"
+                    style="padding: var(--space-2) var(--space-4); border-radius: var(--radius); border: 2px solid var(--border); font-size: 1rem; min-width: 250px;">
                     <option value="all">All Topics</option>
                     {% for cat in categories %}
-                    <option value="{{ cat }}" {% if cat == selected_category %}selected{% endif %}>{{ cat }}</option>
+                    <option value="{{ cat }}" {% if cat==selected_category %}selected{% endif %}>{{ cat }}</option>
                     {% endfor %}
                 </select>
                 {% if selected_category != 'all' %}
-                <a href="/quiz" style="color: var(--primary); text-decoration: none; font-size: 0.9rem; font-weight: 500;">✕ Clear filter</a>
+                <a href="/quiz"
+                    style="color: var(--primary); text-decoration: none; font-size: 0.9rem; font-weight: 500;">✕ Clear
+                    filter</a>
                 {% endif %}
             </form>
         </div>
-        
+
         <!-- Question Search -->
-        <div class="search-section" style="background: var(--card-bg); padding: var(--space-5); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: var(--space-5);">
+        <div class="search-section"
+            style="background: var(--card-bg); padding: var(--space-5); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: var(--space-5);">
             <h3 style="margin-bottom: var(--space-3); font-size: 1rem;">🔍 Search Questions</h3>
             <div style="display: flex; gap: var(--space-3); flex-wrap: wrap; align-items: center;">
-                <input type="text" id="questionSearch" placeholder="Type to search questions..." style="padding: var(--space-3) var(--space-4); border-radius: var(--radius); border: 2px solid var(--border); font-size: 1rem; flex: 1; min-width: 250px;">
-                <button onclick="clearSearch()" style="padding: var(--space-3) var(--space-5); background: var(--bg); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; font-size: 0.9rem;">Clear</button>
+                <input type="text" id="questionSearch" placeholder="Type to search questions..."
+                    style="padding: var(--space-3) var(--space-4); border-radius: var(--radius); border: 2px solid var(--border); font-size: 1rem; flex: 1; min-width: 250px;">
+                <button onclick="clearSearch()"
+                    style="padding: var(--space-3) var(--space-5); background: var(--bg); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; font-size: 0.9rem;">Clear</button>
             </div>
-            <p id="searchResults" style="margin-top: var(--space-2); color: var(--text-secondary); font-size: 0.9rem; display: none;"></p>
+            <p id="searchResults"
+                style="margin-top: var(--space-2); color: var(--text-secondary); font-size: 0.9rem; display: none;"></p>
         </div>
-        
+
         <!-- Question Count Banner -->
-        <div style="background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%); padding: var(--space-4); border-radius: var(--radius); margin-bottom: var(--space-5); text-align: center;">
+        <div
+            style="background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%); padding: var(--space-4); border-radius: var(--radius); margin-bottom: var(--space-5); text-align: center;">
             <strong style="color: var(--primary-dark); font-size: 1.1rem;">
-                Showing {{ questions|length }} questions 
+                Showing {{ questions|length }} questions
                 {% if selected_category != 'all' %}in "{{ selected_category }}"{% endif %}
             </strong>
             <br><small style="margin-top: var(--space-1); display: inline-block;">
-                {% if questions|length < total_available %}
-                <a href="/quiz?category={{ selected_category }}&limit=all" style="color: var(--primary);">Show all {{ total_available }} questions</a>
-                {% endif %}
+                {% if questions|length < total_available %} <a href="/quiz?category={{ selected_category }}&limit=all"
+                    style="color: var(--primary);">Show all {{ total_available }} questions</a>
+                    {% endif %}
             </small>
         </div>
 
@@ -213,14 +194,12 @@
         <!-- Questions -->
         <div id="quizContainer">
             {% for q in questions %}
-            <div class="quiz-card question-card animate-fade-in-up" 
-                 data-question-id="{{ q.id }}" 
-                 data-correct="{{ q.correct_answer }}"
-                 {% if loop.index > 1 %}style="display: none;"{% endif %}>
-                
+            <div class="quiz-card question-card animate-fade-in-up" data-question-id="{{ q.id }}"
+                data-correct="{{ q.correct_answer }}" {% if loop.index> 1 %}style="display: none;"{% endif %}>
+
                 <div class="question-number">Question {{ loop.index }} of {{ questions|length }}</div>
                 <div class="question-text">{{ q.question }}</div>
-                
+
                 <div class="options">
                     {% for option in q.get_options() %}
                     <div class="option" data-index="{{ loop.index0 }}">
@@ -259,9 +238,15 @@
             {% endfor %}
         </div>
 
+        <!-- Navigation -->
+        <div class="quiz-navigation" id="navigation">
+            <button class="nav-button" id="prevBtn" disabled>PREVIOUS</button>
+            <button class="nav-button primary" id="nextBtn" disabled>NEXT</button>
+        </div>
+
         <!-- Final Score -->
         <div class="final-score-display hidden" id="finalScore">
-            <h2 id="completionTitle">🎉 Quiz Complete!</h2>
+            <h2 id="completionTitle">QUIZ COMPLETE</h2>
             <div class="final-score-number" id="scorePercent">0%</div>
             <p class="score-message" id="scoreText"></p>
             <div class="score-buttons">
@@ -269,19 +254,13 @@
                 <a href="/results" class="btn btn-secondary">Results</a>
             </div>
         </div>
-
-        <!-- Navigation -->
-        <div class="quiz-navigation" id="navigation">
-            <button class="nav-button" id="prevBtn" disabled>← Previous</button>
-            <button class="nav-button primary" id="nextBtn" disabled>Next →</button>
-        </div>
     </div>
 
     <script>
         // Level selector
         const levelSelect = document.getElementById('levelSelect');
         if (levelSelect) {
-            levelSelect.addEventListener('change', async function() {
+            levelSelect.addEventListener('change', async function () {
                 const level = this.value;
                 const res = await fetch('/api/update_level', {
                     method: 'POST',
@@ -291,29 +270,29 @@
                 if (res.ok) window.location.reload();
             });
         }
-        
+
         // Encouragement messages
         const messages = {
-            correct: ["🎉 Nailed it!", "💪 Great job!", "🌟 Excellent!", "🔥 On fire!", "✨ Perfect!"],
-            incorrect: ["💡 Almost!", "📚 Learning moment!", "🎯 Close!", "💪 Keep going!"],
+            correct: ["NAILED IT!", "GREAT JOB!", "EXCELLENT!", "ON FIRE!", "PERFECT!"],
+            incorrect: ["ALMOST!", "LEARNING MOMENT!", "CLOSE!", "KEEP GOING!"],
             milestones: [
-                { pct: 25, emoji: "🌟", title: "Quarter Way!", msg: "Building momentum!" },
-                { pct: 50, emoji: "🔥", title: "Halfway!", msg: "Doing amazing!" },
-                { pct: 75, emoji: "🚀", title: "Almost There!", msg: "So close!" },
-                { pct: 100, emoji: "🏆", title: "Complete!", msg: "Fantastic work!" }
+                { pct: 25, emoji: "", title: "QUARTER WAY!", msg: "Building momentum!" },
+                { pct: 50, emoji: "", title: "HALFWAY!", msg: "Doing amazing!" },
+                { pct: 75, emoji: "", title: "ALMOST THERE!", msg: "So close!" },
+                { pct: 100, emoji: "", title: "COMPLETE!", msg: "Fantastic work!" }
             ]
         };
 
         let currentQ = 0, score = 0, streak = 0, milestones = new Set();
         const questions = document.querySelectorAll('.question-card');
-        const total = questions.length;
+        let total = questions.length;
         let answers = {};
 
         function updateProgress() {
             const pct = ((currentQ + 1) / total) * 100;
             document.getElementById('progressBar').style.width = pct + '%';
             document.getElementById('progressText').textContent = `Question ${currentQ + 1} of ${total}`;
-            
+
             messages.milestones.forEach(m => {
                 if (pct >= m.pct && !milestones.has(m.pct)) {
                     milestones.add(m.pct);
@@ -345,21 +324,27 @@
         }
 
         function showQuestion(idx) {
+            currentQ = idx;
+            document.getElementById('finalScore').classList.add('hidden');
+            document.getElementById('quizContainer').style.display = 'block';
+            document.querySelector('.progress-container').style.display = 'block';
+
             questions.forEach((q, i) => q.style.display = i === idx ? 'block' : 'none');
             document.getElementById('prevBtn').disabled = idx === 0;
-            
+
             const qid = questions[idx].dataset.questionId;
             const answered = answers[qid];
             const nextBtn = document.getElementById('nextBtn');
-            
+
             nextBtn.disabled = !answered;
-            nextBtn.textContent = answered && idx === total - 1 ? 'Finish 🎉' : 'Next →';
-            
+            const total = questions.length;
+            nextBtn.textContent = answered && idx === total - 1 ? 'FINISH' : 'NEXT';
+
             updateProgress();
         }
 
         document.querySelectorAll('.option').forEach(opt => {
-            opt.addEventListener('click', async function() {
+            opt.addEventListener('click', async function () {
                 const card = this.closest('.question-card');
                 const qid = card.dataset.questionId;
                 if (answers[qid]) return;
@@ -380,7 +365,7 @@
                 answers[qid] = { correct, selectedIdx };
                 if (correct) { score++; streak++; showToast(messages.correct[Math.floor(Math.random() * messages.correct.length)], 'success'); }
                 else { streak = 0; showToast(messages.incorrect[Math.floor(Math.random() * messages.incorrect.length)], 'info'); }
-                
+
                 updateStreak();
                 showTeaching(qid, correct);
 
@@ -391,7 +376,7 @@
                 });
 
                 document.getElementById('nextBtn').disabled = false;
-                document.getElementById('nextBtn').textContent = currentQ === total - 1 ? 'Finish 🎉' : 'Next →';
+                document.getElementById('nextBtn').textContent = currentQ === total - 1 ? 'FINISH' : 'NEXT';
             });
         });
 
@@ -412,10 +397,15 @@
             } else {
                 const pct = Math.round((score / total) * 100);
                 document.getElementById('quizContainer').style.display = 'none';
-                document.getElementById('navigation').style.display = 'none';
                 document.querySelector('.progress-container').style.display = 'none';
-                document.getElementById('finalScore').classList.remove('hidden');
-                
+
+                const nav = document.getElementById('navigation');
+                const finalScore = document.getElementById('finalScore');
+                const scoreButtons = finalScore.querySelector('.score-buttons');
+                finalScore.insertBefore(nav, scoreButtons);
+
+                finalScore.classList.remove('hidden');
+
                 // Animate score
                 let curr = 0;
                 const timer = setInterval(() => {
@@ -425,12 +415,12 @@
                 }, 30);
 
                 document.getElementById('scoreText').textContent = `You got ${score} out of ${total} correct`;
-                
-                let title = '🎉 Quiz Complete!';
-                if (pct >= 90) title = '🏆 Outstanding!';
-                else if (pct >= 70) title = '⭐ Great Job!';
-                else if (pct >= 50) title = '💪 Good Work!';
-                else title = '📚 Keep Studying!';
+
+                let title = 'QUIZ COMPLETE';
+                if (pct >= 90) title = 'OUTSTANDING';
+                else if (pct >= 70) title = 'GREAT JOB';
+                else if (pct >= 50) title = 'GOOD WORK';
+                else title = 'KEEP STUDYING';
                 document.getElementById('completionTitle').textContent = title;
             }
         });
@@ -442,7 +432,7 @@
         async function revealHint(qid) {
             document.getElementById('hint-link-' + qid).classList.add('hidden');
             document.getElementById('mnemonic-' + qid).classList.add('show');
-            try { await fetch('/api/question/' + qid + '/hint', { method: 'POST' }); } catch (e) {}
+            try { await fetch('/api/question/' + qid + '/hint', { method: 'POST' }); } catch (e) { }
         }
 
         showQuestion(0);
@@ -451,7 +441,7 @@
         const questionCards = document.querySelectorAll('.question-card');
         const searchInput = document.getElementById('questionSearch');
         const searchResults = document.getElementById('searchResults');
-        
+
         // Store original question data for search
         const questionData = [];
         questionCards.forEach((card, index) => {
@@ -468,30 +458,30 @@
                 options: options
             });
         });
-        
+
         let filteredIndices = [];
         let filteredCurrentIndex = 0;
-        
-        searchInput.addEventListener('input', function() {
+
+        searchInput.addEventListener('input', function () {
             const searchTerm = this.value.toLowerCase().trim();
-            
+
             if (searchTerm === '') {
                 clearSearch();
                 return;
             }
-            
+
             // Filter questions
             filteredIndices = [];
             questionData.forEach((q, idx) => {
                 const matchesText = q.text.includes(searchTerm);
                 const matchesExplanation = q.explanation.includes(searchTerm);
                 const matchesOptions = q.options.some(opt => opt.includes(searchTerm));
-                
+
                 if (matchesText || matchesExplanation || matchesOptions) {
                     filteredIndices.push(idx);
                 }
             });
-            
+
             if (filteredIndices.length === 0) {
                 searchResults.textContent = 'No questions found matching "' + searchTerm + '"';
                 searchResults.style.display = 'block';
@@ -500,56 +490,57 @@
             } else {
                 searchResults.textContent = 'Found ' + filteredIndices.length + ' question(s) matching "' + searchTerm + '"';
                 searchResults.style.display = 'block';
-                
+
                 questionCards.forEach(card => card.style.display = 'none');
-                
+
                 filteredIndices.forEach((originalIndex, i) => {
                     const card = questionData[originalIndex].element;
                     card.style.display = 'block';
                     const qNum = card.querySelector('.question-number');
                     qNum.textContent = 'Question ' + (i + 1) + ' of ' + filteredIndices.length;
                 });
-                
+
                 updateFilteredNavigation();
             }
         });
-        
+
         function clearSearch() {
             searchInput.value = '';
             searchResults.style.display = 'none';
             filteredIndices = [];
-            
+
             questionCards.forEach((card, index) => {
                 card.style.display = index === 0 ? 'block' : 'none';
                 const qNum = card.querySelector('.question-number');
                 qNum.textContent = 'Question ' + (index + 1) + ' of ' + questionCards.length;
             });
-            
+
             currentQ = 0;
             total = questionCards.length;
             updateProgress();
             document.getElementById('navigation').style.display = 'flex';
             showQuestion(0);
         }
-        
+
         function updateFilteredNavigation() {
             if (filteredIndices.length === 0) return;
-            
+
             const progress = ((filteredCurrentIndex + 1) / filteredIndices.length) * 100;
             document.getElementById('progressBar').style.width = progress + '%';
             document.getElementById('progressText').textContent = 'Question ' + (filteredCurrentIndex + 1) + ' of ' + filteredIndices.length;
-            
+
             const prevBtn = document.getElementById('prevBtn');
             const nextBtn = document.getElementById('nextBtn');
-            
+
             prevBtn.disabled = filteredCurrentIndex === 0;
-            
+
             if (filteredCurrentIndex === filteredIndices.length - 1) {
-                nextBtn.textContent = 'Finish 🎉';
+                nextBtn.textContent = 'FINISH';
             } else {
-                nextBtn.textContent = 'Next →';
+                nextBtn.textContent = 'NEXT';
             }
         }
     </script>
 </body>
+
 </html>

@@ -1,20 +1,7 @@
 /* Quiz Page Specific Styles */
 
-/* Navbar */
-.navbar {
-  background: var(--primary);
-  color: var(--text-primary);
-  padding: var(--space-4) var(--space-8);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: var(--border-width) solid var(--border);
-}
+/* Navbar is now global in base.css */
 
-.navbar h1 {
-  font-size: 1.3rem;
-  color: var(--text-primary);
-}
 
 .level-select {
   background: var(--card-bg);
@@ -354,23 +341,31 @@
 
 .nav-button {
   padding: var(--space-3) var(--space-6);
-  border-radius: var(--radius);
-  font-weight: 600;
+  border-radius: var(--radius-lg);
+  font-weight: 900;
   cursor: pointer;
   transition: all var(--transition-fast);
-  border: none;
-  background: var(--border-light);
-  color: var(--text-secondary);
+  border: var(--border-width) solid var(--border);
+  background: var(--warning);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-sm);
 }
 
 .nav-button:hover:not(:disabled) {
-  background: var(--border);
-  color: var(--text-primary);
+  background: var(--warning-dark);
+  transform: translate(-1px, -1px);
+  box-shadow: var(--shadow);
+}
+
+.nav-button:active:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: 0px 0px 0px 0px var(--border);
 }
 
 .nav-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  filter: grayscale(0.5);
 }
 
 .nav-button.primary {
@@ -380,6 +375,8 @@
 
 .nav-button.primary:hover {
   background: var(--primary-dark);
+  transform: translate(-1px, -1px);
+  box-shadow: var(--shadow);
 }
 
 /* Streak Counter */

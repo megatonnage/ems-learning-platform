@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - SNHD Learning</title>
-    
+
     <!-- External CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
-    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}?v=3">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}?v=3">
+
     <style>
         /* Dashboard-specific additions */
         .welcome-banner {
@@ -19,23 +20,23 @@
             border-left: 4px solid var(--primary);
             animation: fadeInUp 0.5s ease-out;
         }
-        
+
         .welcome-banner h2 {
             color: var(--primary-dark);
             margin-bottom: var(--space-2);
         }
-        
+
         .welcome-banner p {
             color: var(--text-secondary);
         }
-        
+
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: var(--space-6);
             margin-bottom: var(--space-8);
         }
-        
+
         .stat-card {
             background: var(--card-bg);
             padding: var(--space-6);
@@ -45,16 +46,24 @@
             animation: fadeInUp 0.5s ease-out;
             animation-fill-mode: both;
         }
-        
-        .stat-card:nth-child(1) { animation-delay: 0.1s; }
-        .stat-card:nth-child(2) { animation-delay: 0.2s; }
-        .stat-card:nth-child(3) { animation-delay: 0.3s; }
-        
+
+        .stat-card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .stat-card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .stat-card:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
         .stat-card:hover {
             transform: translateY(-4px);
             box-shadow: var(--shadow-lg);
         }
-        
+
         .stat-card h3 {
             color: var(--text-secondary);
             font-size: 0.8rem;
@@ -62,36 +71,44 @@
             letter-spacing: 0.05em;
             margin-bottom: var(--space-2);
         }
-        
+
         .stat-value {
             font-size: 2.5rem;
             font-weight: 700;
             color: var(--text-primary);
             line-height: 1;
         }
-        
-        .stat-value.correct { color: var(--success); }
-        .stat-value.warning { color: var(--warning); }
-        .stat-value.accent { color: var(--primary); }
-        
+
+        .stat-value.correct {
+            color: var(--success);
+        }
+
+        .stat-value.warning {
+            color: var(--warning);
+        }
+
+        .stat-value.accent {
+            color: var(--primary);
+        }
+
         .stat-progress {
             margin-top: var(--space-3);
         }
-        
+
         .mini-progress {
             height: 6px;
             background: var(--border-light);
             border-radius: var(--radius-full);
             overflow: hidden;
         }
-        
+
         .mini-progress-fill {
             height: 100%;
             background: var(--primary-gradient);
             border-radius: var(--radius-full);
             transition: width 1s ease-out;
         }
-        
+
         .instructions-box {
             background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
             padding: var(--space-6);
@@ -99,32 +116,32 @@
             margin-bottom: var(--space-8);
             border-left: 4px solid var(--primary);
         }
-        
+
         .instructions-box h2 {
             color: var(--primary-dark);
             margin-bottom: var(--space-3);
             font-size: 1.1rem;
         }
-        
+
         .instructions-box p {
             color: var(--text-secondary);
             margin-bottom: var(--space-3);
             line-height: 1.6;
         }
-        
+
         .instructions-box ul {
             color: var(--text-secondary);
             margin-left: var(--space-6);
             margin-bottom: var(--space-3);
             line-height: 1.8;
         }
-        
+
         .actions-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: var(--space-6);
         }
-        
+
         .action-card {
             background: var(--card-bg);
             padding: var(--space-8);
@@ -134,50 +151,50 @@
             transition: all var(--transition-fast);
             animation: fadeInUp 0.5s ease-out 0.4s both;
         }
-        
+
         .action-card:hover {
             transform: translateY(-4px);
             box-shadow: var(--shadow-lg);
         }
-        
+
         .action-card .emoji {
             font-size: 3rem;
             margin-bottom: var(--space-4);
             display: block;
         }
-        
+
         .action-card h2 {
             margin-bottom: var(--space-3);
             color: var(--text-primary);
         }
-        
+
         .action-card p {
             color: var(--text-secondary);
             margin-bottom: var(--space-6);
             line-height: 1.6;
         }
-        
+
         /* Navigation hover effects */
         .nav-link:hover {
-            background: rgba(255,255,255,0.1) !important;
+            background: rgba(255, 255, 255, 0.1) !important;
         }
-        
+
         .nav-link.active:hover {
-            background: rgba(255,255,255,0.2) !important;
+            background: rgba(255, 255, 255, 0.2) !important;
         }
-        
+
         /* Custom tooltip for nav links */
         .nav-link {
             position: relative;
         }
-        
+
         .nav-link::after {
             content: attr(data-tooltip);
             position: absolute;
             bottom: -36px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0,0,0,0.85);
+            background: rgba(0, 0, 0, 0.85);
             color: white;
             padding: 6px 12px;
             border-radius: 6px;
@@ -189,7 +206,7 @@
             z-index: 100;
             pointer-events: none;
         }
-        
+
         .nav-link::before {
             content: '';
             position: absolute;
@@ -197,13 +214,13 @@
             left: 50%;
             transform: translateX(-50%);
             border: 6px solid transparent;
-            border-bottom-color: rgba(0,0,0,0.85);
+            border-bottom-color: rgba(0, 0, 0, 0.85);
             opacity: 0;
             visibility: hidden;
             transition: all 0.2s ease;
             pointer-events: none;
         }
-        
+
         .nav-link:hover::after,
         .nav-link:hover::before {
             opacity: 1;
@@ -211,26 +228,27 @@
         }
     </style>
 </head>
+
 <body>
     <nav class="navbar">
-        <a href="/dashboard" style="color: white; text-decoration: none;">
-            <h1>🚑 SNHD Learning Platform</h1>
+        <a href="/dashboard" class="nav-brand">
+            SNHD LEARNING PLATFORM
         </a>
-        <div class="nav-links" style="display: flex; align-items: center; gap: var(--space-2);">
-            <a href="/dashboard" class="nav-link active" data-tooltip="Go to Dashboard" style="color: white; text-decoration: none; padding: var(--space-2) var(--space-3); border-radius: var(--radius); background: rgba(255,255,255,0.15); font-weight: 500;">
-                🏠 Home
+        <div class="nav-links">
+            <a href="/dashboard" class="btn btn-secondary nav-btn active">
+                HOME
             </a>
-            <a href="/quiz" class="nav-link" data-tooltip="Start a Quiz" style="color: white; text-decoration: none; padding: var(--space-2) var(--space-3); border-radius: var(--radius); transition: background var(--transition-fast);">
-                📝 Quiz
+            <a href="/quiz" class="btn btn-secondary nav-btn">
+                QUIZ
             </a>
-            <a href="/results" class="nav-link" data-tooltip="View Your Results" style="color: white; text-decoration: none; padding: var(--space-2) var(--space-3); border-radius: var(--radius); transition: background var(--transition-fast);">
-                📊 Results
+            <a href="/results" class="btn btn-secondary nav-btn">
+                RESULTS
             </a>
-            <div style="width: 1px; height: 24px; background: rgba(255,255,255,0.3); margin: 0 var(--space-2);"></div>
-            <select class="level-select" id="levelSelect" style="margin-left: var(--space-2);">
-                <option value="EMT" {% if user.level == 'EMT' %}selected{% endif %}>EMT</option>
-                <option value="AEMT" {% if user.level == 'AEMT' %}selected{% endif %}>AEMT</option>
-                <option value="PARAMEDIC" {% if user.level == 'PARAMEDIC' %}selected{% endif %}>Paramedic</option>
+            <div class="nav-divider"></div>
+            <select class="level-select" id="levelSelect">
+                <option value="EMT" {% if user.level=='EMT' %}selected{% endif %}>EMT</option>
+                <option value="AEMT" {% if user.level=='AEMT' %}selected{% endif %}>AEMT</option>
+                <option value="PARAMEDIC" {% if user.level=='PARAMEDIC' %}selected{% endif %}>PARAMEDIC</option>
             </select>
         </div>
     </nav>
@@ -284,7 +302,8 @@
                 <li><strong>Paramedics</strong> must know everything from <strong>BOTH EMT and AEMT</strong> levels</li>
             </ul>
             <p>
-                <strong>💡 Recommendation:</strong> Start with all questions at your level. Use filters to focus on specific topics. Click <strong>"Reset All"</strong> to return to viewing all questions.
+                <strong>💡 Recommendation:</strong> Start with all questions at your level. Use filters to focus on
+                specific topics. Click <strong>"Reset All"</strong> to return to viewing all questions.
             </p>
         </div>
 
@@ -306,7 +325,7 @@
     </div>
 
     <script>
-        document.getElementById('levelSelect').addEventListener('change', async function() {
+        document.getElementById('levelSelect').addEventListener('change', async function () {
             const level = this.value;
             const res = await fetch('/api/update_level', {
                 method: 'POST',
@@ -317,4 +336,5 @@
         });
     </script>
 </body>
+
 </html>
