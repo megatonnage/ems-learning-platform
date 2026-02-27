@@ -187,6 +187,175 @@
             text-align: center;
         }
 
+        /* Topic Performance Styles */
+        .topic-section {
+            background: var(--card-bg);
+            padding: var(--space-6);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            margin-bottom: var(--space-8);
+            animation: fadeInUp 0.5s ease-out 0.4s both;
+        }
+
+        .topic-section h2 {
+            margin-bottom: var(--space-2);
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .topic-subtitle {
+            color: var(--text-secondary);
+            margin-bottom: var(--space-6);
+            font-size: 0.95rem;
+        }
+
+        .topic-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--space-4);
+        }
+
+        .topic-card {
+            background: var(--bg);
+            padding: var(--space-4);
+            border-radius: var(--radius);
+            border: 2px solid transparent;
+            transition: all var(--transition-fast);
+        }
+
+        .topic-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .topic-card.strong {
+            border-color: var(--success);
+            background: linear-gradient(135deg, var(--bg) 0%, var(--success-light) 100%);
+        }
+
+        .topic-card.developing {
+            border-color: var(--warning, #f59e0b);
+            background: linear-gradient(135deg, var(--bg) 0%, rgba(245, 158, 11, 0.1) 100%);
+        }
+
+        .topic-card.needs-work {
+            border-color: var(--error);
+            background: linear-gradient(135deg, var(--bg) 0%, var(--error-light) 100%);
+        }
+
+        .topic-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-3);
+        }
+
+        .topic-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+
+        .topic-percentage {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--text-primary);
+        }
+
+        .topic-bar {
+            height: 8px;
+            background: var(--border-light);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+            margin-bottom: var(--space-3);
+        }
+
+        .topic-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+            border-radius: var(--radius-full);
+            transition: width 0.5s ease-out;
+        }
+
+        .topic-card.strong .topic-fill {
+            background: linear-gradient(90deg, var(--success) 0%, var(--success-light) 100%);
+        }
+
+        .topic-card.developing .topic-fill {
+            background: linear-gradient(90deg, var(--warning, #f59e0b) 0%, rgba(245, 158, 11, 0.3) 100%);
+        }
+
+        .topic-card.needs-work .topic-fill {
+            background: linear-gradient(90deg, var(--error) 0%, var(--error-light) 100%);
+        }
+
+        .topic-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-2);
+        }
+
+        .topic-correct {
+            color: var(--success);
+            font-weight: 500;
+        }
+
+        .topic-status {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .status-badge {
+            font-size: 0.75rem;
+            padding: var(--space-1) var(--space-2);
+            border-radius: var(--radius-full);
+            font-weight: 500;
+        }
+
+        .status-badge.strong {
+            background: var(--success-light);
+            color: var(--success);
+        }
+
+        .status-badge.developing {
+            background: rgba(245, 158, 11, 0.2);
+            color: #d97706;
+        }
+
+        .status-badge.needs-work {
+            background: var(--error-light);
+            color: var(--error);
+        }
+
+        /* Recommendation Box */
+        .recommendation-box {
+            background: linear-gradient(135deg, var(--primary-light) 0%, rgba(59, 130, 246, 0.1) 100%);
+            border: 2px solid var(--primary);
+            border-radius: var(--radius);
+            padding: var(--space-5);
+            margin-top: var(--space-6);
+            text-align: center;
+        }
+
+        .recommendation-box h4 {
+            color: var(--primary);
+            margin-bottom: var(--space-2);
+            font-size: 1.1rem;
+        }
+
+        .recommendation-box p {
+            color: var(--text-secondary);
+            margin-bottom: var(--space-4);
+            line-height: 1.6;
+        }
+
+        .btn-sm {
+            padding: var(--space-2) var(--space-4);
+            font-size: 0.9rem;
+        }
+
         /* Navigation hover effects */
         .nav-link:hover {
             background: rgba(255, 255, 255, 0.1) !important;
@@ -577,6 +746,52 @@
                 <div class="stat-value primary">{{ stats.percentage }}%</div>
             </div>
         </div>
+
+        <!-- Topic Performance Breakdown -->
+        {% if topic_stats %}
+        <div class="topic-section">
+            <h2>PERFORMANCE BY TOPIC</h2>
+            <p class="topic-subtitle">See which areas you've mastered and which need more practice</p>
+            
+            <div class="topic-grid">
+                {% for topic in topic_stats %}
+                <div class="topic-card {{ topic.status }}">
+                    <div class="topic-header">
+                        <span class="topic-name">{{ topic.category }}</span>
+                        <span class="topic-percentage">{{ topic.percentage }}%</span>
+                    </div>
+                    <div class="topic-bar">
+                        <div class="topic-fill" style="width: {{ topic.percentage }}%"></div>
+                    </div>
+                    <div class="topic-stats">
+                        <span class="topic-correct">{{ topic.correct }} ✓</span>
+                        <span class="topic-total">{{ topic.total }} questions</span>
+                    </div>
+                    <div class="topic-status">
+                        {% if topic.status == 'strong' %}
+                        <span class="status-badge strong">💪 Strong</span>
+                        {% elif topic.status == 'developing' %}
+                        <span class="status-badge developing">📈 Developing</span>
+                        {% else %}
+                        <span class="status-badge needs-work">🎯 Needs Work</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Study Recommendations -->
+            {% if topic_stats and topic_stats[0].percentage < 60 %}
+            <div class="recommendation-box">
+                <h4>📚 Study Recommendation</h4>
+                <p>You're doing great! To improve your overall score, focus on <strong>{{ topic_stats[0].category }}</strong> — it's your biggest opportunity area right now.</p>
+                <a href="/quiz?category={{ topic_stats[0].category | urlencode }}" class="btn btn-primary btn-sm">
+                    Practice {{ topic_stats[0].category }} →
+                </a>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
 
         <!-- History -->
         <div class="history-section">

@@ -91,6 +91,50 @@ class User(db.Model):
             "percentage": round((correct / len(answers)) * 100, 1),
         }
 
+    def get_topic_stats(self):
+        """Get success rates by category/topic."""
+        from sqlalchemy import func
+
+        # Query all answers with their question categories
+        topic_data = (
+            db.session.query(
+                Question.category,
+                func.count(Answer.id).label("total"),
+                func.sum(func.cast(Answer.correct, db.Integer)).label("correct"),
+            )
+            .join(Question, Answer.question_id == Question.id)
+            .filter(Answer.user_id == self.id)
+            .group_by(Question.category)
+            .all()
+        )
+
+        # Calculate percentages and format
+        topic_stats = []
+        for category, total, correct in topic_data:
+            if category and total > 0:
+                percentage = round((correct / total) * 100, 1)
+                topic_stats.append({
+                    "category": category,
+                    "total": total,
+                    "correct": correct,
+                    "incorrect": total - correct,
+                    "percentage": percentage,
+                    "status": self._get_performance_status(percentage),
+                })
+
+        # Sort by percentage (lowest first - areas needing improvement)
+        topic_stats.sort(key=lambda x: x["percentage"])
+        return topic_stats
+
+    def _get_performance_status(self, percentage):
+        """Return performance status based on percentage."""
+        if percentage >= 80:
+            return "strong"
+        elif percentage >= 60:
+            return "developing"
+        else:
+            return "needs_work"
+
 
 class Question(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -327,6 +371,9 @@ def results():
     end = start + per_page
     recent = all_answers[start:end]
 
+    # Get topic stats for the user
+    topic_stats = user.get_topic_stats()
+
     return render_template(
         "results.html",
         user=user,
@@ -336,6 +383,7 @@ def results():
         total_pages=total_pages,
         total=total,
         per_page=per_page,
+        topic_stats=topic_stats,
     )
 
 
