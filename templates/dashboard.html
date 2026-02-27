@@ -263,7 +263,7 @@
         <!-- Stats Grid -->
         <div class="stats-grid">
             <div class="stat-card">
-                <h3>📚 Total Questions</h3>
+                <h3>Total Questions</h3>
                 <div class="stat-value">{{ stats.total }}</div>
                 <div class="stat-progress">
                     <div class="mini-progress">
@@ -272,7 +272,7 @@
                 </div>
             </div>
             <div class="stat-card">
-                <h3>✅ Correct Answers</h3>
+                <h3>Correct Answers</h3>
                 <div class="stat-value correct">{{ stats.correct }}</div>
                 <div class="stat-progress">
                     <div class="mini-progress">
@@ -281,7 +281,7 @@
                 </div>
             </div>
             <div class="stat-card">
-                <h3>🎯 Success Rate</h3>
+                <h3>Success Rate</h3>
                 <div class="stat-value accent">{{ stats.percentage }}%</div>
                 <div class="stat-progress">
                     <div class="mini-progress">
@@ -293,7 +293,7 @@
 
         <!-- Instructions -->
         <div class="instructions-box">
-            <h2>💡 How to Use This Platform</h2>
+            <h2>How to Use This Platform</h2>
             <p>
                 <strong>Higher certification levels need to know content from more junior levels.</strong> For example:
             </p>
@@ -302,7 +302,7 @@
                 <li><strong>Paramedics</strong> must know everything from <strong>BOTH EMT and AEMT</strong> levels</li>
             </ul>
             <p>
-                <strong>💡 Recommendation:</strong> Start with all questions at your level. Use filters to focus on
+                <strong>Recommendation:</strong> Start with all questions at your level. Use filters to focus on
                 specific topics. Click <strong>"Reset All"</strong> to return to viewing all questions.
             </p>
         </div>
@@ -310,13 +310,11 @@
         <!-- Action Cards -->
         <div class="actions-grid">
             <div class="action-card">
-                <span class="emoji">📝</span>
                 <h2>Start Quiz</h2>
                 <p>Test your knowledge with {{ user.level }}-level questions based on SNHD protocols.</p>
-                <a href="/quiz" class="btn btn-primary">Start Learning →</a>
+                <a href="/quiz" class="btn btn-primary">Start Learning</a>
             </div>
             <div class="action-card">
-                <span class="emoji">📊</span>
                 <h2>View Results</h2>
                 <p>See your performance breakdown, track progress, and identify areas to improve.</p>
                 <a href="/results" class="btn btn-secondary">View Results</a>

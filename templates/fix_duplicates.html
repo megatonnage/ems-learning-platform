@@ -132,14 +132,14 @@
                     if (data.duplicate_groups > 0) {
                         status.className = 'status warning';
                         status.innerHTML = `
-                            <p><strong>⚠️ Duplicates Found!</strong></p>
+                            <p><strong>Duplicates Found!</strong></p>
                             <p>${data.message}</p>
                         `;
                         actionArea.style.display = 'block';
                     } else {
                         status.className = 'status success';
                         status.innerHTML = `
-                            <p><strong>✅ No Duplicates!</strong></p>
+                            <p><strong>No Duplicates!</strong></p>
                             <p>Your database is clean. No action needed.</p>
                         `;
                     }
@@ -175,7 +175,7 @@
                 if (data.success) {
                     result.innerHTML = `
                         <div class="status success">
-                            <h3>✅ Fix Complete!</h3>
+                            <h3>Fix Complete!</h3>
                             <p><strong>Duplicates found:</strong> ${data.duplicates_found}</p>
                             <p><strong>Questions deleted:</strong> ${data.questions_deleted}</p>
                             <p><strong>Orphaned answers cleaned:</strong> ${data.orphaned_answers_deleted}</p>

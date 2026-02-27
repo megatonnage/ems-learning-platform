@@ -140,9 +140,9 @@
 
     <div class="quiz-container">
         <div class="instructions-box">
-            <h2>📖 How to Use This Quiz</h2>
+            <h2>How to Use This Quiz</h2>
             <p>Select a topic to focus on specific content, or view all questions to study everything.</p>
-            <p><strong>💡 Tip:</strong> Higher levels need to know content from junior levels.</p>
+            <p><strong>Tip:</strong> Higher levels need to know content from junior levels.</p>
         </div>
 
         <!-- Topic Filter -->
@@ -222,7 +222,7 @@
 
                 {% if q.mnemonic_enabled and q.mnemonic_acronym %}
                 <a class="hint-link" id="hint-link-{{ q.id }}" onclick="revealHint({{ q.id }})">
-                    💡 Need a hint?
+                    Need a hint?
                 </a>
                 <div class="mnemonic-hint" id="mnemonic-{{ q.id }}">
                     <div class="mnemonic-label">Memory Aid</div>
@@ -231,14 +231,14 @@
                 {% endif %}
 
                 <div class="explanation" id="explanation-{{ q.id }}">
-                    <h4>🎯 Explanation</h4>
+                    <h4>Explanation</h4>
                     <p>{{ q.explanation }}</p>
                 </div>
 
                 {% if q.mnemonic_enabled and q.mnemonic_expansion %}
                 <div class="teaching-moment" id="teaching-{{ q.id }}">
                     <div class="teaching-header">
-                        <span id="teaching-icon-{{ q.id }}">📚</span>
+                        <span id="teaching-icon-{{ q.id }}"></span>
                         <span id="teaching-title-{{ q.id }}">Study Note</span>
                         <span class="teaching-badge" id="teaching-badge-{{ q.id }}">Memory Aid</span>
                     </div>
@@ -395,7 +395,7 @@
             if (!el) return;
             el.classList.remove('correct', 'wrong');
             el.classList.add(correct ? 'correct' : 'wrong', 'show');
-            document.getElementById('teaching-icon-' + qid).textContent = correct ? '🎓' : '📚';
+            document.getElementById('teaching-icon-' + qid).textContent = correct ? 'Correct' : 'Learn';
             document.getElementById('teaching-title-' + qid).textContent = correct ? 'Study Note' : 'Learning Moment';
             document.getElementById('teaching-badge-' + qid).textContent = correct ? 'Bonus' : 'Key Concept';
         }

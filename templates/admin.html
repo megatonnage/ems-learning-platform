@@ -428,7 +428,7 @@
                         <td class="q-text" title="{{ q.question }}">{{ q.question }}</td>
                         <td>
                             {% if q.mnemonic_enabled %}
-                            <span class="mnemonic-badge">💡 {{ q.mnemonic_acronym }}</span>
+                            <span class="mnemonic-badge">{{ q.mnemonic_acronym }}</span>
                             {% else %}
                             <span style="color:#999; font-size:0.8rem">—</span>
                             {% endif %}
@@ -710,7 +710,7 @@ T - Time (how long has it lasted?)"></textarea>
                     html += `<div style="white-space:pre-line; font-size:0.9rem; margin-bottom:0.5rem;">${expansion.replace(/\n/g, '<br>')}</div>`;
                 }
                 if (context) {
-                    html += `<div style="font-style:italic; color:#666; font-size:0.85rem; border-top:1px dashed #ddd; padding-top:0.5rem;">💡 ${context}</div>`;
+                    html += `<div style="font-style:italic; color:#666; font-size:0.85rem; border-top:1px dashed #ddd; padding-top:0.5rem;">${context}</div>`;
                 }
                 previewContent.innerHTML = html;
             } else {
@@ -771,18 +771,18 @@ T - Time (how long has it lasted?)"></textarea>
                 
                 if (data.success) {
                     resultDiv.innerHTML = `<div style="color:green; padding:10px; background:#e6ffe6; border-radius:6px;">
-                        ✅ Imported ${data.imported} new, updated ${data.updated} existing questions.
+                        Imported ${data.imported} new, updated ${data.updated} existing questions.
                         ${data.errors.length > 0 ? '<br>Errors: ' + data.errors.join(', ') : ''}
                     </div>`;
                     setTimeout(() => location.reload(), 2000);
                 } else {
                     resultDiv.innerHTML = `<div style="color:red; padding:10px; background:#ffe6e6; border-radius:6px;">
-                        ❌ Error: ${data.error}
+                        Error: ${data.error}
                     </div>`;
                 }
             } catch (err) {
                 resultDiv.innerHTML = `<div style="color:red; padding:10px; background:#ffe6e6; border-radius:6px;">
-                    ❌ Import failed: ${err.message}
+                    Import failed: ${err.message}
                 </div>`;
             }
             resultDiv.style.display = 'block';
@@ -803,18 +803,18 @@ T - Time (how long has it lasted?)"></textarea>
                 
                 if (data.success) {
                     resultDiv.innerHTML = `<div style="color:green; padding:10px; background:#e6ffe6; border-radius:6px;">
-                        ✅ Imported ${data.imported} new, updated ${data.updated} existing questions.
+                        Imported ${data.imported} new, updated ${data.updated} existing questions.
                         ${data.errors.length > 0 ? '<br>Errors: ' + data.errors.join(', ') : ''}
                     </div>`;
                     setTimeout(() => location.reload(), 2000);
                 } else {
                     resultDiv.innerHTML = `<div style="color:red; padding:10px; background:#ffe6e6; border-radius:6px;">
-                        ❌ Error: ${data.error}
+                        Error: ${data.error}
                     </div>`;
                 }
             } catch (err) {
                 resultDiv.innerHTML = `<div style="color:red; padding:10px; background:#ffe6e6; border-radius:6px;">
-                    ❌ Import failed: ${err.message}
+                    Import failed: ${err.message}
                 </div>`;
             }
             resultDiv.style.display = 'block';

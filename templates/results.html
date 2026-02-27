@@ -694,7 +694,7 @@
     <div class="modal-overlay" id="questionModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>📚 Question Review</h3>
+                <h3>Question Review</h3>
                 <button class="modal-close" onclick="closeModal()">&times;</button>
             </div>
             <div class="modal-body">
@@ -703,12 +703,12 @@
                 <div class="modal-options" id="modalOptions"></div>
 
                 <div class="modal-section" id="explanationSection">
-                    <div class="modal-section-title">🎯 Explanation</div>
+                    <div class="modal-section-title">Explanation</div>
                     <div class="modal-explanation" id="modalExplanation"></div>
                 </div>
 
                 <div class="modal-section" id="mnemonicSection" style="display: none;">
-                    <div class="modal-section-title">💡 Memory Aid</div>
+                    <div class="modal-section-title">Memory Aid</div>
                     <div class="modal-mnemonic">
                         <div class="mnemonic-acronym" id="modalMnemonicAcronym"></div>
                         <div class="mnemonic-expansion" id="modalMnemonicExpansion"></div>
@@ -764,16 +764,16 @@
                         <div class="topic-fill" style="width: {{ topic.percentage }}%"></div>
                     </div>
                     <div class="topic-stats">
-                        <span class="topic-correct">{{ topic.correct }} ✓</span>
+                        <span class="topic-correct">{{ topic.correct }} correct</span>
                         <span class="topic-total">{{ topic.total }} questions</span>
                     </div>
                     <div class="topic-status">
                         {% if topic.status == 'strong' %}
-                        <span class="status-badge strong">💪 Strong</span>
+                        <span class="status-badge strong">Strong</span>
                         {% elif topic.status == 'developing' %}
-                        <span class="status-badge developing">📈 Developing</span>
+                        <span class="status-badge developing">Developing</span>
                         {% else %}
-                        <span class="status-badge needs-work">🎯 Needs Work</span>
+                        <span class="status-badge needs-work">Needs Work</span>
                         {% endif %}
                     </div>
                 </div>
@@ -783,7 +783,7 @@
             <!-- Study Recommendations -->
             {% if topic_stats and topic_stats[0].percentage < 60 %}
             <div class="recommendation-box">
-                <h4>📚 Study Recommendation</h4>
+                <h4>Study Recommendation</h4>
                 <p>You're doing great! To improve your overall score, focus on <strong>{{ topic_stats[0].category }}</strong> — it's your biggest opportunity area right now.</p>
                 <a href="/quiz?category={{ topic_stats[0].category | urlencode }}" class="btn btn-primary btn-sm">
                     Practice {{ topic_stats[0].category }} →
@@ -801,7 +801,7 @@
             <div class="answer-item" onclick="showQuestionDetail({{ loop.index0 }})"
                 data-question-id="{{ question.id }}">
                 <div class="status-icon {{ 'correct' if answer.correct else 'incorrect' }}">
-                    {{ '✓' if answer.correct else '✗' }}
+                    {{ 'Correct' if answer.correct else 'Incorrect' }}
                 </div>
                 <div class="answer-details">
                     <div class="answer-question">{{ question.question[:100] }}{% if question.question|length > 100
@@ -912,9 +912,9 @@
 
             // Set meta info
             document.getElementById('modalMeta').innerHTML = `
-                <span>📚 ${q.level}</span>
+                <span>${q.level}</span>
                 <span>📂 ${q.category}</span>
-                <span>${q.user_correct ? '✅ You got this right' : '❌ You got this wrong'}</span>
+                <span>${q.user_correct ? 'You got this right' : 'You got this wrong'}</span>
             `;
 
             // Show modal
