@@ -801,7 +801,7 @@
             <div class="answer-item" onclick="showQuestionDetail({{ loop.index0 }})"
                 data-question-id="{{ question.id }}">
                 <div class="status-icon {{ 'correct' if answer.correct else 'incorrect' }}">
-                    {{ 'Correct' if answer.correct else 'Incorrect' }}
+                    {{ '✓' if answer.correct else '✗' }}
                 </div>
                 <div class="answer-details">
                     <div class="answer-question">{{ question.question[:100] }}{% if question.question|length > 100
