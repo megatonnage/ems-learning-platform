@@ -92,37 +92,54 @@ class User(db.Model):
         }
 
     def get_topic_stats(self):
-        """Get success rates by category/topic."""
+        """Get success rates by category/topic based on total pool of questions."""
         from sqlalchemy import func
 
-        # Query all answers with their question categories
-        topic_data = (
-            db.session.query(
-                Question.category,
-                func.count(Answer.id).label("total"),
-                func.sum(func.cast(Answer.correct, db.Integer)).label("correct"),
-            )
-            .join(Question, Answer.question_id == Question.id)
-            .filter(Answer.user_id == self.id)
+        # Determine level filter (matching quiz page logic)
+        if self.level == "PARAMEDIC":
+            level_filter = ["EMT", "AEMT", "PARAMEDIC"]
+        elif self.level == "AEMT":
+            level_filter = ["EMT", "AEMT"]
+        else:  # EMT
+            level_filter = ["EMT"]
+
+        # 1. Get total questions per category for the user's level
+        category_totals = (
+            db.session.query(Question.category, func.count(Question.id))
+            .filter(Question.level.in_(level_filter))
             .group_by(Question.category)
             .all()
         )
+        total_map = {cat: count for cat, count in category_totals if cat}
 
-        # Calculate percentages and format
+        # 2. Get unique questions correctly answered by the user for the user's level
+        correct_data = (
+            db.session.query(Question.category, func.count(func.distinct(Question.id)))
+            .join(Answer, Answer.question_id == Question.id)
+            .filter(Answer.user_id == self.id)
+            .filter(Answer.correct == True)
+            .filter(Question.level.in_(level_filter))
+            .group_by(Question.category)
+            .all()
+        )
+        correct_map = {cat: count for cat, count in correct_data if cat}
+
+        # 3. Combine and format
         topic_stats = []
-        for category, total, correct in topic_data:
-            if category and total > 0:
-                percentage = round((correct / total) * 100, 1)
-                topic_stats.append({
-                    "category": category,
-                    "total": total,
-                    "correct": correct,
-                    "incorrect": total - correct,
-                    "percentage": percentage,
-                    "status": self._get_performance_status(percentage),
-                })
+        for category, total in total_map.items():
+            correct = correct_map.get(category, 0)
+            percentage = round((correct / total) * 100, 1) if total > 0 else 0
+            
+            topic_stats.append({
+                "category": category,
+                "total": total,
+                "correct": correct,
+                "incorrect": total - correct,
+                "percentage": percentage,
+                "status": self._get_performance_status(percentage),
+            })
 
-        # Sort by percentage (lowest first - areas needing improvement)
+        # Sort by percentage (lowest first - focus areas)
         topic_stats.sort(key=lambda x: x["percentage"])
         return topic_stats
 

@@ -671,7 +671,12 @@
         <a href="/dashboard" class="nav-brand">
             SNHD LEARNING PLATFORM
         </a>
-        <div class="nav-links">
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <div class="nav-links" id="navLinks">
             <a href="/dashboard" class="btn btn-secondary nav-btn">
                 HOME
             </a>
@@ -752,7 +757,7 @@
         <div class="topic-section">
             <h2>PERFORMANCE BY TOPIC</h2>
             <p class="topic-subtitle">See which areas you've mastered and which need more practice</p>
-            
+
             <div class="topic-grid">
                 {% for topic in topic_stats %}
                 <div class="topic-card {{ topic.status }}">
@@ -779,44 +784,43 @@
                 </div>
                 {% endfor %}
             </div>
-            
+
             <!-- Study Recommendations -->
-            {% if topic_stats and topic_stats[0].percentage < 60 %}
-            <div class="recommendation-box">
+            {% if topic_stats and topic_stats[0].percentage < 60 %} <div class="recommendation-box">
                 <h4>Study Recommendation</h4>
-                <p>You're doing great! To improve your overall score, focus on <strong>{{ topic_stats[0].category }}</strong> — it's your biggest opportunity area right now.</p>
+                <p>You're doing great! To improve your overall score, focus on <strong>{{ topic_stats[0].category
+                        }}</strong> — it's your biggest opportunity area right now.</p>
                 <a href="/quiz?category={{ topic_stats[0].category | urlencode }}" class="btn btn-primary btn-sm">
                     Practice {{ topic_stats[0].category }} →
                 </a>
-            </div>
-            {% endif %}
         </div>
         {% endif %}
+    </div>
+    {% endif %}
 
-        <!-- History -->
-        <div class="history-section">
-            <h2>RECENT ANSWERS</h2>
-            {% if recent %}
-            {% for answer, question in recent %}
-            <div class="answer-item" onclick="showQuestionDetail({{ loop.index0 }})"
-                data-question-id="{{ question.id }}">
-                <div class="status-icon {{ 'correct' if answer.correct else 'incorrect' }}">
-                    {{ '✓' if answer.correct else '✗' }}
-                </div>
-                <div class="answer-details">
-                    <div class="answer-question">{{ question.question[:100] }}{% if question.question|length > 100
-                        %}...{% endif %}</div>
-                    <div class="answer-meta">
-                        {{ question.level }} • {{ question.category }} • {{ answer.timestamp.strftime('%Y-%m-%d %H:%M')
-                        }}
-                    </div>
-                </div>
-                <span class="view-details">View →</span>
+    <!-- History -->
+    <div class="history-section">
+        <h2>RECENT ANSWERS</h2>
+        {% if recent %}
+        {% for answer, question in recent %}
+        <div class="answer-item" onclick="showQuestionDetail({{ loop.index0 }})" data-question-id="{{ question.id }}">
+            <div class="status-icon {{ 'correct' if answer.correct else 'incorrect' }}">
+                {{ '✓' if answer.correct else '✗' }}
             </div>
-            {% endfor %}
+            <div class="answer-details">
+                <div class="answer-question">{{ question.question[:100] }}{% if question.question|length > 100
+                    %}...{% endif %}</div>
+                <div class="answer-meta">
+                    {{ question.level }} • {{ question.category }} • {{ answer.timestamp.strftime('%Y-%m-%d %H:%M')
+                    }}
+                </div>
+            </div>
+            <span class="view-details">View →</span>
+        </div>
+        {% endfor %}
 
-            <!-- Question data for JavaScript -->
-            <script id="questionsData" type="application/json">
+        <!-- Question data for JavaScript -->
+        <script id="questionsData" type="application/json">
                 [
                     {% for answer, question in recent %}
                     {
@@ -836,38 +840,38 @@
                 ]
                 </script>
 
-            <!-- Pagination -->
-            {% if total_pages > 1 %}
-            <div class="pagination">
-                <a href="{{ url_for('results', page=page-1) }}"
-                    class="pagination-btn {{ 'disabled' if page <= 1 else '' }}">
-                    PREVIOUS
-                </a>
-                <span class="pagination-info">
-                    Page <span class="pagination-current">{{ page }}</span> of {{ total_pages }}
-                </span>
-                <a href="{{ url_for('results', page=page+1) }}"
-                    class="pagination-btn {{ 'disabled' if page >= total_pages else '' }}">
-                    NEXT
-                </a>
-            </div>
-            {% endif %}
-            {% else %}
-            <div class="empty-state">
-                <span class="empty-state-icon"></span>
-                <h3>No answers yet</h3>
-                <p>Take a quiz to see your results and track your progress!</p>
-                <a href="/quiz" class="btn btn-primary">Start Your First Quiz →</a>
-            </div>
-            {% endif %}
-        </div>
-
-        <!-- Action Bar -->
-        {% if recent %}
-        <div class="action-bar">
-            <a href="/quiz" class="btn btn-primary">Take Another Quiz →</a>
+        <!-- Pagination -->
+        {% if total_pages > 1 %}
+        <div class="pagination">
+            <a href="{{ url_for('results', page=page-1) }}"
+                class="pagination-btn {{ 'disabled' if page <= 1 else '' }}">
+                PREVIOUS
+            </a>
+            <span class="pagination-info">
+                Page <span class="pagination-current">{{ page }}</span> of {{ total_pages }}
+            </span>
+            <a href="{{ url_for('results', page=page+1) }}"
+                class="pagination-btn {{ 'disabled' if page >= total_pages else '' }}">
+                NEXT
+            </a>
         </div>
         {% endif %}
+        {% else %}
+        <div class="empty-state">
+            <span class="empty-state-icon"></span>
+            <h3>No answers yet</h3>
+            <p>Take a quiz to see your results and track your progress!</p>
+            <a href="/quiz" class="btn btn-primary">Start Your First Quiz →</a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Action Bar -->
+    {% if recent %}
+    <div class="action-bar">
+        <a href="/quiz" class="btn btn-primary">Take Another Quiz →</a>
+    </div>
+    {% endif %}
     </div>
 
     <script>
@@ -947,6 +951,31 @@
             });
             if (res.ok) window.location.reload();
         });
+
+        // Mobile Menu Toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const navLinks = document.getElementById('navLinks');
+
+        if (menuToggle && navLinks) {
+            menuToggle.addEventListener('click', function () {
+                menuToggle.classList.toggle('active');
+                navLinks.classList.toggle('active');
+
+                if (navLinks.classList.contains('active')) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = '';
+                }
+            });
+
+            document.addEventListener('click', function (e) {
+                if (!menuToggle.contains(e.target) && !navLinks.contains(e.target) && navLinks.classList.contains('active')) {
+                    menuToggle.classList.remove('active');
+                    navLinks.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
+        }
     </script>
 </body>
 

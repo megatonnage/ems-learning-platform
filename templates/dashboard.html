@@ -234,7 +234,12 @@
         <a href="/dashboard" class="nav-brand">
             SNHD LEARNING PLATFORM
         </a>
-        <div class="nav-links">
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <div class="nav-links" id="navLinks">
             <a href="/dashboard" class="btn btn-secondary nav-btn active">
                 HOME
             </a>
@@ -331,6 +336,31 @@
                 body: JSON.stringify({ level })
             });
             if (res.ok) window.location.reload();
+        });
+
+        // Mobile Menu Toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const navLinks = document.getElementById('navLinks');
+
+        menuToggle.addEventListener('click', function () {
+            menuToggle.classList.toggle('active');
+            navLinks.classList.toggle('active');
+
+            // Prevent scrolling when menu is open
+            if (navLinks.classList.contains('active')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = '';
+            }
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', function (e) {
+            if (!menuToggle.contains(e.target) && !navLinks.contains(e.target) && navLinks.classList.contains('active')) {
+                menuToggle.classList.remove('active');
+                navLinks.classList.remove('active');
+                document.body.style.overflow = '';
+            }
         });
     </script>
 </body>
