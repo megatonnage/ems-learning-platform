@@ -4320,13 +4320,25 @@ def view_protocol(filename):
         if '..' in filename or filename.startswith('/'):
             abort(404)
 
-        filepath = os.path.join(app.static_folder, 'protocols', filename)
+        # Try multiple possible paths for Vercel
+        possible_paths = [
+            os.path.join(app.static_folder, 'protocols', filename),
+            os.path.join(os.path.dirname(__file__), 'static', 'protocols', filename),
+            os.path.join('/var/task', 'static', 'protocols', filename),
+        ]
 
-        app.logger.info(f"Looking for protocol file at: {filepath}")
+        filepath = None
+        for path in possible_paths:
+            app.logger.info(f"Checking path: {path}")
+            if os.path.exists(path):
+                filepath = path
+                break
 
-        if not os.path.exists(filepath):
-            app.logger.error(f"Protocol file not found: {filepath}")
+        if not filepath:
+            app.logger.error(f"Protocol file not found in any location. Tried: {possible_paths}")
             return jsonify({"error": f"Protocol file not found: {filename}"}), 404
+
+        app.logger.info(f"Found protocol file at: {filepath}")
 
         # Read markdown content
         with open(filepath, 'r', encoding='utf-8') as f:
@@ -4349,8 +4361,10 @@ def view_protocol(filename):
             title="SNHD Protocols"
         )
     except Exception as e:
+        import traceback
         app.logger.error(f"Error in view_protocol: {str(e)}")
-        return jsonify({"error": str(e)}), 500
+        app.logger.error(traceback.format_exc())
+        return jsonify({"error": str(e), "traceback": traceback.format_exc()}), 500
 
 
 # ==================== MAIN ====================
