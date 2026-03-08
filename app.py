@@ -4311,39 +4311,46 @@ def view_protocol(filename):
     import markdown
     from markdown.extensions.toc import TocExtension
 
-    # Security: Only allow .md files from protocols directory
-    if not filename.endswith('.md'):
-        abort(404)
+    try:
+        # Security: Only allow .md files from protocols directory
+        if not filename.endswith('.md'):
+            abort(404)
 
-    # Prevent directory traversal
-    if '..' in filename or filename.startswith('/'):
-        abort(404)
+        # Prevent directory traversal
+        if '..' in filename or filename.startswith('/'):
+            abort(404)
 
-    filepath = os.path.join(app.static_folder, 'protocols', filename)
+        filepath = os.path.join(app.static_folder, 'protocols', filename)
 
-    if not os.path.exists(filepath):
-        abort(404)
+        app.logger.info(f"Looking for protocol file at: {filepath}")
 
-    # Read markdown content
-    with open(filepath, 'r', encoding='utf-8') as f:
-        content = f.read()
+        if not os.path.exists(filepath):
+            app.logger.error(f"Protocol file not found: {filepath}")
+            return jsonify({"error": f"Protocol file not found: {filename}"}), 404
 
-    # Convert to HTML with TOC extension for anchors
-    md = markdown.Markdown(extensions=[TocExtension(baselevel=1)])
-    html_content = md.convert(content)
-    toc = md.toc
+        # Read markdown content
+        with open(filepath, 'r', encoding='utf-8') as f:
+            content = f.read()
 
-    # Get anchor from query string
-    anchor = request.args.get('section', '')
+        # Convert to HTML with TOC extension for anchors
+        md = markdown.Markdown(extensions=[TocExtension(baselevel=1)])
+        html_content = md.convert(content)
+        toc = md.toc
 
-    return render_template(
-        'protocol_viewer.html',
-        content=html_content,
-        toc=toc,
-        filename=filename,
-        anchor=anchor,
-        title="SNHD Protocols"
-    )
+        # Get anchor from query string
+        anchor = request.args.get('section', '')
+
+        return render_template(
+            'protocol_viewer.html',
+            content=html_content,
+            toc=toc,
+            filename=filename,
+            anchor=anchor,
+            title="SNHD Protocols"
+        )
+    except Exception as e:
+        app.logger.error(f"Error in view_protocol: {str(e)}")
+        return jsonify({"error": str(e)}), 500
 
 
 # ==================== MAIN ====================
