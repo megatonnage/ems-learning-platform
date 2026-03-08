@@ -13,6 +13,7 @@ dependencies = [
     "gunicorn==21.2.0",
     "psycopg2-binary==2.9.9",
     "Werkzeug>=2.3.0",
+    "markdown==3.5.1",
 ]
 
 [tool.setuptools]
