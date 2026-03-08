@@ -436,6 +436,9 @@
                         <td>
                             <button class="btn btn-secondary" style="padding:5px 10px; font-size:0.8rem"
                                 onclick='openModal("edit", {{ q.id }}, {{ q.to_dict_with_mnemonic() | tojson }})'>Edit</button>
+                            {% if q.protocol_link %}
+                            <a href="/protocols/{{ q.protocol_link }}" target="_blank" class="btn btn-secondary" style="padding:5px 10px; font-size:0.8rem; text-decoration:none;">📖 Protocol</a>
+                            {% endif %}
                             <button class="btn btn-danger" style="padding:5px 10px; font-size:0.8rem"
                                 onclick="deleteQuestion({{ q.id }})">Delete</button>
                         </td>
@@ -500,6 +503,12 @@
                 <div class="form-row">
                     <label>Source/Reference</label>
                     <input type="text" id="qSource" name="source" placeholder="e.g., SNHD Protocols - Section X">
+                </div>
+
+                <div class="form-row">
+                    <label>Protocol Link</label>
+                    <input type="text" id="qProtocolLink" name="protocol_link" placeholder="e.g., snhd-protocols.md#cardiac-arrest-non-traumatic">
+                    <small style="color:#666; font-size:0.85rem;">Link to protocol section (optional). Format: filename.md#anchor</small>
                 </div>
 
                 <!-- Mnemonic Section -->
@@ -581,6 +590,7 @@ T - Time (how long has it lasted?)"></textarea>
                 document.getElementById('qText').value = data.question;
                 document.getElementById('qExplanation').value = data.explanation;
                 document.getElementById('qSource').value = data.source;
+                document.getElementById('qProtocolLink').value = data.protocol_link || '';
                 
                 // Populate mnemonic fields
                 if (data.mnemonic) {
@@ -605,6 +615,7 @@ T - Time (how long has it lasted?)"></textarea>
                 document.getElementById('mnemonicAcronym').value = '';
                 document.getElementById('mnemonicExpansion').value = '';
                 document.getElementById('mnemonicTeachingContext').value = '';
+                document.getElementById('qProtocolLink').value = '';
                 toggleMnemonicFields();
             }
 
@@ -633,7 +644,8 @@ T - Time (how long has it lasted?)"></textarea>
             formBody.append('correct_answer', formData.get('correct_answer'));
             formBody.append('explanation', formData.get('explanation'));
             formBody.append('source', formData.get('source'));
-            
+            formBody.append('protocol_link', formData.get('protocol_link') || '');
+
             // Mnemonic fields
             if (formData.get('mnemonic_enabled') === 'on') {
                 formBody.append('mnemonic_enabled', 'on');

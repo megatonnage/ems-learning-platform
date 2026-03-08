@@ -720,6 +720,14 @@
                     </div>
                 </div>
 
+                <div class="modal-section" id="protocolSection" style="display: none;">
+                    <div class="modal-section-title">Protocol Reference</div>
+                    <a href="#" id="modalProtocolLink" target="_blank" class="protocol-link"
+                        style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 6px; color: #0369a1; text-decoration: none; font-size: 0.95rem; font-weight: 500; transition: all 0.2s;">
+                        📖 View Full Protocol
+                    </a>
+                </div>
+
                 <div class="modal-meta" id="modalMeta"></div>
             </div>
         </div>
@@ -832,6 +840,7 @@
                         "mnemonic_enabled": {{ question.mnemonic_enabled | tojson }},
                         "mnemonic_acronym": {{ question.mnemonic_acronym | tojson }},
                         "mnemonic_expansion": {{ question.mnemonic_expansion | tojson }},
+                        "protocol_link": {{ question.protocol_link | tojson }},
                         "level": {{ question.level | tojson }},
                         "category": {{ question.category | tojson }},
                         "user_correct": {{ answer.correct | tojson }}
@@ -912,6 +921,15 @@
                 document.getElementById('modalMnemonicExpansion').textContent = q.mnemonic_expansion || '';
             } else {
                 mnemonicSection.style.display = 'none';
+            }
+
+            // Handle protocol link
+            const protocolSection = document.getElementById('protocolSection');
+            if (q.protocol_link) {
+                protocolSection.style.display = 'block';
+                document.getElementById('modalProtocolLink').href = '/protocols/' + q.protocol_link;
+            } else {
+                protocolSection.style.display = 'none';
             }
 
             // Set meta info

@@ -1,11 +1,14 @@
 import json
 import os
 import random
+import re
 from datetime import datetime
 from functools import wraps
 
-from flask import Flask, jsonify, redirect, render_template, request, session, url_for
+import markdown
+from flask import Flask, abort, jsonify, redirect, render_template, request, session, url_for
 from flask_sqlalchemy import SQLAlchemy
+from markdown.extensions.toc import TocExtension
 from werkzeug.security import check_password_hash, generate_password_hash
 
 app = Flask(__name__)
@@ -169,6 +172,7 @@ class Question(db.Model):
     mnemonic_acronym = db.Column(db.String(20))  # e.g., "OPQRST"
     mnemonic_expansion = db.Column(db.Text)  # Full expansion
     mnemonic_teaching_context = db.Column(db.Text)  # Why this applies
+    protocol_link = db.Column(db.String(500), nullable=True)  # e.g., "snhd-protocols.md#cardiac-arrest-non-traumatic"
 
     def get_options(self):
         return json.loads(self.options)
@@ -184,6 +188,7 @@ class Question(db.Model):
             "correct_answer": self.correct_answer,
             "explanation": self.explanation,
             "source": self.source,
+            "protocol_link": self.protocol_link,
         }
 
     def to_dict_with_mnemonic(self):
@@ -3650,6 +3655,7 @@ def admin_create_question():
             mnemonic_acronym=request.form.get("mnemonic_acronym", ""),
             mnemonic_expansion=request.form.get("mnemonic_expansion", ""),
             mnemonic_teaching_context=request.form.get("mnemonic_teaching_context", ""),
+            protocol_link=request.form.get("protocol_link", "").strip() or None,
         )
         db.session.add(question)
         db.session.commit()
@@ -3683,6 +3689,7 @@ def admin_update_question(question_id):
         question.mnemonic_acronym = request.form.get("mnemonic_acronym", "")
         question.mnemonic_expansion = request.form.get("mnemonic_expansion", "")
         question.mnemonic_teaching_context = request.form.get("mnemonic_teaching_context", "")
+        question.protocol_link = request.form.get("protocol_link", "").strip() or None
         db.session.commit()
         return jsonify({"success": True, "message": "Question updated successfully"})
     except Exception as e:
@@ -4186,6 +4193,46 @@ def list_questions_with_mnemonics():
     """Admin: List all questions with their mnemonic data"""
     questions = Question.query.all()
     return jsonify({"success": True, "questions": [q.to_dict_with_mnemonic() for q in questions]})
+
+
+# ==================== PROTOCOL VIEWER ====================
+
+@app.route("/protocols/<path:filename>")
+def view_protocol(filename):
+    """View SNHD protocols with anchor navigation"""
+    # Security: Only allow .md files from protocols directory
+    if not filename.endswith('.md'):
+        abort(404)
+
+    # Prevent directory traversal
+    if '..' in filename or filename.startswith('/'):
+        abort(404)
+
+    filepath = os.path.join(app.static_folder, 'protocols', filename)
+
+    if not os.path.exists(filepath):
+        abort(404)
+
+    # Read markdown content
+    with open(filepath, 'r', encoding='utf-8') as f:
+        content = f.read()
+
+    # Convert to HTML with TOC extension for anchors
+    md = markdown.Markdown(extensions=[TocExtension(baselevel=1)])
+    html_content = md.convert(content)
+    toc = md.toc
+
+    # Get anchor from query string
+    anchor = request.args.get('section', '')
+
+    return render_template(
+        'protocol_viewer.html',
+        content=html_content,
+        toc=toc,
+        filename=filename,
+        anchor=anchor,
+        title="SNHD Protocols"
+    )
 
 
 # ==================== MAIN ====================
