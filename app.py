@@ -4250,3 +4250,14 @@ if os.environ.get("VERCEL"):
         db.create_all()
         if Question.query.count() == 0:
             init_sample_questions()
+        # Run migrations for protocol_link column
+        try:
+            from sqlalchemy import text, inspect
+            inspector = inspect(db.engine)
+            columns = [col["name"] for col in inspector.get_columns("question")]
+            if "protocol_link" not in columns:
+                db.session.execute(text("ALTER TABLE question ADD COLUMN protocol_link VARCHAR(500)"))
+                db.session.commit()
+                print("✓ Added protocol_link column to question table")
+        except Exception as e:
+            print(f"Migration warning: {e}")
