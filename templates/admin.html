@@ -382,6 +382,7 @@
             </div>
             <button class="btn btn-primary" onclick="openModal('add')">+ Add Question</button>
             <button class="btn btn-secondary" onclick="toggleBulkOps()">📁 Bulk Import/Export</button>
+            <button class="btn btn-secondary" onclick="generateProtocolLinks()">🔗 Generate Protocol Links</button>
         </div>
 
         <div class="controls" id="bulkOps" style="display:none; background:#f8f9fa;">
@@ -766,6 +767,27 @@ T - Time (how long has it lasted?)"></textarea>
         function toggleBulkOps() {
             const bulkOps = document.getElementById('bulkOps');
             bulkOps.style.display = bulkOps.style.display === 'none' ? 'flex' : 'none';
+        }
+
+        // Generate protocol links
+        async function generateProtocolLinks() {
+            if (!confirm('This will auto-generate protocol links for all questions without links. Continue?')) return;
+            
+            try {
+                const response = await fetch('/admin/generate-protocol-links', {
+                    method: 'POST'
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert('Error: ' + (data.error || 'Unknown error'));
+                }
+            } catch (err) {
+                alert('Failed to generate links: ' + err.message);
+            }
         }
 
         // Import JSON

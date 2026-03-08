@@ -4193,6 +4193,116 @@ def list_questions_with_mnemonics():
     return jsonify({"success": True, "questions": [q.to_dict_with_mnemonic() for q in questions]})
 
 
+# Protocol section mapping for link generation
+PROTOCOL_SECTIONS = {
+    "cardiac arrest": "cardiac-arrest-non-traumatic",
+    "cpr": "cardiac-arrest-non-traumatic",
+    "chest pain": "chest-pain-non-traumatic-and-suspected-acute-coronary-syndrome",
+    "acs": "chest-pain-non-traumatic-and-suspected-acute-coronary-syndrome",
+    "mi": "chest-pain-non-traumatic-and-suspected-acute-coronary-syndrome",
+    "stemi": "stemi-suspected",
+    "stroke": "stroke-cva",
+    "cva": "stroke-cva",
+    "seizure": "seizure",
+    "respiratory": "respiratory-distress",
+    "breathing": "respiratory-distress",
+    "asthma": "respiratory-distress",
+    "copd": "respiratory-distress",
+    "shock": "shock",
+    "allergic": "allergic-reaction",
+    "anaphylaxis": "allergic-reaction",
+    "behavioral": "behavioral-emergencies",
+    "psych": "behavioral-emergencies",
+    "mental": "behavioral-emergencies",
+    "diabetic": "altered-mental-status-syncope",
+    "hypoglycemia": "altered-mental-status-syncope",
+    "ams": "altered-mental-status-syncope",
+    "syncope": "altered-mental-status-syncope",
+    "overdose": "overdose-poisoning",
+    "poisoning": "overdose-poisoning",
+    "pain": "pain-management",
+    "burn": "burns",
+    "trauma": "general-adult-trauma-assessment",
+    "bleeding": "hemorrhage-control",
+    "hemorrhage": "hemorrhage-control",
+    "ob": "ob-obstetric-emergency",
+    "obstetric": "ob-obstetric-emergency",
+    "labor": "ob-uncomplicated-childbirth-labor",
+    "delivery": "ob-uncomplicated-childbirth-labor",
+    "preeclampsia": "ob-preeclampsia-eclampsia",
+    "eclampsia": "ob-preeclampsia-eclampsia",
+    "sepsis": "sepsis",
+    "bradycardia": "bradycardia",
+    "tachycardia": "tachycardia-stable",
+    "hyperkalemia": "hyperkalemia-suspected",
+    "heat": "heat-related-illness",
+    "cold": "cold-related-illness",
+    "hypothermia": "cold-related-illness",
+    "smoke": "smoke-inhalation",
+    "inhalation": "smoke-inhalation",
+    "abdominal": "abdominal-pain-flank-pain-nausea-vomiting",
+    "nausea": "abdominal-pain-flank-pain-nausea-vomiting",
+    "vomiting": "abdominal-pain-flank-pain-nausea-vomiting",
+    "chf": "pulmonary-edema-chf",
+    "pulmonary edema": "pulmonary-edema-chf",
+    "epistaxis": "epistaxis",
+    "nosebleed": "epistaxis",
+    "pediatric arrest": "pediatric-cardiac-arrest-non-traumatic",
+    "peds arrest": "pediatric-cardiac-arrest-non-traumatic",
+    "pediatric respiratory": "pediatric-respiratory-distress",
+    "peds respiratory": "pediatric-respiratory-distress",
+    "pediatric shock": "pediatric-shock",
+    "peds shock": "pediatric-shock",
+    "pediatric seizure": "pediatric-seizure",
+    "peds seizure": "pediatric-seizure",
+    "neonatal": "neonatal-resuscitation",
+    "newborn": "neonatal-resuscitation",
+    "intubation": "endotracheal-intubation",
+    "airway": "endotracheal-intubation",
+    "cricothyroidotomy": "needle-cricothyroidotomy",
+    "surgical airway": "needle-cricothyroidotomy",
+    "chest decompression": "needle-thoracostomy",
+    "needle decompression": "needle-thoracostomy",
+    "thoracostomy": "needle-thoracostomy",
+    "pneumothorax": "needle-thoracostomy",
+    "io": "vascular-access",
+    "iv": "vascular-access",
+    "vascular access": "vascular-access",
+    "defibrillation": "electrical-therapy-defibrillation",
+    "cardioversion": "electrical-therapy-synchronized-cardioversion",
+    "pacing": "electrical-therapy-transcutaneous-pacing",
+    "tcp": "electrical-therapy-transcutaneous-pacing",
+}
+
+
+def find_protocol_link(question):
+    """Find best matching protocol link for a question"""
+    text = f"{question.category} {question.subcategory or ''} {question.question} {question.explanation or ''}".lower()
+    for keyword, anchor in PROTOCOL_SECTIONS.items():
+        if keyword in text:
+            return f"snhd-protocols.md#{anchor}"
+    # Fallback: try to match category directly
+    category_slug = question.category.lower().replace(' ', '-').replace('/', '-')
+    return f"snhd-protocols.md#{category_slug}"
+
+
+@app.route("/admin/generate-protocol-links", methods=["POST"])
+@admin_required
+def admin_generate_protocol_links():
+    """Admin: Auto-generate protocol links for all questions without links"""
+    try:
+        questions = Question.query.all()
+        updated = 0
+        for q in questions:
+            if not q.protocol_link:
+                q.protocol_link = find_protocol_link(q)
+                updated += 1
+        db.session.commit()
+        return jsonify({"success": True, "message": f"Updated {updated} questions with protocol links"})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
 # ==================== PROTOCOL VIEWER ====================
 
 @app.route("/protocols/<path:filename>")
