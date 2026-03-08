@@ -4305,6 +4305,41 @@ def admin_generate_protocol_links():
 
 # ==================== PROTOCOL VIEWER ====================
 
+@app.route("/debug/protocols")
+def debug_protocols():
+    """Debug endpoint to check protocol file locations"""
+    import os
+    results = {
+        "static_folder": app.static_folder,
+        "cwd": os.getcwd(),
+        "__file__": __file__,
+        "paths_checked": [],
+    }
+    
+    # Check various paths
+    paths_to_check = [
+        app.static_folder,
+        os.path.join(app.static_folder, 'protocols'),
+        os.path.join(os.path.dirname(__file__), 'static', 'protocols'),
+        '/var/task/static/protocols',
+        '/var/task',
+        os.getcwd(),
+    ]
+    
+    for path in paths_to_check:
+        exists = os.path.exists(path)
+        is_dir = os.path.isdir(path) if exists else False
+        contents = os.listdir(path) if is_dir else None
+        results["paths_checked"].append({
+            "path": path,
+            "exists": exists,
+            "is_dir": is_dir,
+            "contents": contents[:20] if contents else None  # Limit contents
+        })
+    
+    return jsonify(results)
+
+
 @app.route("/protocols/<path:filename>")
 def view_protocol(filename):
     """View SNHD protocols with anchor navigation"""
