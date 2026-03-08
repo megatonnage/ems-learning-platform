@@ -4355,6 +4355,24 @@ def debug_protocols():
             "traceback": traceback.format_exc()
         }
     
+    # Try markdown conversion
+    try:
+        import markdown
+        from markdown.extensions.toc import TocExtension
+        md = markdown.Markdown(extensions=[TocExtension(baselevel=1)])
+        html_content = md.convert("# Test\n\nThis is a test.")
+        results["markdown_test"] = {
+            "success": True,
+            "html_output": html_content[:200],
+            "toc": md.toc[:200] if md.toc else None
+        }
+    except Exception as e:
+        results["markdown_test"] = {
+            "success": False,
+            "error": str(e),
+            "traceback": traceback.format_exc()
+        }
+    
     return jsonify(results)
 
 
