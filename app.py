@@ -5,10 +5,8 @@ import re
 from datetime import datetime
 from functools import wraps
 
-import markdown
 from flask import Flask, abort, jsonify, redirect, render_template, request, session, url_for
 from flask_sqlalchemy import SQLAlchemy
-from markdown.extensions.toc import TocExtension
 from werkzeug.security import check_password_hash, generate_password_hash
 
 app = Flask(__name__)
@@ -4200,6 +4198,9 @@ def list_questions_with_mnemonics():
 @app.route("/protocols/<path:filename>")
 def view_protocol(filename):
     """View SNHD protocols with anchor navigation"""
+    import markdown
+    from markdown.extensions.toc import TocExtension
+
     # Security: Only allow .md files from protocols directory
     if not filename.endswith('.md'):
         abort(404)
