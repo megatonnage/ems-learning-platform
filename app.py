@@ -4309,11 +4309,13 @@ def admin_generate_protocol_links():
 def debug_protocols():
     """Debug endpoint to check protocol file locations"""
     import os
+    import traceback
     results = {
         "static_folder": app.static_folder,
         "cwd": os.getcwd(),
         "__file__": __file__,
         "paths_checked": [],
+        "file_read_test": None,
     }
     
     # Check various paths
@@ -4336,6 +4338,22 @@ def debug_protocols():
             "is_dir": is_dir,
             "contents": contents[:20] if contents else None  # Limit contents
         })
+    
+    # Try to actually read the file
+    try:
+        filepath = '/var/task/static/protocols/snhd-protocols.md'
+        with open(filepath, 'r', encoding='utf-8') as f:
+            content = f.read(500)  # Read first 500 chars
+        results["file_read_test"] = {
+            "success": True,
+            "first_500_chars": content[:500]
+        }
+    except Exception as e:
+        results["file_read_test"] = {
+            "success": False,
+            "error": str(e),
+            "traceback": traceback.format_exc()
+        }
     
     return jsonify(results)
 
